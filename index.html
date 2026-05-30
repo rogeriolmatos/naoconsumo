@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#040b22">
+<title>Temporizador de Não Consumo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#030a1f;
+    --bg-1:#061233;
+    --ink:#eaf2ff;
+    --ink-dim:#9fb4dd;
+    --ink-faint:#5d72a0;
+    /* luminous blues */
+    --blue-cyan:#3ee0ff;
+    --blue-sky:#4aa8ff;
+    --blue-deep:#6b8bff;
+    --glass:rgba(120,170,255,0.07);
+    --glass-line:rgba(140,190,255,0.16);
+    --radius:26px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    font-family:'Sora',system-ui,sans-serif;
+    background:var(--bg-0);
+    color:var(--ink);
+    min-height:100dvh;
+    overflow-x:hidden;
+    position:relative;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* glowing atmosphere */
+  .aura{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+  .aura::before,.aura::after{
+    content:"";position:absolute;border-radius:50%;filter:blur(70px);opacity:.55;
+  }
+  .aura::before{
+    width:75vw;height:75vw;left:-25vw;top:-18vh;
+    background:radial-gradient(circle, #1b6dff 0%, rgba(27,109,255,0) 70%);
+    animation:drift1 16s ease-in-out infinite alternate;
+  }
+  .aura::after{
+    width:80vw;height:80vw;right:-30vw;bottom:-12vh;
+    background:radial-gradient(circle, #19c6ff 0%, rgba(25,198,255,0) 70%);
+    animation:drift2 19s ease-in-out infinite alternate;
+  }
+  @keyframes drift1{to{transform:translate(8vw,6vh) scale(1.12);}}
+  @keyframes drift2{to{transform:translate(-7vw,-5vh) scale(1.15);}}
+  .grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.4;
+    background:linear-gradient(180deg, rgba(3,10,31,.2), rgba(3,10,31,.85));}
+
+  .wrap{
+    position:relative;z-index:2;
+    max-width:460px;margin:0 auto;
+    padding:calc(env(safe-area-inset-top) + 22px) 18px calc(env(safe-area-inset-bottom) + 26px);
+    display:flex;flex-direction:column;gap:18px;min-height:100dvh;
+  }
+
+  /* header */
+  .top{display:flex;flex-direction:column;gap:14px;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand .dot{width:9px;height:9px;border-radius:50%;
+    background:var(--blue-cyan);box-shadow:0 0 14px var(--blue-cyan);
+    animation:pulse 2.4s ease-in-out infinite;}
+  @keyframes pulse{50%{opacity:.35;transform:scale(.7);}}
+  .brand .kicker{font-size:11.5px;letter-spacing:.32em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;}
+
+  .cheer{
+    border-radius:var(--radius);
+    background:linear-gradient(135deg, rgba(62,224,255,.16), rgba(107,139,255,.10));
+    border:1px solid var(--glass-line);
+    padding:18px 20px;
+    box-shadow:0 0 40px rgba(40,130,255,.12) inset, 0 8px 30px rgba(0,0,0,.3);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  }
+  .cheer .hi{font-size:13px;color:var(--blue-cyan);font-weight:700;letter-spacing:.14em;text-transform:uppercase;}
+  .cheer .msg{margin-top:6px;font-size:16.5px;line-height:1.45;color:var(--ink);font-weight:400;}
+  .cheer .msg b{font-weight:700;color:#fff;}
+
+  /* cards */
+  .cards{display:flex;flex-direction:column;gap:18px;flex:1;}
+  .card{
+    position:relative;
+    border-radius:var(--radius);
+    background:var(--glass);
+    border:1px solid var(--glass-line);
+    padding:22px 22px 20px;
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    box-shadow:0 10px 40px rgba(0,0,0,.35);
+    overflow:hidden;
+  }
+  .card::before{
+    content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;
+    background:linear-gradient(140deg, var(--c1), transparent 45%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;opacity:.7;pointer-events:none;
+  }
+  .card .halo{position:absolute;width:160px;height:160px;border-radius:50%;
+    top:-70px;right:-50px;filter:blur(36px);opacity:.5;background:var(--c1);}
+
+  .c-head{display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;}
+  .c-title{display:flex;align-items:center;gap:11px;}
+  .c-ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;
+    background:rgba(255,255,255,.06);border:1px solid var(--glass-line);font-size:18px;}
+  .c-name{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-dim);font-weight:600;line-height:1.2;}
+  .c-since{font-size:11px;color:var(--ink-faint);margin-top:2px;letter-spacing:.04em;}
+  .badge{font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--c1);padding:6px 11px;border-radius:999px;background:rgba(255,255,255,.04);
+    border:1px solid var(--glass-line);white-space:nowrap;}
+
+  .hero{display:flex;align-items:baseline;gap:10px;margin:18px 0 4px;position:relative;}
+  .hero .big{font-size:64px;font-weight:800;line-height:.9;letter-spacing:-.02em;
+    color:#fff;font-variant-numeric:tabular-nums;
+    text-shadow:0 0 26px var(--c1);}
+  .hero .unit{font-size:15px;color:var(--ink-dim);font-weight:500;letter-spacing:.02em;}
+
+  .units{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:16px;position:relative;}
+  .u{
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(140,190,255,.10);
+    border-radius:14px;padding:11px 4px 9px;text-align:center;
+  }
+  .u .v{font-size:21px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;line-height:1;
+    display:inline-block;}
+  .u .l{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin-top:6px;font-weight:600;}
+  .u .v.tick{animation:tick .5s cubic-bezier(.2,.9,.3,1.2);}
+  @keyframes tick{0%{transform:translateY(-22%);opacity:0;filter:blur(2px);}60%{opacity:1;}100%{transform:translateY(0);}}
+
+  /* seconds emphasis */
+  .u.sec .v{color:var(--c1);text-shadow:0 0 16px var(--c1);}
+
+  .foot{margin-top:auto;text-align:center;font-size:11px;color:var(--ink-faint);letter-spacing:.06em;
+    padding-top:6px;}
+  .foot .live{display:inline-flex;align-items:center;gap:6px;}
+  .foot .live i{width:6px;height:6px;border-radius:50%;background:#3ee0ff;box-shadow:0 0 8px #3ee0ff;
+    animation:pulse 2s infinite;}
+</style>
+</head>
+<body>
+  <div class="aura"></div>
+  <div class="grain"></div>
+
+  <main class="wrap">
+    <header class="top">
+      <div class="brand">
+        <span class="dot"></span>
+        <span class="kicker">Temporizador de Não Consumo</span>
+      </div>
+      <div class="cheer">
+        <div class="hi">Parabéns 🎉</div>
+        <div class="msg" id="cheerMsg">Você está construindo algo grande, um segundo de cada vez.</div>
+      </div>
+    </header>
+
+    <section class="cards" id="cards"></section>
+
+    <footer class="foot">
+      <span class="live"><i></i>Atualizando em tempo real</span>
+    </footer>
+  </main>
+
+<script>
+  // ---- Configure aqui os temporizadores ----
+  const TIMERS = [
+    {
+      key:'alcool',
+      name:'Sem Álcool',
+      icon:'🍷',
+      sinceLabel:'Desde 27 de janeiro de 2026',
+      start:new Date(2026,0,27,0,0,0), // mês 0 = janeiro
+      c1:'#3ee0ff'
+    },
+    {
+      key:'doce',
+      name:'Sem Doce',
+      icon:'🍩',
+      sinceLabel:'Desde 24 de maio de 2026',
+      start:new Date(2026,4,24,0,0,0), // mês 4 = maio
+      c1:'#6b8bff'
+    }
+  ];
+
+  // ---- diferença calendário-precisa ----
+  function diff(start, now){
+    if(now < start) now = start;
+    let y = now.getFullYear()-start.getFullYear();
+    let mo = now.getMonth()-start.getMonth();
+    let d = now.getDate()-start.getDate();
+    let h = now.getHours()-start.getHours();
+    let mi = now.getMinutes()-start.getMinutes();
+    let s = now.getSeconds()-start.getSeconds();
+    if(s<0){s+=60;mi--;}
+    if(mi<0){mi+=60;h--;}
+    if(h<0){h+=24;d--;}
+    if(d<0){
+      const pm = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+      d+=pm; mo--;
+    }
+    if(mo<0){mo+=12;y--;}
+    const totalDays = Math.floor((now-start)/86400000);
+    return {y,mo,d,h,mi,s,totalDays};
+  }
+
+  function pad(n){return String(n).padStart(2,'0');}
+
+  // build cards
+  const cardsEl = document.getElementById('cards');
+  const refs = {};
+  TIMERS.forEach(t=>{
+    const card = document.createElement('article');
+    card.className='card';
+    card.style.setProperty('--c1', t.c1);
+    card.innerHTML = `
+      <div class="halo"></div>
+      <div class="c-head">
+        <div class="c-title">
+          <div class="c-ico">${t.icon}</div>
+          <div>
+            <div class="c-name">${t.name}</div>
+            <div class="c-since">${t.sinceLabel}</div>
+          </div>
+        </div>
+        <div class="badge" data-r="days">— dias</div>
+      </div>
+      <div class="hero">
+        <span class="big" data-r="big">0</span>
+        <span class="unit">dias firme</span>
+      </div>
+      <div class="units">
+        <div class="u"><span class="v" data-u="y">0</span><div class="l">Anos</div></div>
+        <div class="u"><span class="v" data-u="mo">0</span><div class="l">Meses</div></div>
+        <div class="u"><span class="v" data-u="d">0</span><div class="l">Dias</div></div>
+        <div class="u"><span class="v" data-u="h">00</span><div class="l">Horas</div></div>
+        <div class="u sec"><span class="v" data-u="combo">00</span><div class="l">Min·Seg</div></div>
+      </div>`;
+    cardsEl.appendChild(card);
+    refs[t.key] = {
+      big:card.querySelector('[data-r="big"]'),
+      days:card.querySelector('[data-r="days"]'),
+      u:{
+        y:card.querySelector('[data-u="y"]'),
+        mo:card.querySelector('[data-u="mo"]'),
+        d:card.querySelector('[data-u="d"]'),
+        h:card.querySelector('[data-u="h"]'),
+        combo:card.querySelector('[data-u="combo"]'),
+      },
+      prev:{}
+    };
+  });
+
+  function setVal(el, val, store, key){
+    const str = String(val);
+    if(store[key] !== str){
+      store[key]=str;
+      el.textContent=str;
+      el.classList.remove('tick');
+      void el.offsetWidth;
+      el.classList.add('tick');
+    }
+  }
+
+  const cheerLines = [
+    d=>`Você está há <b>${d}</b> dias livre. Cada dia conta, e você está vencendo.`,
+    d=>`<b>${d}</b> dias de escolhas que te deixam orgulhoso. Continue assim!`,
+    d=>`Olha só: <b>${d}</b> dias inteiros de disciplina. Isso é poder.`,
+    d=>`Mais um dia firme. Já são <b>${d}</b> dias construindo a sua melhor versão.`
+  ];
+
+  function tick(){
+    const now = new Date();
+    let maxDays = 0, maxName='';
+    TIMERS.forEach(t=>{
+      const r = refs[t.key];
+      const x = diff(t.start, now);
+      setVal(r.big, x.totalDays, r.prev, 'big');
+      r.days.textContent = `${x.totalDays} dias`;
+      setVal(r.u.y, x.y, r.prev,'y');
+      setVal(r.u.mo, x.mo, r.prev,'mo');
+      setVal(r.u.d, x.d, r.prev,'d');
+      setVal(r.u.h, pad(x.h), r.prev,'h');
+      setVal(r.u.combo, pad(x.mi)+':'+pad(x.s), r.prev,'combo');
+      if(x.totalDays>=maxDays){maxDays=x.totalDays;maxName=t.name;}
+    });
+    return maxDays;
+  }
+
+  // cheer rotation
+  let cheerIdx=0;
+  function rotateCheer(maxDays){
+    const el=document.getElementById('cheerMsg');
+    el.style.opacity=0;
+    setTimeout(()=>{
+      el.innerHTML=cheerLines[cheerIdx % cheerLines.length](maxDays);
+      el.style.transition='opacity .5s';
+      el.style.opacity=1;
+      cheerIdx++;
+    },300);
+  }
+
+  let lastMax = tick();
+  rotateCheer(lastMax);
+  setInterval(()=>{ lastMax = tick(); }, 1000);
+  setInterval(()=>{ rotateCheer(lastMax); }, 6000);
+</script>
+</body>
+</html>
