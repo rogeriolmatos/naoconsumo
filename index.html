@@ -15,7 +15,6 @@
     --ink:#eaf2ff;
     --ink-dim:#9fb4dd;
     --ink-faint:#5d72a0;
-    /* luminous blues */
     --blue-cyan:#3ee0ff;
     --blue-sky:#4aa8ff;
     --blue-deep:#6b8bff;
@@ -34,7 +33,6 @@
     position:relative;
     -webkit-font-smoothing:antialiased;
   }
-  /* glowing atmosphere */
   .aura{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
   .aura::before,.aura::after{
     content:"";position:absolute;border-radius:50%;filter:blur(70px);opacity:.55;
@@ -61,7 +59,6 @@
     display:flex;flex-direction:column;gap:18px;min-height:100dvh;
   }
 
-  /* header */
   .top{display:flex;flex-direction:column;gap:14px;}
   .brand{display:flex;align-items:center;gap:10px;}
   .brand .dot{width:9px;height:9px;border-radius:50%;
@@ -82,7 +79,6 @@
   .cheer .msg{margin-top:6px;font-size:16.5px;line-height:1.45;color:var(--ink);font-weight:400;}
   .cheer .msg b{font-weight:700;color:#fff;}
 
-  /* cards */
   .cards{display:flex;flex-direction:column;gap:18px;flex:1;}
   .card{
     position:relative;
@@ -131,8 +127,22 @@
   .u .v.tick{animation:tick .5s cubic-bezier(.2,.9,.3,1.2);}
   @keyframes tick{0%{transform:translateY(-22%);opacity:0;filter:blur(2px);}60%{opacity:1;}100%{transform:translateY(0);}}
 
-  /* seconds emphasis */
   .u.sec .v{color:var(--c1);text-shadow:0 0 16px var(--c1);}
+
+  /* ---- card duplo (sub-contadores) ---- */
+  .subs{display:flex;flex-direction:column;gap:16px;margin-top:18px;position:relative;}
+  .sub{position:relative;}
+  .sub + .sub{border-top:1px solid var(--glass-line);padding-top:16px;}
+  .sub-head{display:flex;flex-direction:column;gap:3px;}
+  .sub-label{display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--ink-dim);font-weight:600;}
+  .sub-label .si{font-size:16px;}
+  .sub-since{font-size:10.5px;color:var(--ink-faint);letter-spacing:.03em;}
+  .hero.sm{margin:11px 0 2px;}
+  .hero.sm .big{font-size:46px;}
+
+  .state{text-align:center;color:var(--ink-dim);font-size:14px;padding:40px 10px;line-height:1.5;}
+  .state b{color:#fff;}
 
   .foot{margin-top:auto;text-align:center;font-size:11px;color:var(--ink-faint);letter-spacing:.06em;
     padding-top:6px;}
@@ -157,7 +167,9 @@
       </div>
     </header>
 
-    <section class="cards" id="cards"></section>
+    <section class="cards" id="cards">
+      <div class="state" id="state">Carregando os dados…</div>
+    </section>
 
     <footer class="foot">
       <span class="live"><i></i>Atualizando em tempo real</span>
@@ -165,88 +177,90 @@
   </main>
 
 <script>
-  // ---- Configure aqui os temporizadores ----
-  const TIMERS = [
-    {
-      key:'alcool',
-      name:'Sem Álcool',
-      icon:'🍷',
-      sinceLabel:'Desde 27 de janeiro de 2026',
-      start:new Date(2026,0,27,0,0,0), // mês 0 = janeiro
-      c1:'#3ee0ff'
-    },
-    {
-      key:'doce',
-      name:'Sem Doce',
-      icon:'🍩',
-      sinceLabel:'Desde 24 de maio de 2026',
-      start:new Date(2026,4,24,0,0,0), // mês 4 = maio
-      c1:'#6b8bff'
-    },
-    {
-      key:'fritura',
-      name:'Sem Frituras',
-      icon:'🍟',
-      sinceLabel:'Desde 8 de junho de 2026',
-      start:new Date(2026,5,8,0,0,0), // mês 5 = junho
-      c1:'#4aa8ff'
-    },
-    {
-      key:'bebida',
-      name:'Sem Bebidas Ultraprocessadas',
-      icon:'🥤',
-      sinceLabel:'Desde 9 de junho de 2026',
-      start:new Date(2026,5,9,0,0,0), // mês 5 = junho
-      c1:'#5ac8ff'
-    }
+  /* =======================================================================
+     COLE AQUI O LINK CSV DA SUA PLANILHA PUBLICADA NA WEB (opcional)
+     Enquanto não estiver configurado, o painel usa os dados do FALLBACK.
+     ======================================================================= */
+  const CSV_URL = "COLE_O_LINK_CSV_AQUI";
+
+  /* Dados padrão (usados quando a planilha não está configurada/carregada).
+     - Card simples: tem "start".
+     - Card duplo (como DOCES): tem "subs" com vários contadores no mesmo box. */
+  const FALLBACK = [
+    {name:'Sem Álcool', icon:'🍷', start:'2026-01-27', color:'#3ee0ff'},
+    {name:'Doces', icon:'🍰', color:'#6b8bff', subs:[
+      {label:'Sem Sobremesas', icon:'🍮', start:'2026-05-24'},
+      {label:'Sem Bolos de Aniversário', icon:'🎂', start:'2026-06-13'}
+    ]},
+    {name:'Sem Frituras', icon:'🍟', start:'2026-06-08', color:'#4aa8ff'},
+    {name:'Sem Bebidas Ultraprocessadas', icon:'🥤', start:'2026-06-09', color:'#5ac8ff'}
   ];
 
-  // ---- diferença calendário-precisa ----
+  const PALETTE = ['#3ee0ff','#6b8bff','#4aa8ff','#5ac8ff','#7d8dff','#38c6ff','#5fd0ff'];
+  const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+
+  // -------- parser de CSV --------
+  function parseCSV(text){
+    const rows=[]; let row=[], field='', inQuotes=false;
+    for(let i=0;i<text.length;i++){
+      const ch=text[i];
+      if(inQuotes){
+        if(ch==='"'){ if(text[i+1]==='"'){field+='"';i++;} else inQuotes=false; }
+        else field+=ch;
+      }else{
+        if(ch==='"') inQuotes=true;
+        else if(ch===',') {row.push(field);field='';}
+        else if(ch==='\n'){row.push(field);rows.push(row);row=[];field='';}
+        else if(ch==='\r'){}
+        else field+=ch;
+      }
+    }
+    if(field.length||row.length){row.push(field);rows.push(row);}
+    return rows.filter(r=>r.some(c=>c.trim()!==''));
+  }
+  function rowsToObjects(rows){
+    if(!rows.length) return [];
+    const headers=rows[0].map(h=>h.trim().toLowerCase());
+    return rows.slice(1).map(r=>{
+      const o={}; headers.forEach((h,idx)=> o[h]=(r[idx]||'').trim()); return o;
+    });
+  }
+
+  // -------- datas --------
+  function parseDate(str){
+    str=(str||'').trim(); if(!str) return null;
+    let m;
+    if((m=str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/))) return new Date(+m[1],+m[2]-1,+m[3],0,0,0);
+    if((m=str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/))) return new Date(+m[3],+m[2]-1,+m[1],0,0,0);
+    const d=new Date(str); return isNaN(d)?null:d;
+  }
+  function sinceLabel(d){ return `Desde ${d.getDate()} de ${MESES[d.getMonth()]} de ${d.getFullYear()}`; }
+
+  // -------- diferença calendário-precisa --------
   function diff(start, now){
     if(now < start) now = start;
-    let y = now.getFullYear()-start.getFullYear();
-    let mo = now.getMonth()-start.getMonth();
-    let d = now.getDate()-start.getDate();
-    let h = now.getHours()-start.getHours();
-    let mi = now.getMinutes()-start.getMinutes();
-    let s = now.getSeconds()-start.getSeconds();
+    let y=now.getFullYear()-start.getFullYear();
+    let mo=now.getMonth()-start.getMonth();
+    let d=now.getDate()-start.getDate();
+    let h=now.getHours()-start.getHours();
+    let mi=now.getMinutes()-start.getMinutes();
+    let s=now.getSeconds()-start.getSeconds();
     if(s<0){s+=60;mi--;}
     if(mi<0){mi+=60;h--;}
     if(h<0){h+=24;d--;}
-    if(d<0){
-      const pm = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
-      d+=pm; mo--;
-    }
+    if(d<0){ const pm=new Date(now.getFullYear(),now.getMonth(),0).getDate(); d+=pm; mo--; }
     if(mo<0){mo+=12;y--;}
-    const totalDays = Math.floor((now-start)/86400000);
+    const totalDays=Math.floor((now-start)/86400000);
     return {y,mo,d,h,mi,s,totalDays};
   }
-
   function pad(n){return String(n).padStart(2,'0');}
 
-  // build cards
+  // -------- montagem --------
   const cardsEl = document.getElementById('cards');
-  const refs = {};
-  TIMERS.forEach(t=>{
-    const card = document.createElement('article');
-    card.className='card';
-    card.style.setProperty('--c1', t.c1);
-    card.innerHTML = `
-      <div class="halo"></div>
-      <div class="c-head">
-        <div class="c-title">
-          <div class="c-ico">${t.icon}</div>
-          <div>
-            <div class="c-name">${t.name}</div>
-            <div class="c-since">${t.sinceLabel}</div>
-          </div>
-        </div>
-        <div class="badge" data-r="days">— dias</div>
-      </div>
-      <div class="hero">
-        <span class="big" data-r="big">0</span>
-        <span class="unit">dias firme</span>
-      </div>
+  let COUNTERS = []; // cada item: {start, refs}
+
+  function unitsGridHTML(){
+    return `
       <div class="units">
         <div class="u"><span class="v" data-u="y">0</span><div class="l">Anos</div></div>
         <div class="u"><span class="v" data-u="mo">0</span><div class="l">Meses</div></div>
@@ -254,74 +268,195 @@
         <div class="u"><span class="v" data-u="h">00</span><div class="l">Horas</div></div>
         <div class="u sec"><span class="v" data-u="combo">00</span><div class="l">Min·Seg</div></div>
       </div>`;
-    cardsEl.appendChild(card);
-    refs[t.key] = {
-      big:card.querySelector('[data-r="big"]'),
-      days:card.querySelector('[data-r="days"]'),
+  }
+  function collectRefs(root){
+    return {
+      big: root.querySelector('[data-r="big"]'),
+      days: root.querySelector('[data-r="days"]'),
       u:{
-        y:card.querySelector('[data-u="y"]'),
-        mo:card.querySelector('[data-u="mo"]'),
-        d:card.querySelector('[data-u="d"]'),
-        h:card.querySelector('[data-u="h"]'),
-        combo:card.querySelector('[data-u="combo"]'),
+        y: root.querySelector('[data-u="y"]'),
+        mo: root.querySelector('[data-u="mo"]'),
+        d: root.querySelector('[data-u="d"]'),
+        h: root.querySelector('[data-u="h"]'),
+        combo: root.querySelector('[data-u="combo"]'),
       },
       prev:{}
     };
-  });
+  }
 
-  function setVal(el, val, store, key){
-    const str = String(val);
-    if(store[key] !== str){
-      store[key]=str;
-      el.textContent=str;
-      el.classList.remove('tick');
-      void el.offsetWidth;
-      el.classList.add('tick');
+  function buildCards(list){
+    cardsEl.innerHTML='';
+    COUNTERS=[];
+    let count=0;
+
+    list.forEach((item,i)=>{
+      const c1=(item.color&&item.color.trim())?item.color.trim():PALETTE[i%PALETTE.length];
+      const card=document.createElement('article');
+      card.className='card';
+      card.style.setProperty('--c1', c1);
+
+      if(item.subs && item.subs.length){
+        // ----- card duplo -----
+        const subs=item.subs.map(s=>({label:s.label||'', icon:s.icon||'', start:parseDate(s.start)})).filter(s=>s.start);
+        if(!subs.length) return;
+        let subsHTML='';
+        subs.forEach((s,si)=>{
+          subsHTML+=`
+            <div class="sub" data-sub="${si}">
+              <div class="sub-head">
+                <div class="sub-label"><span class="si">${s.icon}</span>${s.label}</div>
+                <div class="sub-since">${sinceLabel(s.start)}</div>
+              </div>
+              <div class="hero sm">
+                <span class="big" data-r="big">0</span>
+                <span class="unit">dias firme</span>
+              </div>
+              ${unitsGridHTML()}
+            </div>`;
+        });
+        card.innerHTML=`
+          <div class="halo"></div>
+          <div class="c-head">
+            <div class="c-title">
+              <div class="c-ico">${item.icon||'🍰'}</div>
+              <div>
+                <div class="c-name">${item.name||'Doces'}</div>
+                <div class="c-since">Aberto a ocasiões especiais</div>
+              </div>
+            </div>
+          </div>
+          <div class="subs">${subsHTML}</div>`;
+        cardsEl.appendChild(card);
+        card.querySelectorAll('.sub').forEach((subEl,si)=>{
+          COUNTERS.push({start:subs[si].start, refs:collectRefs(subEl), label:subs[si].label, icon:subs[si].icon});
+        });
+        count++;
+      }else{
+        // ----- card simples -----
+        const start=parseDate(item.start);
+        if(!start) return;
+        card.innerHTML=`
+          <div class="halo"></div>
+          <div class="c-head">
+            <div class="c-title">
+              <div class="c-ico">${item.icon||'✨'}</div>
+              <div>
+                <div class="c-name">${item.name||'Sem nome'}</div>
+                <div class="c-since">${sinceLabel(start)}</div>
+              </div>
+            </div>
+            <div class="badge" data-r="days">— dias</div>
+          </div>
+          <div class="hero">
+            <span class="big" data-r="big">0</span>
+            <span class="unit">dias firme</span>
+          </div>
+          ${unitsGridHTML()}`;
+        cardsEl.appendChild(card);
+        COUNTERS.push({start:start, refs:collectRefs(card), label:(item.name||'Sem nome'), icon:(item.icon||'✨')});
+        count++;
+      }
+    });
+
+    if(!count){
+      cardsEl.innerHTML='<div class="state">Nenhum dado válido encontrado.</div>';
+      return false;
+    }
+    return true;
+  }
+
+  function setVal(el,val,store,key){
+    if(!el) return;
+    const str=String(val);
+    if(store[key]!==str){
+      store[key]=str; el.textContent=str;
+      el.classList.remove('tick'); void el.offsetWidth; el.classList.add('tick');
     }
   }
 
-  const cheerLines = [
-    d=>`Você está há <b>${d}</b> dias livre. Cada dia conta, e você está vencendo.`,
-    d=>`<b>${d}</b> dias de escolhas que te deixam orgulhoso. Continue assim!`,
-    d=>`Olha só: <b>${d}</b> dias inteiros de disciplina. Isso é poder.`,
-    d=>`Mais um dia firme. Já são <b>${d}</b> dias construindo a sua melhor versão.`
+  // ----- mensagens motivacionais: rodízio geral por todas as áreas -----
+  function lab(c){ return (c.label||'').toLowerCase(); }
+  function daysOf(c){ return diff(c.start, new Date()).totalDays; }
+
+  const areaTpl = [
+    (c,d)=>`${c.icon} Você está há <b>${d}</b> dias ${lab(c)}. Continue firme!`,
+    (c,d)=>`${c.icon} <b>${d}</b> dias ${lab(c)} — muito orgulho de você!`,
+    (c,d)=>`${c.icon} Já são <b>${d}</b> dias ${lab(c)}. Cada dia conta.`
+  ];
+  function areaMsg(c, k){
+    const d=daysOf(c);
+    if(d===0) return `${c.icon} Recomeço hoje em ${lab(c)} — ocasião especial vale! Amanhã a contagem já cresce. 😉`;
+    return areaTpl[k % areaTpl.length](c,d);
+  }
+  const geralTpl = [
+    ()=>`🔥 No total, já são <b>${COUNTERS.reduce((a,c)=>a+daysOf(c),0)}</b> dias de escolhas saudáveis somadas!`,
+    ()=>`💪 Você está cuidando de <b>${COUNTERS.length}</b> metas ao mesmo tempo. Que disciplina!`,
+    ()=>`🏆 Seu maior recorde agora é <b>${COUNTERS.reduce((m,c)=>Math.max(m,daysOf(c)),0)}</b> dias. Imparável!`
   ];
 
+  // monta a sequência alternando áreas e mensagens gerais
+  function buildCheerSlots(){
+    const slots=[];
+    COUNTERS.forEach((c,i)=>{
+      slots.push(k=>areaMsg(c,k));
+      if(i%2===1){ const gi=Math.floor(i/2)%geralTpl.length; slots.push(()=>geralTpl[gi]()); }
+    });
+    geralTpl.forEach((g,gi)=>slots.push(()=>geralTpl[gi]()));
+    return slots;
+  }
+
+  let cheerSlots=[], cheerIdx=0;
+  function rotateCheer(){
+    if(!cheerSlots.length) return;
+    const el=document.getElementById('cheerMsg');
+    el.style.opacity=0;
+    setTimeout(()=>{
+      el.innerHTML=cheerSlots[cheerIdx % cheerSlots.length](cheerIdx);
+      el.style.transition='opacity .5s'; el.style.opacity=1; cheerIdx++;
+    },300);
+  }
+
   function tick(){
-    const now = new Date();
-    let maxDays = 0, maxName='';
-    TIMERS.forEach(t=>{
-      const r = refs[t.key];
-      const x = diff(t.start, now);
-      setVal(r.big, x.totalDays, r.prev, 'big');
-      r.days.textContent = `${x.totalDays} dias`;
+    const now=new Date();
+    COUNTERS.forEach(c=>{
+      const r=c.refs;
+      const x=diff(c.start, now);
+      setVal(r.big, x.totalDays, r.prev,'big');
+      if(r.days) r.days.textContent=`${x.totalDays} dias`;
       setVal(r.u.y, x.y, r.prev,'y');
       setVal(r.u.mo, x.mo, r.prev,'mo');
       setVal(r.u.d, x.d, r.prev,'d');
       setVal(r.u.h, pad(x.h), r.prev,'h');
       setVal(r.u.combo, pad(x.mi)+':'+pad(x.s), r.prev,'combo');
-      if(x.totalDays>=maxDays){maxDays=x.totalDays;maxName=t.name;}
     });
-    return maxDays;
   }
 
-  // cheer rotation
-  let cheerIdx=0;
-  function rotateCheer(maxDays){
-    const el=document.getElementById('cheerMsg');
-    el.style.opacity=0;
-    setTimeout(()=>{
-      el.innerHTML=cheerLines[cheerIdx % cheerLines.length](maxDays);
-      el.style.transition='opacity .5s';
-      el.style.opacity=1;
-      cheerIdx++;
-    },300);
+  let started=false;
+  function start(list){
+    if(!buildCards(list)) return;
+    cheerSlots=buildCheerSlots();
+    if(!started){
+      started=true;
+      cheerIdx=Math.floor(Math.random()*cheerSlots.length); // começa numa área aleatória
+      tick(); rotateCheer();
+      setInterval(tick,1000);
+      setInterval(rotateCheer,6000);
+    }else{ tick(); }
   }
 
-  let lastMax = tick();
-  rotateCheer(lastMax);
-  setInterval(()=>{ lastMax = tick(); }, 1000);
-  setInterval(()=>{ rotateCheer(lastMax); }, 6000);
+  async function load(){
+    if(!CSV_URL || CSV_URL.indexOf('COLE_O_LINK')!==-1){ start(FALLBACK); return; }
+    try{
+      const sep=CSV_URL.indexOf('?')!==-1?'&':'?';
+      const res=await fetch(CSV_URL+sep+'cacheBust='+Date.now());
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const objs=rowsToObjects(parseCSV(await res.text()));
+      start(objs.length?objs:FALLBACK);
+    }catch(e){ console.error('Falha ao carregar planilha:',e); start(FALLBACK); }
+  }
+
+
+  load();
 </script>
 </body>
 </html>
