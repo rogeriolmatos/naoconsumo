@@ -2,461 +2,644 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#040b22">
-<title>Temporizador de Não Consumo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CASA DIVIDIDA — uma micro-novela jogável</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Nunito:ital,wght@0,400;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg-0:#030a1f;
-    --bg-1:#061233;
-    --ink:#eaf2ff;
-    --ink-dim:#9fb4dd;
-    --ink-faint:#5d72a0;
-    --blue-cyan:#3ee0ff;
-    --blue-sky:#4aa8ff;
-    --blue-deep:#6b8bff;
-    --glass:rgba(120,170,255,0.07);
-    --glass-line:rgba(140,190,255,0.16);
-    --radius:26px;
+    --noite:#26101F;       /* fundo vinho profundo */
+    --noite2:#3A1A30;
+    --dourado:#E9B44C;     /* Vera / títulos */
+    --rosa:#FF4D8D;        /* Cândido / drama */
+    --verde:#35C4A8;       /* Cristiane / sucesso */
+    --creme:#F6E8D6;       /* texto */
+    --vermelho:#E4484F;    /* perigo / oficial */
+    --display:'Abril Fatface', serif;
+    --body:'Nunito', sans-serif;
   }
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  *{box-sizing:border-box; margin:0; padding:0;}
   html,body{height:100%;}
   body{
-    font-family:'Sora',system-ui,sans-serif;
-    background:var(--bg-0);
-    color:var(--ink);
-    min-height:100dvh;
-    overflow-x:hidden;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #47203c 0%, var(--noite) 60%),
+      var(--noite);
+    font-family:var(--body);
+    color:var(--creme);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    min-height:100vh; padding:16px; gap:10px;
+  }
+  /* ---------- Moldura de TV ---------- */
+  #tv{
+    width:min(760px, 100%);
+    aspect-ratio:4/3;
+    max-height:88vh;
+    background:#120810;
+    border-radius:22px;
+    border:10px solid #1c0f18;
+    box-shadow:
+      0 0 0 3px #4a2a3e,
+      0 24px 60px rgba(0,0,0,.6),
+      inset 0 0 80px rgba(0,0,0,.65);
     position:relative;
-    -webkit-font-smoothing:antialiased;
-  }
-  .aura{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
-  .aura::before,.aura::after{
-    content:"";position:absolute;border-radius:50%;filter:blur(70px);opacity:.55;
-  }
-  .aura::before{
-    width:75vw;height:75vw;left:-25vw;top:-18vh;
-    background:radial-gradient(circle, #1b6dff 0%, rgba(27,109,255,0) 70%);
-    animation:drift1 16s ease-in-out infinite alternate;
-  }
-  .aura::after{
-    width:80vw;height:80vw;right:-30vw;bottom:-12vh;
-    background:radial-gradient(circle, #19c6ff 0%, rgba(25,198,255,0) 70%);
-    animation:drift2 19s ease-in-out infinite alternate;
-  }
-  @keyframes drift1{to{transform:translate(8vw,6vh) scale(1.12);}}
-  @keyframes drift2{to{transform:translate(-7vw,-5vh) scale(1.15);}}
-  .grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.4;
-    background:linear-gradient(180deg, rgba(3,10,31,.2), rgba(3,10,31,.85));}
-
-  .wrap{
-    position:relative;z-index:2;
-    max-width:460px;margin:0 auto;
-    padding:calc(env(safe-area-inset-top) + 22px) 18px calc(env(safe-area-inset-bottom) + 26px);
-    display:flex;flex-direction:column;gap:18px;min-height:100dvh;
-  }
-
-  .top{display:flex;flex-direction:column;gap:14px;}
-  .brand{display:flex;align-items:center;gap:10px;}
-  .brand .dot{width:9px;height:9px;border-radius:50%;
-    background:var(--blue-cyan);box-shadow:0 0 14px var(--blue-cyan);
-    animation:pulse 2.4s ease-in-out infinite;}
-  @keyframes pulse{50%{opacity:.35;transform:scale(.7);}}
-  .brand .kicker{font-size:11.5px;letter-spacing:.32em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;}
-
-  .cheer{
-    border-radius:var(--radius);
-    background:linear-gradient(135deg, rgba(62,224,255,.16), rgba(107,139,255,.10));
-    border:1px solid var(--glass-line);
-    padding:18px 20px;
-    box-shadow:0 0 40px rgba(40,130,255,.12) inset, 0 8px 30px rgba(0,0,0,.3);
-    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  }
-  .cheer .hi{font-size:13px;color:var(--blue-cyan);font-weight:700;letter-spacing:.14em;text-transform:uppercase;}
-  .cheer .msg{margin-top:6px;font-size:16.5px;line-height:1.45;color:var(--ink);font-weight:400;}
-  .cheer .msg b{font-weight:700;color:#fff;}
-
-  .cards{display:flex;flex-direction:column;gap:18px;flex:1;}
-  .card{
-    position:relative;
-    border-radius:var(--radius);
-    background:var(--glass);
-    border:1px solid var(--glass-line);
-    padding:22px 22px 20px;
-    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-    box-shadow:0 10px 40px rgba(0,0,0,.35);
     overflow:hidden;
+    display:flex; flex-direction:column;
   }
-  .card::before{
-    content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;
-    background:linear-gradient(140deg, var(--c1), transparent 45%);
-    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite:xor;mask-composite:exclude;opacity:.7;pointer-events:none;
+  /* scanlines de TV antiga */
+  #tv::after{
+    content:''; position:absolute; inset:0; pointer-events:none; z-index:50;
+    background:repeating-linear-gradient(0deg, rgba(255,255,255,.028) 0 1px, transparent 1px 3px);
+    mix-blend-mode:overlay;
   }
-  .card .halo{position:absolute;width:160px;height:160px;border-radius:50%;
-    top:-70px;right:-50px;filter:blur(36px);opacity:.5;background:var(--c1);}
-
-  .c-head{display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;}
-  .c-title{display:flex;align-items:center;gap:11px;}
-  .c-ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;
-    background:rgba(255,255,255,.06);border:1px solid var(--glass-line);font-size:18px;}
-  .c-name{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-dim);font-weight:600;line-height:1.2;}
-  .c-since{font-size:11px;color:var(--ink-faint);margin-top:2px;letter-spacing:.04em;}
-  .badge{font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
-    color:var(--c1);padding:6px 11px;border-radius:999px;background:rgba(255,255,255,.04);
-    border:1px solid var(--glass-line);white-space:nowrap;}
-
-  .hero{display:flex;align-items:baseline;gap:10px;margin:18px 0 4px;position:relative;}
-  .hero .big{font-size:64px;font-weight:800;line-height:.9;letter-spacing:-.02em;
-    color:#fff;font-variant-numeric:tabular-nums;
-    text-shadow:0 0 26px var(--c1);}
-  .hero .unit{font-size:15px;color:var(--ink-dim);font-weight:500;letter-spacing:.02em;}
-
-  .units{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:16px;position:relative;}
-  .u{
-    background:rgba(255,255,255,.035);
-    border:1px solid rgba(140,190,255,.10);
-    border-radius:14px;padding:11px 4px 9px;text-align:center;
+  #hud{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:8px 14px; font-size:12px; letter-spacing:.12em;
+    color:var(--dourado); text-transform:uppercase; z-index:5;
+    border-bottom:1px solid rgba(233,180,76,.18);
+    font-weight:800;
   }
-  .u .v{font-size:21px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;line-height:1;
-    display:inline-block;}
-  .u .l{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin-top:6px;font-weight:600;}
-  .u .v.tick{animation:tick .5s cubic-bezier(.2,.9,.3,1.2);}
-  @keyframes tick{0%{transform:translateY(-22%);opacity:0;filter:blur(2px);}60%{opacity:1;}100%{transform:translateY(0);}}
+  #hud .drama{color:var(--rosa);}
+  #stage{flex:1; position:relative; overflow:hidden;}
+  .screen{position:absolute; inset:0; display:none; flex-direction:column;}
+  .screen.on{display:flex; animation:fadein .5s ease;}
+  @keyframes fadein{from{opacity:0} to{opacity:1}}
 
-  .u.sec .v{color:var(--c1);text-shadow:0 0 16px var(--c1);}
+  /* ---------- Título ---------- */
+  #tela-titulo{align-items:center; justify-content:center; text-align:center; gap:14px; padding:24px;}
+  .logo-novela{
+    font-family:var(--display);
+    font-size:clamp(38px, 8vw, 72px);
+    line-height:.95;
+    color:var(--dourado);
+    text-shadow:0 0 30px rgba(233,180,76,.35), 3px 3px 0 #7a1f4b;
+    animation:brilho 3s ease-in-out infinite;
+  }
+  @keyframes brilho{0%,100%{text-shadow:0 0 30px rgba(233,180,76,.35), 3px 3px 0 #7a1f4b}
+    50%{text-shadow:0 0 55px rgba(255,77,141,.55), 3px 3px 0 #7a1f4b}}
+  .sub{font-style:italic; opacity:.85; font-size:15px;}
+  .elenco{font-size:13px; opacity:.7; line-height:1.7;}
 
-  /* ---- card duplo (sub-contadores) ---- */
-  .subs{display:flex;flex-direction:column;gap:16px;margin-top:18px;position:relative;}
-  .sub{position:relative;}
-  .sub + .sub{border-top:1px solid var(--glass-line);padding-top:16px;}
-  .sub-head{display:flex;flex-direction:column;gap:3px;}
-  .sub-label{display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.16em;
-    text-transform:uppercase;color:var(--ink-dim);font-weight:600;}
-  .sub-label .si{font-size:16px;}
-  .sub-since{font-size:10.5px;color:var(--ink-faint);letter-spacing:.03em;}
-  .hero.sm{margin:11px 0 2px;}
-  .hero.sm .big{font-size:46px;}
+  /* ---------- Cartela de episódio (PLIM PLIM) ---------- */
+  #tela-cartela{align-items:center; justify-content:center; text-align:center; gap:8px; background:radial-gradient(600px 400px at 50% 40%, #55254a 0%, transparent 70%);}
+  .plim{font-size:13px; letter-spacing:.5em; color:var(--rosa); font-weight:800; animation:pisca .7s steps(2) infinite;}
+  @keyframes pisca{50%{opacity:.2}}
+  .ep-num{font-size:14px; letter-spacing:.35em; color:var(--dourado); text-transform:uppercase; font-weight:800;}
+  .ep-titulo{
+    font-family:var(--display);
+    font-size:clamp(30px, 6.5vw, 54px);
+    color:var(--creme);
+    animation:zoomdrama 2.6s ease both;
+  }
+  @keyframes zoomdrama{from{transform:scale(.6); opacity:0; filter:blur(6px)} to{transform:scale(1); opacity:1; filter:blur(0)}}
+  .ep-desc{max-width:420px; opacity:.8; font-size:14px; font-style:italic;}
 
-  .state{text-align:center;color:var(--ink-dim);font-size:14px;padding:40px 10px;line-height:1.5;}
-  .state b{color:#fff;}
+  /* ---------- Diálogo ---------- */
+  #tela-dialogo{justify-content:flex-end;}
+  #cenario{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:clamp(60px,14vw,110px); opacity:.9; filter:drop-shadow(0 10px 20px rgba(0,0,0,.5));}
+  #caixa{
+    position:relative; z-index:6;
+    margin:12px; padding:14px 16px 16px;
+    background:rgba(18,8,16,.92);
+    border:2px solid var(--dourado);
+    border-radius:14px;
+    min-height:128px;
+    display:flex; gap:14px; align-items:flex-start;
+    cursor:pointer;
+  }
+  .retrato{
+    flex:0 0 58px; height:58px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:30px; background:var(--noite2);
+    border:3px solid var(--cor,var(--creme));
+    box-shadow:0 0 14px color-mix(in srgb, var(--cor,var(--creme)) 50%, transparent);
+  }
+  .fala{flex:1;}
+  .quem{font-weight:800; letter-spacing:.08em; text-transform:uppercase; font-size:12px; color:var(--cor,var(--creme)); margin-bottom:4px;}
+  .texto{font-size:16px; line-height:1.5; min-height:48px;}
+  .avancar{position:absolute; right:14px; bottom:8px; font-size:11px; opacity:.55; animation:pisca 1.2s infinite;}
+  #escolhas{position:relative; z-index:6; margin:0 12px 12px; display:none; flex-direction:column; gap:8px;}
+  .opcao{
+    background:var(--noite2); color:var(--creme); border:2px solid var(--rosa);
+    border-radius:10px; padding:10px 14px; font-family:var(--body); font-weight:700;
+    font-size:14px; cursor:pointer; text-align:left; transition:transform .12s, background .12s;
+  }
+  .opcao:hover, .opcao:focus-visible{background:var(--rosa); color:#fff; transform:translateX(4px); outline:none;}
 
-  .foot{margin-top:auto;text-align:center;font-size:11px;color:var(--ink-faint);letter-spacing:.06em;
-    padding-top:6px;}
-  .foot .live{display:inline-flex;align-items:center;gap:6px;}
-  .foot .live i{width:6px;height:6px;border-radius:50%;background:#3ee0ff;box-shadow:0 0 8px #3ee0ff;
-    animation:pulse 2s infinite;}
+  /* ---------- Botões ---------- */
+  .btn{
+    font-family:var(--body); font-weight:800; letter-spacing:.08em;
+    background:var(--dourado); color:#3a1a30; border:none; border-radius:999px;
+    padding:12px 28px; font-size:15px; cursor:pointer; text-transform:uppercase;
+    box-shadow:0 6px 0 #9c6f1e; transition:transform .1s, box-shadow .1s;
+  }
+  .btn:hover{transform:translateY(2px); box-shadow:0 4px 0 #9c6f1e;}
+  .btn:active{transform:translateY(6px); box-shadow:0 0 0 #9c6f1e;}
+  .btn.rosa{background:var(--rosa); color:#fff; box-shadow:0 6px 0 #a12457;}
+  .btn.rosa:hover{box-shadow:0 4px 0 #a12457;}
+
+  /* ---------- Mini-game 1: placas ---------- */
+  #jogo1{background:linear-gradient(#3f2440 0 55%, #2f5c3a 55% 100%);}
+  #jardim{flex:1; position:relative;}
+  .casa-fundo{position:absolute; left:50%; top:46%; transform:translate(-50%,-50%); font-size:clamp(70px,16vw,130px); filter:drop-shadow(0 8px 14px rgba(0,0,0,.5));}
+  .placa{
+    position:absolute; width:86px; text-align:center; cursor:pointer; user-select:none;
+    animation:fincar .25s ease;
+  }
+  @keyframes fincar{from{transform:translateY(-30px) scale(.6); opacity:0}}
+  .placa .tabua{
+    background:#c8842f; border:3px solid #7a4a12; border-radius:6px; padding:5px 4px;
+    font-weight:800; font-size:11px; color:#fff; letter-spacing:.06em;
+    box-shadow:0 4px 10px rgba(0,0,0,.4);
+  }
+  .placa .pau{width:6px; height:26px; background:#7a4a12; margin:0 auto;}
+  .placa .tempo{height:5px; background:#00000055; border-radius:3px; overflow:hidden; margin-top:3px;}
+  .placa .tempo i{display:block; height:100%; width:100%; background:var(--vermelho); animation:esvazia linear forwards;}
+  @keyframes esvazia{from{width:100%} to{width:0}}
+  .pontinho{position:absolute; font-weight:800; color:var(--verde); animation:sobe .7s ease forwards; pointer-events:none; font-size:15px;}
+  .pontinho.ruim{color:var(--vermelho);}
+  @keyframes sobe{to{transform:translateY(-34px); opacity:0}}
+  .barra-jogo{display:flex; justify-content:space-between; gap:10px; padding:10px 14px; font-weight:800; font-size:13px; background:rgba(0,0,0,.35); z-index:5;}
+
+  /* ---------- Mini-game 2: oficial ---------- */
+  #jogo2{background:linear-gradient(#241226 0 60%, #4a3450 60% 100%);}
+  #sala{flex:1; position:relative; overflow:hidden;}
+  #oficial{position:absolute; top:12px; left:50%; transform:translateX(-50%); text-align:center; transition:transform .25s;}
+  #oficial .icone{font-size:clamp(44px,9vw,66px);}
+  #oficial .estado{font-weight:800; font-size:12px; letter-spacing:.15em; padding:3px 10px; border-radius:999px; display:inline-block;}
+  #oficial.costas .estado{background:var(--verde); color:#0c2a22;}
+  #oficial.virando .estado{background:var(--dourado); color:#3a2a08;}
+  #oficial.olhando .estado{background:var(--vermelho); color:#fff;}
+  #oficial.olhando .icone{transform:scale(1.15);}
+  #cris{position:absolute; bottom:66px; font-size:clamp(36px,7vw,52px); left:4%; transition:left .15s linear; filter:drop-shadow(0 6px 8px rgba(0,0,0,.5));}
+  #porta{position:absolute; bottom:60px; right:2%; font-size:clamp(40px,8vw,60px);}
+  #trilha{position:absolute; bottom:40px; left:4%; right:4%; height:8px; background:rgba(255,255,255,.12); border-radius:4px;}
+  #trilha i{display:block; height:100%; width:0%; background:var(--verde); border-radius:4px; transition:width .15s linear;}
+  #btn-andar{
+    position:absolute; bottom:10px; left:50%; transform:translateX(-50%);
+    z-index:6; touch-action:none;
+  }
+  .aviso-pego{position:absolute; inset:0; display:none; align-items:center; justify-content:center; flex-direction:column; gap:8px; background:rgba(120,10,20,.55); z-index:8; font-family:var(--display); font-size:clamp(26px,6vw,44px); text-align:center;}
+
+  /* ---------- Final ---------- */
+  #tela-final{align-items:center; justify-content:center; text-align:center; gap:14px; padding:24px;}
+  .selo-final{font-family:var(--display); font-size:clamp(30px,7vw,56px); color:var(--dourado); animation:zoomdrama 1.8s ease both;}
+  .resumo-final{max-width:460px; font-size:15px; line-height:1.6; opacity:.9;}
+  .placar-final{font-size:13px; letter-spacing:.1em; color:var(--rosa); font-weight:800; text-transform:uppercase;}
+
+  #rodape{font-size:11px; opacity:.5; text-align:center;}
+  @media (max-width:520px){
+    #tv{aspect-ratio:auto; height:86vh;}
+    .texto{font-size:14px;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.01s !important; transition-duration:.01s !important;}
+  }
 </style>
 </head>
 <body>
-  <div class="aura"></div>
-  <div class="grain"></div>
+<div id="tv">
+  <div id="hud">
+    <span id="hud-ep">CASA DIVIDIDA</span>
+    <span class="drama">DRAMA: <span id="hud-drama">0</span> 🔥</span>
+  </div>
+  <div id="stage">
 
-  <main class="wrap">
-    <header class="top">
-      <div class="brand">
-        <span class="dot"></span>
-        <span class="kicker">Temporizador de Não Consumo</span>
-      </div>
-      <div class="cheer">
-        <div class="hi">Parabéns 🎉</div>
-        <div class="msg" id="cheerMsg">Você está construindo algo grande, um segundo de cada vez.</div>
-      </div>
-    </header>
-
-    <section class="cards" id="cards">
-      <div class="state" id="state">Carregando os dados…</div>
+    <!-- TÍTULO -->
+    <section id="tela-titulo" class="screen on">
+      <div style="font-size:44px">📺</div>
+      <h1 class="logo-novela">CASA<br>DIVIDIDA</h1>
+      <p class="sub">uma micro-novela jogável em 3 episódios</p>
+      <p class="elenco">com 👩‍🦱 VERA &nbsp;·&nbsp; 🕺 CÂNDIDO &nbsp;·&nbsp; 🙄 CRISTIANE<br>participação especial: 👮 O OFICIAL DE JUSTIÇA</p>
+      <button class="btn" onclick="Jogo.comecar()">▶ Assistir jogando</button>
     </section>
 
-    <footer class="foot">
-      <span class="live"><i></i>Atualizando em tempo real</span>
-    </footer>
-  </main>
+    <!-- CARTELA DE EPISÓDIO -->
+    <section id="tela-cartela" class="screen">
+      <div class="plim">✦ PLIM &nbsp; PLIM ✦</div>
+      <div class="ep-num" id="cartela-num"></div>
+      <h2 class="ep-titulo" id="cartela-titulo"></h2>
+      <p class="ep-desc" id="cartela-desc"></p>
+      <button class="btn rosa" style="margin-top:14px" onclick="Jogo.depoisCartela()">Continuar</button>
+    </section>
+
+    <!-- DIÁLOGO -->
+    <section id="tela-dialogo" class="screen">
+      <div id="cenario">🏠</div>
+      <div id="caixa" onclick="Dialogo.avancar()">
+        <div class="retrato" id="dlg-retrato">📺</div>
+        <div class="fala">
+          <div class="quem" id="dlg-quem">NARRADOR</div>
+          <div class="texto" id="dlg-texto"></div>
+        </div>
+        <div class="avancar">clique para continuar ▸</div>
+      </div>
+      <div id="escolhas"></div>
+    </section>
+
+    <!-- JOGO 1: PLACAS -->
+    <section id="jogo1" class="screen">
+      <div id="jardim"><div class="casa-fundo">🏠</div></div>
+      <div class="barra-jogo">
+        <span>🪧 Arrancadas: <span id="j1-pontos">0</span>/10</span>
+        <span>❤️ Paciência da Vera: <span id="j1-vidas">3</span></span>
+      </div>
+    </section>
+
+    <!-- JOGO 2: OFICIAL -->
+    <section id="jogo2" class="screen">
+      <div id="sala">
+        <div id="oficial" class="costas">
+          <div class="icone">👮</div>
+          <div class="estado" id="oficial-estado">DE COSTAS</div>
+        </div>
+        <div id="porta">🚪</div>
+        <div id="cris">🙄</div>
+        <div id="trilha"><i id="trilha-fill"></i></div>
+        <button class="btn rosa" id="btn-andar">SEGURE PARA ANDAR 🤫</button>
+        <div class="aviso-pego" id="pego">
+          <div>“A SENHORITA ESTÁ INTIMADA!”</div>
+          <button class="btn" onclick="Jogo2.reiniciar()">Tentar de novo</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINAL -->
+    <section id="tela-final" class="screen">
+      <div style="font-size:40px">🌅</div>
+      <h2 class="selo-final" id="final-titulo">FIM</h2>
+      <p class="resumo-final" id="final-texto"></p>
+      <p class="placar-final">Nível de drama da família: <span id="final-drama">0</span> 🔥</p>
+      <button class="btn" onclick="location.reload()">↻ Reprisar a novela</button>
+    </section>
+
+  </div>
+</div>
+<p id="rodape">Feito com Claude · aperte F pra pagar o aluguel da Vera</p>
 
 <script>
-  /* =======================================================================
-     COLE AQUI O LINK CSV DA SUA PLANILHA PUBLICADA NA WEB (opcional)
-     Enquanto não estiver configurado, o painel usa os dados do FALLBACK.
-     ======================================================================= */
-  const CSV_URL = "COLE_O_LINK_CSV_AQUI";
+/* ================== ESTADO GERAL ================== */
+const $ = s => document.querySelector(s);
+const Jogo = {
+  drama: 0,
+  candidoFoiHumilhado: 0, // encontros que deram errado no Ep.3
+  telaAtual: 'tela-titulo',
+  proximo: null, // callback após cartela
 
-  /* Dados padrão (usados quando a planilha não está configurada/carregada).
-     - Card simples: tem "start".
-     - Card duplo (como DOCES): tem "subs" com vários contadores no mesmo box. */
-  const FALLBACK = [
-    {name:'Sem Álcool', icon:'🍷', start:'2026-01-27', color:'#3ee0ff'},
-    {name:'Doces', icon:'🍰', color:'#6b8bff', subs:[
-      {label:'Sem Sobremesas', icon:'🍮', start:'2026-06-19'},
-      {label:'Sem Bolos de Aniversário', icon:'🎂', start:'2026-06-13'}
-    ]},
-    {name:'Sem Frituras', icon:'🍟', start:'2026-06-08', color:'#4aa8ff'},
-    {name:'Sem Bebidas Ultraprocessadas', icon:'🥤', start:'2026-06-09', color:'#5ac8ff'}
-  ];
+  mostrar(id){
+    document.querySelectorAll('.screen').forEach(t=>t.classList.remove('on'));
+    $('#'+id).classList.add('on');
+    this.telaAtual = id;
+  },
+  addDrama(n){
+    this.drama += n;
+    $('#hud-drama').textContent = this.drama;
+  },
+  cartela(num, titulo, desc, depois){
+    $('#cartela-num').textContent = num;
+    $('#cartela-titulo').textContent = titulo;
+    $('#cartela-desc').textContent = desc;
+    this.proximo = depois;
+    this.mostrar('tela-cartela');
+  },
+  depoisCartela(){ if(this.proximo) this.proximo(); },
+  comecar(){
+    this.cartela('EPISÓDIO 1', '“A Casa é Minha!”',
+      'Vera acorda com barulho no jardim. Adivinha quem trouxe placas de VENDE-SE outra vez…',
+      ()=> Dialogo.rodar(ROTEIRO.ep1_intro, ()=> Jogo1.iniciar()));
+  }
+};
 
-  const PALETTE = ['#3ee0ff','#6b8bff','#4aa8ff','#5ac8ff','#7d8dff','#38c6ff','#5fd0ff'];
-  const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+/* ================== MOTOR DE DIÁLOGO ================== */
+const PERSONAGENS = {
+  narrador:{nome:'NARRADOR', emoji:'📺', cor:'#F6E8D6'},
+  vera:{nome:'VERA', emoji:'👩‍🦱', cor:'#E9B44C'},
+  candido:{nome:'CÂNDIDO', emoji:'🕺', cor:'#FF4D8D'},
+  cris:{nome:'CRISTIANE', emoji:'🙄', cor:'#35C4A8'},
+  oficial:{nome:'OFICIAL DE JUSTIÇA', emoji:'👮', cor:'#E4484F'},
+  date:{nome:'PRETENDENTE', emoji:'💃', cor:'#c9a0ff'}
+};
 
-  // -------- parser de CSV --------
-  function parseCSV(text){
-    const rows=[]; let row=[], field='', inQuotes=false;
-    for(let i=0;i<text.length;i++){
-      const ch=text[i];
-      if(inQuotes){
-        if(ch==='"'){ if(text[i+1]==='"'){field+='"';i++;} else inQuotes=false; }
-        else field+=ch;
-      }else{
-        if(ch==='"') inQuotes=true;
-        else if(ch===',') {row.push(field);field='';}
-        else if(ch==='\n'){row.push(field);rows.push(row);row=[];field='';}
-        else if(ch==='\r'){}
-        else field+=ch;
-      }
+const Dialogo = {
+  fila:[], i:0, aoTerminar:null, digitando:null, escolhaAtiva:false,
+
+  rodar(cenas, aoTerminar){
+    this.fila = cenas; this.i = 0; this.aoTerminar = aoTerminar;
+    Jogo.mostrar('tela-dialogo');
+    this.exibir();
+  },
+  exibir(){
+    const c = this.fila[this.i];
+    if(!c){ this.escolhaAtiva=false; if(this.aoTerminar) this.aoTerminar(); return; }
+    if(c.cenario) $('#cenario').textContent = c.cenario;
+    if(c.drama){ Jogo.addDrama(c.drama); }
+
+    const p = PERSONAGENS[c.p] || PERSONAGENS.narrador;
+    const ret = $('#dlg-retrato');
+    ret.textContent = p.emoji;
+    ret.style.setProperty('--cor', p.cor);
+    $('#dlg-quem').textContent = p.nome;
+    $('#dlg-quem').style.setProperty('--cor', p.cor);
+    $('#caixa').style.setProperty('--cor', p.cor);
+
+    // efeito máquina de escrever
+    clearInterval(this.digitando);
+    const alvo = $('#dlg-texto'); alvo.textContent = '';
+    let j = 0;
+    this.digitando = setInterval(()=>{
+      alvo.textContent = c.t.slice(0, ++j);
+      if(j >= c.t.length) clearInterval(this.digitando);
+    }, 16);
+
+    // escolhas?
+    const esc = $('#escolhas');
+    if(c.escolhas){
+      this.escolhaAtiva = true;
+      esc.style.display = 'flex';
+      esc.innerHTML = '';
+      c.escolhas.forEach(op=>{
+        const b = document.createElement('button');
+        b.className = 'opcao';
+        b.textContent = op.rotulo;
+        b.onclick = e => { e.stopPropagation(); esc.style.display='none'; this.escolhaAtiva=false; op.acao(); };
+        esc.appendChild(b);
+      });
+    } else {
+      esc.style.display = 'none';
     }
-    if(field.length||row.length){row.push(field);rows.push(row);}
-    return rows.filter(r=>r.some(c=>c.trim()!==''));
+  },
+  avancar(){
+    if(this.escolhaAtiva) return;
+    const c = this.fila[this.i];
+    // se ainda está digitando, completa primeiro
+    if(c && $('#dlg-texto').textContent.length < c.t.length){
+      clearInterval(this.digitando);
+      $('#dlg-texto').textContent = c.t;
+      return;
+    }
+    this.i++; this.exibir();
   }
-  function rowsToObjects(rows){
-    if(!rows.length) return [];
-    const headers=rows[0].map(h=>h.trim().toLowerCase());
-    return rows.slice(1).map(r=>{
-      const o={}; headers.forEach((h,idx)=> o[h]=(r[idx]||'').trim()); return o;
-    });
-  }
+};
 
-  // -------- datas --------
-  function parseDate(str){
-    str=(str||'').trim(); if(!str) return null;
-    let m;
-    if((m=str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/))) return new Date(+m[1],+m[2]-1,+m[3],0,0,0);
-    if((m=str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/))) return new Date(+m[3],+m[2]-1,+m[1],0,0,0);
-    const d=new Date(str); return isNaN(d)?null:d;
-  }
-  function sinceLabel(d){ return `Desde ${d.getDate()} de ${MESES[d.getMonth()]} de ${d.getFullYear()}`; }
+/* ================== ROTEIRO ================== */
+const ROTEIRO = {
+  ep1_intro:[
+    {p:'narrador', cenario:'🌅🏠', t:'Sete da manhã. O bairro ainda dorme. A casa da família — a famosa casa — resiste em pé, igual ao orgulho da Vera.'},
+    {p:'vera', t:'Eu ouvi barulho de martelo. MARTELO. Se for o que eu tô pensando…', drama:1},
+    {p:'candido', cenario:'🕺🪧', t:'Bom dia, Verinha! Só vim deixar umas plaquinhas. VENDE-SE. Metade dessa casa é minha, tá no papel!'},
+    {p:'vera', t:'A única coisa que vai ser vendida aqui é essa sua cara de pau, Cândido!', drama:2},
+    {p:'cris', cenario:'🙄☕', t:'(da janela) Gente… são SETE da manhã. Eu não assinei pra ser plateia disso.'},
+    {p:'narrador', t:'MISSÃO DA VERA: arranque 10 placas de VENDE-SE antes que fixem no jardim. Cuidado: se 3 placas fixarem, a paciência dela acaba (e o episódio recomeça).'}
+  ],
+  ep1_fim:[
+    {p:'vera', cenario:'💪🏠', t:'DEZ placas! Pode trazer mais cem, eu arranco cento e uma!', drama:1},
+    {p:'candido', t:'Isso não fica assim! Eu vou… eu vou chamar a JUSTIÇA! A Cristiane vai ter que depor!'},
+    {p:'cris', t:'Depor?! EU?! Eu só moro aqui, meu Deus. Eu nem escolhi essa família direito.', drama:2},
+    {p:'narrador', t:'E assim, mais uma vez, a filha foi jogada no meio do fogo cruzado…'}
+  ],
+  ep2_intro:[
+    {p:'narrador', cenario:'🛋️📄', t:'Dias depois. Um homem de crachá ronda a sala com um envelope na mão. A intimação para a audiência dos pais.'},
+    {p:'oficial', t:'Cristiane? Cristianeee? Eu sei que a senhorita está em casa. Eu ouvi o barulho da geladeira.'},
+    {p:'cris', t:'(sussurrando) Se ele não me entregar o papel, eu não fui intimada. É a lei. Eu acho. Eu vi num vídeo.', drama:1},
+    {p:'narrador', t:'MISSÃO DA CRISTIANE: segure o botão para andar até a porta dos fundos 🚪 — mas SÓ quando o oficial estiver DE COSTAS. Se ele te ver andando… tchau, liberdade.'}
+  ],
+  ep2_fim:[
+    {p:'cris', cenario:'🚪🏃‍♀️', t:'CONSEGUI! Adeus, audiência! Vou pra casa da vó comer bolo em paz.'},
+    {p:'oficial', t:'(sozinho na sala) …Vinte anos de carreira. Perdi pra uma menina de pantufa.', drama:1},
+    {p:'narrador', t:'Enquanto isso, do outro lado da cidade, Cândido se preparava para mais uma noite de… “superação”.'}
+  ],
+  ep3_intro:[
+    {p:'narrador', cenario:'🍷🕯️', t:'Restaurante à meia-luz. Cândido ajeita a camisa aberta até o terceiro botão. Hoje ele decidiu: vai virar a página.'},
+    {p:'candido', t:'Hoje eu não falo da Vera. Nem da casa. Nem do processo. Hoje é sobre o FUTURO.', drama:1},
+    {p:'narrador', t:'MISSÃO DO CÂNDIDO: sobreviva a 3 encontros escolhendo o que dizer. Spoiler: ele é o próprio inimigo.'}
+  ],
+  final_intro:[
+    {p:'narrador', cenario:'🏠🌧️', t:'Domingo. Chove. Cristiane, cansada de fugir de oficial, de placa e de fofoca, faz o impensável: chama os dois pra mesma sala.'},
+    {p:'cris', t:'Sentem. Os dois. Sem martelo, sem envelope, sem perfume de conquista.', drama:1},
+    {p:'vera', t:'Se ele falar da casa, eu levanto.'},
+    {p:'candido', t:'Se ela revirar o olho, eu levanto.'},
+    {p:'cris', t:'NINGUÉM LEVANTA. Eu passei três episódios sendo colocada no meio da briga de vocês. Agora EU decido como isso termina.',
+      escolhas:[
+        {rotulo:'💥 “CHEGA! Vou gritar tudo que eu engoli em 20 anos!”', acao:()=>Final.encerrar('barraco')},
+        {rotulo:'🧘 “Eu amo os dois. Mas eu não sou o campo de batalha de vocês.”', acao:()=>Final.encerrar('limite')},
+        {rotulo:'🧳 “Sabe de uma coisa? Resolvam sozinhos. Vou morar com a vó.”', acao:()=>Final.encerrar('vo')}
+      ]}
+  ]
+};
 
-  // -------- diferença calendário-precisa --------
-  function diff(start, now){
-    if(now < start) now = start;
-    let y=now.getFullYear()-start.getFullYear();
-    let mo=now.getMonth()-start.getMonth();
-    let d=now.getDate()-start.getDate();
-    let h=now.getHours()-start.getHours();
-    let mi=now.getMinutes()-start.getMinutes();
-    let s=now.getSeconds()-start.getSeconds();
-    if(s<0){s+=60;mi--;}
-    if(mi<0){mi+=60;h--;}
-    if(h<0){h+=24;d--;}
-    if(d<0){ const pm=new Date(now.getFullYear(),now.getMonth(),0).getDate(); d+=pm; mo--; }
-    if(mo<0){mo+=12;y--;}
-    const totalDays=Math.floor((now-start)/86400000);
-    return {y,mo,d,h,mi,s,totalDays};
-  }
-  function pad(n){return String(n).padStart(2,'0');}
-
-  // -------- montagem --------
-  const cardsEl = document.getElementById('cards');
-  let COUNTERS = []; // cada item: {start, refs}
-
-  function unitsGridHTML(){
-    return `
-      <div class="units">
-        <div class="u"><span class="v" data-u="y">0</span><div class="l">Anos</div></div>
-        <div class="u"><span class="v" data-u="mo">0</span><div class="l">Meses</div></div>
-        <div class="u"><span class="v" data-u="d">0</span><div class="l">Dias</div></div>
-        <div class="u"><span class="v" data-u="h">00</span><div class="l">Horas</div></div>
-        <div class="u sec"><span class="v" data-u="combo">00</span><div class="l">Min·Seg</div></div>
-      </div>`;
-  }
-  function collectRefs(root){
-    return {
-      big: root.querySelector('[data-r="big"]'),
-      days: root.querySelector('[data-r="days"]'),
-      u:{
-        y: root.querySelector('[data-u="y"]'),
-        mo: root.querySelector('[data-u="mo"]'),
-        d: root.querySelector('[data-u="d"]'),
-        h: root.querySelector('[data-u="h"]'),
-        combo: root.querySelector('[data-u="combo"]'),
-      },
-      prev:{}
+/* ================== MINI-GAME 1: PLACAS ================== */
+const Jogo1 = {
+  pontos:0, vidas:3, spawner:null, ativo:false,
+  iniciar(){
+    this.pontos=0; this.vidas=3; this.ativo=true;
+    $('#j1-pontos').textContent=0; $('#j1-vidas').textContent=3;
+    $('#jardim').querySelectorAll('.placa').forEach(p=>p.remove());
+    Jogo.mostrar('jogo1');
+    this.spawn();
+  },
+  spawn(){
+    if(!this.ativo) return;
+    this.criarPlaca();
+    const ritmo = Math.max(450, 1150 - this.pontos*60); // acelera
+    this.spawner = setTimeout(()=>this.spawn(), ritmo);
+  },
+  criarPlaca(){
+    const jardim = $('#jardim');
+    const p = document.createElement('div');
+    p.className='placa';
+    const dur = Math.max(1.4, 2.6 - this.pontos*0.1);
+    p.innerHTML = `<div class="tabua">VENDE-SE</div><div class="pau"></div><div class="tempo"><i style="animation-duration:${dur}s"></i></div>`;
+    p.style.left = (8 + Math.random()*78) + '%';
+    p.style.top  = (18 + Math.random()*58) + '%';
+    let resolvida = false;
+    const fixou = setTimeout(()=>{
+      if(resolvida || !this.ativo) return;
+      resolvida = true;
+      p.remove();
+      this.flutuar(p.style.left, p.style.top, 'FIXOU! 😤', true);
+      this.vidas--; $('#j1-vidas').textContent = this.vidas;
+      Jogo.addDrama(1);
+      if(this.vidas <= 0) this.perdeu();
+    }, dur*1000);
+    p.onpointerdown = e =>{
+      e.preventDefault();
+      if(resolvida) return;
+      resolvida = true; clearTimeout(fixou);
+      p.remove();
+      this.flutuar(p.style.left, p.style.top, '+1 🪧');
+      this.pontos++; $('#j1-pontos').textContent = this.pontos;
+      if(this.pontos >= 10) this.venceu();
     };
+    jardim.appendChild(p);
+  },
+  flutuar(left, top, txt, ruim=false){
+    const f = document.createElement('div');
+    f.className = 'pontinho' + (ruim?' ruim':'');
+    f.textContent = txt;
+    f.style.left = left; f.style.top = top;
+    $('#jardim').appendChild(f);
+    setTimeout(()=>f.remove(), 700);
+  },
+  parar(){ this.ativo=false; clearTimeout(this.spawner); },
+  venceu(){
+    this.parar();
+    Dialogo.rodar(ROTEIRO.ep1_fim, ()=>
+      Jogo.cartela('EPISÓDIO 2', '“Ninguém Me Intima”',
+        'O oficial de justiça está na sala. Cristiane só queria chegar na geladeira em paz.',
+        ()=> Dialogo.rodar(ROTEIRO.ep2_intro, ()=> Jogo2.iniciar())));
+  },
+  perdeu(){
+    this.parar();
+    Dialogo.rodar([
+      {p:'candido', cenario:'🪧🪧🪧', t:'Três placas fixadas! Amanhã tem visita de corretor, Verinha! HAHAHA!'},
+      {p:'vera', t:'Ah, é assim? Então recomeça esse episódio que HOJE eu arranco tudo.', drama:1}
+    ], ()=> this.iniciar());
   }
+};
 
-  function buildCards(list){
-    cardsEl.innerHTML='';
-    COUNTERS=[];
-    let count=0;
+/* ================== MINI-GAME 2: OFICIAL ================== */
+const Jogo2 = {
+  progresso:0, estado:'costas', andando:false, loop:null, ciclo:null, ativo:false,
+  iniciar(){
+    Jogo.mostrar('jogo2');
+    this.reiniciar();
+    const btn = $('#btn-andar');
+    btn.onpointerdown = e=>{e.preventDefault(); this.andando=true;};
+    const soltar = ()=>{this.andando=false;};
+    btn.onpointerup = soltar; btn.onpointercancel = soltar; btn.onpointerleave = soltar;
+    window.onkeydown = e=>{ if(e.code==='Space'){e.preventDefault(); this.andando=true;} };
+    window.onkeyup = e=>{ if(e.code==='Space') this.andando=false; };
+  },
+  reiniciar(){
+    this.progresso=0; this.andando=false; this.ativo=true;
+    $('#pego').style.display='none';
+    this.atualizar();
+    this.mudarEstado('costas');
+    clearInterval(this.loop);
+    this.loop = setInterval(()=>this.tick(), 90);
+    this.agendarCiclo();
+  },
+  agendarCiclo(){
+    clearTimeout(this.ciclo);
+    if(!this.ativo) return;
+    if(this.estado==='costas'){
+      this.ciclo = setTimeout(()=>{ this.mudarEstado('virando');
+        this.ciclo = setTimeout(()=>{ this.mudarEstado('olhando'); this.agendarCiclo(); }, 500);
+      }, 1300 + Math.random()*1800);
+    } else if(this.estado==='olhando'){
+      this.ciclo = setTimeout(()=>{ this.mudarEstado('costas'); this.agendarCiclo(); }, 900 + Math.random()*1300);
+    }
+  },
+  mudarEstado(s){
+    this.estado = s;
+    const o = $('#oficial');
+    o.className = s;
+    const rot = {costas:'DE COSTAS 🍃', virando:'VIRANDO… ⚠️', olhando:'OLHANDO!! 👀'};
+    $('#oficial-estado').textContent = rot[s];
+    $('#oficial .icone').textContent = s==='costas' ? '🚶' : '👮';
+  },
+  tick(){
+    if(!this.ativo) return;
+    if(this.andando){
+      if(this.estado==='olhando'){ this.pego(); return; }
+      this.progresso = Math.min(100, this.progresso + 1.6);
+      this.atualizar();
+      if(this.progresso >= 100) this.venceu();
+    }
+  },
+  atualizar(){
+    $('#trilha-fill').style.width = this.progresso + '%';
+    $('#cris').style.left = (4 + this.progresso*0.82) + '%';
+  },
+  pego(){
+    this.ativo=false; clearInterval(this.loop); clearTimeout(this.ciclo);
+    Jogo.addDrama(1);
+    $('#pego').style.display='flex';
+  },
+  venceu(){
+    this.ativo=false; clearInterval(this.loop); clearTimeout(this.ciclo);
+    window.onkeydown = window.onkeyup = null;
+    Dialogo.rodar(ROTEIRO.ep2_fim, ()=>
+      Jogo.cartela('EPISÓDIO 3', '“O Conquistador”',
+        'Cândido jurou que hoje não fala da ex. O restaurante inteiro duvida.',
+        ()=> Dialogo.rodar(ROTEIRO.ep3_intro, ()=> Jogo3.iniciar())));
+  }
+};
 
-    list.forEach((item,i)=>{
-      const c1=(item.color&&item.color.trim())?item.color.trim():PALETTE[i%PALETTE.length];
-      const card=document.createElement('article');
-      card.className='card';
-      card.style.setProperty('--c1', c1);
+/* ================== MINI-GAME 3: ENCONTROS ================== */
+const Jogo3 = {
+  encontro:0,
+  dates:[
+    {emoji:'💃', nome:'MÁRCIA', abertura:'Então, Cândido… me fala de você. O que te faz feliz?',
+      certa:{rotulo:'😊 “Boa música, um bom papo… e recomeços.”', reacao:'Márcia sorri. Milagre: Cândido pareceu um adulto funcional por 12 segundos.'},
+      errada:{rotulo:'🏠 “Feliz mesmo eu vou ficar quando vender aquela casa. METADE é minha.”', reacao:'Márcia pediu a conta antes da entrada chegar. Recorde da casa.'}},
+    {emoji:'💁‍♀️', nome:'SOLANGE', abertura:'Adorei o restaurante! Você vem sempre aqui?',
+      certa:{rotulo:'🍷 “Primeira vez. Guardei pra uma ocasião especial.”', reacao:'Solange achou charmoso. Cândido quase estraga citando o valor da conta, mas segurou.'},
+      errada:{rotulo:'💔 “Vinha com a Vera. Ela sentava AÍ. Nessa cadeira. Exatamente essa.”', reacao:'Solange olhou pra cadeira, olhou pra ele, e simplesmente evaporou.'}},
+    {emoji:'👩‍🎤', nome:'PATRÍCIA', abertura:'Seu perfil dizia “sem bagagem emocional”. É verdade?',
+      certa:{rotulo:'😅 “Todo mundo tem bagagem. A minha eu carrego sozinho.”', reacao:'Patrícia aplaudiu a sinceridade. Primeira sobremesa dividida em 8 meses!'},
+      errada:{rotulo:'📄 “Só uma açãozinha judicial. Aliás, você depõe? Preciso de testemunha.”', reacao:'Patrícia fingiu uma ligação da tia. Não existia tia. Não existia ligação.'}}
+  ],
+  iniciar(){ this.encontro=0; Jogo.candidoFoiHumilhado=0; this.proximoDate(); },
+  proximoDate(){
+    if(this.encontro >= this.dates.length){ this.terminar(); return; }
+    const d = this.dates[this.encontro];
+    PERSONAGENS.date.nome = d.nome; PERSONAGENS.date.emoji = d.emoji;
+    const opcoes = [
+      {rotulo:d.certa.rotulo, acao:()=> this.resultado(d.certa.reacao, false)},
+      {rotulo:d.errada.rotulo, acao:()=> this.resultado(d.errada.reacao, true)}
+    ].sort(()=> Math.random()-.5); // embaralha posição
+    Dialogo.rodar([
+      {p:'narrador', cenario:'🍷'+d.emoji, t:`Encontro ${this.encontro+1} de 3: ${d.nome}.`},
+      {p:'date', t:d.abertura, escolhas:opcoes}
+    ]);
+  },
+  resultado(texto, deuRuim){
+    if(deuRuim){ Jogo.candidoFoiHumilhado++; Jogo.addDrama(2); }
+    this.encontro++;
+    Dialogo.rodar([{p:'narrador', t:texto, cenario: deuRuim?'💨🪑':'🥂✨'}], ()=> this.proximoDate());
+  },
+  terminar(){
+    const h = Jogo.candidoFoiHumilhado;
+    const balanco = h===0 ? 'Três encontros SEM citar a Vera. Cientistas estudam o caso.'
+      : h===3 ? 'Três fracassos em três tentativas. O garçom já anota “mesa pra um” quando ele chega.'
+      : 'Saldo misto: parte da cidade acha ele charmoso, parte tem pena.';
+    Dialogo.rodar([
+      {p:'narrador', cenario:'🌙🍷', t:balanco},
+      {p:'candido', t:'(no espelho do banheiro) Você é uma águia, Cândido. Uma águia… que sente falta do ninho.', drama:1}
+    ], ()=> Jogo.cartela('CAPÍTULO FINAL', '“A Filha no Meio”',
+        'Cristiane convoca a reunião que nenhum oficial de justiça conseguiu marcar.',
+        ()=> Dialogo.rodar(ROTEIRO.final_intro)));
+  }
+};
 
-      if(item.subs && item.subs.length){
-        // ----- card duplo -----
-        const subs=item.subs.map(s=>({label:s.label||'', icon:s.icon||'', start:parseDate(s.start)})).filter(s=>s.start);
-        if(!subs.length) return;
-        let subsHTML='';
-        subs.forEach((s,si)=>{
-          subsHTML+=`
-            <div class="sub" data-sub="${si}">
-              <div class="sub-head">
-                <div class="sub-label"><span class="si">${s.icon}</span>${s.label}</div>
-                <div class="sub-since">${sinceLabel(s.start)}</div>
-              </div>
-              <div class="hero sm">
-                <span class="big" data-r="big">0</span>
-                <span class="unit">dias firme</span>
-              </div>
-              ${unitsGridHTML()}
-            </div>`;
-        });
-        card.innerHTML=`
-          <div class="halo"></div>
-          <div class="c-head">
-            <div class="c-title">
-              <div class="c-ico">${item.icon||'🍰'}</div>
-              <div>
-                <div class="c-name">${item.name||'Doces'}</div>
-                <div class="c-since">Aberto a ocasiões especiais</div>
-              </div>
-            </div>
-          </div>
-          <div class="subs">${subsHTML}</div>`;
-        cardsEl.appendChild(card);
-        card.querySelectorAll('.sub').forEach((subEl,si)=>{
-          COUNTERS.push({start:subs[si].start, refs:collectRefs(subEl), label:subs[si].label, icon:subs[si].icon});
-        });
-        count++;
-      }else{
-        // ----- card simples -----
-        const start=parseDate(item.start);
-        if(!start) return;
-        card.innerHTML=`
-          <div class="halo"></div>
-          <div class="c-head">
-            <div class="c-title">
-              <div class="c-ico">${item.icon||'✨'}</div>
-              <div>
-                <div class="c-name">${item.name||'Sem nome'}</div>
-                <div class="c-since">${sinceLabel(start)}</div>
-              </div>
-            </div>
-            <div class="badge" data-r="days">— dias</div>
-          </div>
-          <div class="hero">
-            <span class="big" data-r="big">0</span>
-            <span class="unit">dias firme</span>
-          </div>
-          ${unitsGridHTML()}`;
-        cardsEl.appendChild(card);
-        COUNTERS.push({start:start, refs:collectRefs(card), label:(item.name||'Sem nome'), icon:(item.icon||'✨')});
-        count++;
+/* ================== FINAIS ================== */
+const Final = {
+  encerrar(tipo){
+    const finais = {
+      barraco:{
+        titulo:'FIM (COM BARRACO)',
+        texto:'Cristiane gritou por 40 minutos sem respirar. A vizinhança aplaudiu de pé. Vera e Cândido, em choque, concordaram em algo pela primeira vez em anos: "a menina puxou os dois". A casa? Continua lá. A terapia familiar? Começa terça.',
+        drama:5
+      },
+      limite:{
+        titulo:'FIM (COM LIMITE)',
+        texto:'Silêncio na sala. Pela primeira vez, os dois ouviram. Vera guardou o alicate de arrancar placa. Cândido rasgou o anúncio do corretor. A casa ficou — não como troféu, mas como lar da Cristiane. E combinaram: briga de adulto se resolve entre adultos.',
+        drama:0
+      },
+      vo:{
+        titulo:'FIM (NA CASA DA VÓ)',
+        texto:'Cristiane fez a mala em 8 minutos. Na casa da avó tem bolo, novela às nove e ZERO oficial de justiça. Vera e Cândido, sem plateia, perceberam que brigar sem público não tem graça nenhuma. Dizem que já foram vistos tomando café. No mesmo bar. Em mesas separadas. Por enquanto.',
+        drama:2
       }
-    });
-
-    if(!count){
-      cardsEl.innerHTML='<div class="state">Nenhum dado válido encontrado.</div>';
-      return false;
-    }
-    return true;
+    };
+    const f = finais[tipo];
+    Jogo.addDrama(f.drama);
+    $('#final-titulo').textContent = f.titulo;
+    $('#final-texto').textContent = f.texto;
+    $('#final-drama').textContent = Jogo.drama;
+    Jogo.mostrar('tela-final');
   }
-
-  function setVal(el,val,store,key){
-    if(!el) return;
-    const str=String(val);
-    if(store[key]!==str){
-      store[key]=str; el.textContent=str;
-      el.classList.remove('tick'); void el.offsetWidth; el.classList.add('tick');
-    }
-  }
-
-  // ----- mensagens motivacionais: rodízio geral por todas as áreas -----
-  function lab(c){ return (c.label||'').toLowerCase(); }
-  function daysOf(c){ return diff(c.start, new Date()).totalDays; }
-
-  const areaTpl = [
-    (c,d)=>`${c.icon} Você está há <b>${d}</b> dias ${lab(c)}. Continue firme!`,
-    (c,d)=>`${c.icon} <b>${d}</b> dias ${lab(c)} — muito orgulho de você!`,
-    (c,d)=>`${c.icon} Já são <b>${d}</b> dias ${lab(c)}. Cada dia conta.`
-  ];
-  function areaMsg(c, k){
-    const d=daysOf(c);
-    if(d===0) return `${c.icon} Recomeço hoje em ${lab(c)} — ocasião especial vale! Amanhã a contagem já cresce. 😉`;
-    return areaTpl[k % areaTpl.length](c,d);
-  }
-  const geralTpl = [
-    ()=>`🔥 No total, já são <b>${COUNTERS.reduce((a,c)=>a+daysOf(c),0)}</b> dias de escolhas saudáveis somadas!`,
-    ()=>`💪 Você está cuidando de <b>${COUNTERS.length}</b> metas ao mesmo tempo. Que disciplina!`,
-    ()=>`🏆 Seu maior recorde agora é <b>${COUNTERS.reduce((m,c)=>Math.max(m,daysOf(c)),0)}</b> dias. Imparável!`
-  ];
-
-  // monta a sequência alternando áreas e mensagens gerais
-  function buildCheerSlots(){
-    const slots=[];
-    COUNTERS.forEach((c,i)=>{
-      slots.push(k=>areaMsg(c,k));
-      if(i%2===1){ const gi=Math.floor(i/2)%geralTpl.length; slots.push(()=>geralTpl[gi]()); }
-    });
-    geralTpl.forEach((g,gi)=>slots.push(()=>geralTpl[gi]()));
-    return slots;
-  }
-
-  let cheerSlots=[], cheerIdx=0;
-  function rotateCheer(){
-    if(!cheerSlots.length) return;
-    const el=document.getElementById('cheerMsg');
-    el.style.opacity=0;
-    setTimeout(()=>{
-      el.innerHTML=cheerSlots[cheerIdx % cheerSlots.length](cheerIdx);
-      el.style.transition='opacity .5s'; el.style.opacity=1; cheerIdx++;
-    },300);
-  }
-
-  function tick(){
-    const now=new Date();
-    COUNTERS.forEach(c=>{
-      const r=c.refs;
-      const x=diff(c.start, now);
-      setVal(r.big, x.totalDays, r.prev,'big');
-      if(r.days) r.days.textContent=`${x.totalDays} dias`;
-      setVal(r.u.y, x.y, r.prev,'y');
-      setVal(r.u.mo, x.mo, r.prev,'mo');
-      setVal(r.u.d, x.d, r.prev,'d');
-      setVal(r.u.h, pad(x.h), r.prev,'h');
-      setVal(r.u.combo, pad(x.mi)+':'+pad(x.s), r.prev,'combo');
-    });
-  }
-
-  let started=false;
-  function start(list){
-    if(!buildCards(list)) return;
-    cheerSlots=buildCheerSlots();
-    if(!started){
-      started=true;
-      cheerIdx=Math.floor(Math.random()*cheerSlots.length); // começa numa área aleatória
-      tick(); rotateCheer();
-      setInterval(tick,1000);
-      setInterval(rotateCheer,6000);
-    }else{ tick(); }
-  }
-
-  async function load(){
-    if(!CSV_URL || CSV_URL.indexOf('COLE_O_LINK')!==-1){ start(FALLBACK); return; }
-    try{
-      const sep=CSV_URL.indexOf('?')!==-1?'&':'?';
-      const res=await fetch(CSV_URL+sep+'cacheBust='+Date.now());
-      if(!res.ok) throw new Error('HTTP '+res.status);
-      const objs=rowsToObjects(parseCSV(await res.text()));
-      start(objs.length?objs:FALLBACK);
-    }catch(e){ console.error('Falha ao carregar planilha:',e); start(FALLBACK); }
-  }
-
-
-  load();
+};
 </script>
 </body>
 </html>
