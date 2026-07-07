@@ -3,18 +3,556 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CASA DIVIDIDA — uma micro-novela jogável</title>
+<title>Fliperama da Família — Escolha seu jogo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Karla:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --fundo:#120b1e;
+    --neon1:#ffc93c;
+    --neon2:#ff4d8d;
+    --creme:#fdf3e3;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:
+      radial-gradient(900px 500px at 20% -10%, #2a1640 0%, transparent 60%),
+      radial-gradient(900px 500px at 85% 110%, #3a1030 0%, transparent 60%),
+      var(--fundo);
+    color:var(--creme);
+    font-family:'Karla',sans-serif;
+    min-height:100vh;
+  }
+  /* ---------- MENU ---------- */
+  #menu{
+    min-height:100vh;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:26px;
+    padding:30px 16px;text-align:center;
+  }
+  #menu h1{
+    font-family:'Fraunces',serif;font-weight:900;
+    font-size:clamp(2rem,7vw,3.6rem);line-height:1.05;color:#fff;
+  }
+  #menu h1 span{color:var(--neon1)}
+  #menu .sub{color:rgba(253,243,227,.7);max-width:52ch}
+  .canais{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:20px;width:min(820px,94vw);
+  }
+  .canal{
+    text-align:left;color:var(--creme);cursor:pointer;
+    border-radius:20px;padding:26px 24px;
+    border:2px solid rgba(255,255,255,.15);
+    transition:transform .18s, box-shadow .2s, border-color .2s;
+    position:relative;overflow:hidden;
+  }
+  .canal:hover,.canal:focus-visible{transform:translateY(-6px) scale(1.01);outline:none}
+  .canal .tag{
+    display:inline-block;font-size:.7rem;font-weight:800;letter-spacing:.22em;
+    text-transform:uppercase;border-radius:999px;padding:4px 12px;margin-bottom:12px;
+  }
+  .canal h2{font-family:'Fraunces',serif;font-size:1.6rem;color:#fff;margin-bottom:8px}
+  .canal p{font-size:.95rem;color:rgba(253,243,227,.8);line-height:1.5}
+  .canal .emoji{font-size:2.4rem;margin-bottom:8px}
+  .canal .play{
+    margin-top:16px;font-weight:800;font-size:.9rem;letter-spacing:.1em;text-transform:uppercase;
+  }
+  #canal-folga{
+    background:linear-gradient(160deg,#0f3438,#14454a);
+  }
+  #canal-folga:hover{border-color:#ffc93c;box-shadow:0 16px 40px rgba(255,201,60,.2)}
+  #canal-folga .tag{background:#ffc93c;color:#0c2a2d}
+  #canal-folga .play{color:#ffc93c}
+  #canal-novela{
+    background:linear-gradient(160deg,#26101f,#3a1a30);
+  }
+  #canal-novela:hover{border-color:#ff4d8d;box-shadow:0 16px 40px rgba(255,77,141,.25)}
+  #canal-novela .tag{background:#ff4d8d;color:#fff}
+  #canal-novela .play{color:#ff4d8d}
+  #menu .rodape{font-size:.78rem;color:rgba(253,243,227,.4)}
+
+  /* ---------- ÁREA DO JOGO ---------- */
+  #arena{display:none;position:fixed;inset:0;z-index:10;background:var(--fundo)}
+  #arena.on{display:block}
+  #quadro{width:100%;height:100%;border:0;display:block}
+  #voltar{
+    position:fixed;top:12px;left:12px;z-index:20;
+    font-family:'Karla',sans-serif;font-weight:800;font-size:.85rem;
+    color:var(--fundo);background:var(--creme);
+    border:none;border-radius:999px;padding:9px 18px;cursor:pointer;
+    box-shadow:0 6px 18px rgba(0,0,0,.45);opacity:.92;
+    transition:transform .15s;
+  }
+  #voltar:hover{transform:translateY(-2px)}
+  #voltar:focus-visible{outline:3px solid var(--neon1);outline-offset:2px}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     MENU INICIAL — escolha seu jogo
+     ============================================================ -->
+<main id="menu">
+  <h1>🕹️ Fliperama da <span>Família</span></h1>
+  <p class="sub">Dois jogos, um botão de escolha. De um lado, pais desesperados por uma folga. Do outro, uma novela de conflito familiar que você joga. Escolha seu canal:</p>
+
+  <div class="canais">
+    <button class="canal" id="canal-folga" onclick="abrirJogo('tpl-folga')">
+      <div class="emoji">👨‍👩‍👦💨</div>
+      <span class="tag">Canal 1 · Comédia</span>
+      <h2>Operação Folga</h2>
+      <p>Marcel e Gabriela só querem UMA noite sem o Juca. Mas Melise, Henrique, Andriele, Cristiane e Rogério fogem, se escondem e inventam desculpas. Empurre o bebê em alguém antes que a paciência acabe!</p>
+      <div class="play">▶ Jogar</div>
+    </button>
+
+    <button class="canal" id="canal-novela" onclick="abrirJogo('tpl-novela')">
+      <div class="emoji">📺🔥</div>
+      <span class="tag">Canal 2 · Dramalhão</span>
+      <h2>Casa Dividida</h2>
+      <p>Uma micro-novela jogável em 3 episódios: Vera arranca placas de VENDE-SE, Cristiane foge do oficial de justiça e Cândido tenta (e falha) recomeçar. No final, você decide o destino da família.</p>
+      <div class="play">▶ Assistir jogando</div>
+    </button>
+  </div>
+
+  <p class="rodape">Feito com Claude · dois jogos em um só arquivo</p>
+</main>
+
+<!-- ============================================================
+     ARENA — onde o jogo escolhido roda (iframe isolado)
+     ============================================================ -->
+<div id="arena">
+  <button id="voltar" onclick="voltarMenu()">← Menu</button>
+  <iframe id="quadro" title="Jogo"></iframe>
+</div>
+
+<script>
+  function abrirJogo(tplId){
+    const tpl = document.getElementById(tplId);
+    const frame = document.getElementById('quadro');
+    frame.srcdoc = '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body>' + tpl.innerHTML + '</body></html>';
+    document.getElementById('arena').classList.add('on');
+    document.getElementById('menu').style.display = 'none';
+  }
+  function voltarMenu(){
+    document.getElementById('quadro').srcdoc = '';
+    document.getElementById('arena').classList.remove('on');
+    document.getElementById('menu').style.display = 'flex';
+  }
+</script>
+
+<!-- ============================================================
+     JOGO 1: OPERAÇÃO FOLGA (template inerte, roda no iframe)
+     ============================================================ -->
+<template id="tpl-folga">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Karla:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --fundo:#0f3438;
+    --fundo-2:#14454a;
+    --coral:#ff6b57;
+    --sol:#ffc93c;
+    --creme:#fdf3e3;
+    --agua:#5fd0c7;
+    --tinta:#0c2a2d;
+    --sombra:rgba(0,0,0,.35);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:
+      radial-gradient(ellipse 120% 55% at 50% -12%, var(--fundo-2), transparent 70%),
+      var(--fundo);
+    color:var(--creme);
+    font-family:'Karla',sans-serif;
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;
+    padding:56px 14px 70px;line-height:1.5;
+  }
+  h1,h2,h3{font-family:'Fraunces',serif}
+  button{font-family:'Karla',sans-serif;cursor:pointer}
+  button:focus-visible{outline:3px solid var(--sol);outline-offset:2px}
+
+  .palco{width:min(760px,96vw)}
+
+  .hud{
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.1);
+    border-radius:16px;padding:12px 18px;margin-bottom:16px;
+  }
+  .hud .casal{font-size:1.7rem}
+  .hud .info{flex:1;min-width:180px}
+  .hud .nome{font-weight:800;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--sol)}
+  .trilho{height:12px;border-radius:999px;background:rgba(0,0,0,.35);overflow:hidden;margin-top:4px}
+  .fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#d4523d,var(--coral),var(--sol));transition:width .6s ease}
+  .hud .rodada{font-weight:800;color:var(--agua);white-space:nowrap}
+
+  .alvos{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-bottom:16px}
+  .alvo{
+    text-align:left;color:var(--creme);
+    background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02));
+    border:2px solid rgba(255,255,255,.14);border-radius:18px;
+    padding:16px;transition:transform .15s,border-color .2s,box-shadow .2s;
+    position:relative;overflow:hidden;
+  }
+  .alvo:hover:not(:disabled){transform:translateY(-4px);border-color:var(--sol);box-shadow:0 12px 28px var(--sombra)}
+  .alvo.selecionado{border-color:var(--coral);box-shadow:0 0 0 3px rgba(255,107,87,.3)}
+  .alvo:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.6)}
+  .alvo .cenario{font-size:2rem}
+  .alvo .quem{font-family:'Fraunces',serif;font-weight:700;font-size:1.12rem;margin:6px 0 2px;color:#fff}
+  .alvo .onde{font-size:.82rem;color:var(--agua)}
+  .alvo .resist{margin-top:10px}
+  .alvo .resist .rotulo{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(253,243,227,.6)}
+  .alvo .trilho{height:9px;background:rgba(0,0,0,.4)}
+  .alvo .fill{background:linear-gradient(90deg,#2e8f86,var(--agua))}
+  .alvo .fugindo{position:absolute;top:10px;right:-40px;font-size:1.5rem;animation:foge 1.2s ease forwards}
+  @keyframes foge{from{right:-40px;opacity:1}to{right:110%;opacity:.2}}
+  @media (prefers-reduced-motion:reduce){.alvo .fugindo{animation:none;right:10px}}
+
+  .painel{
+    background:linear-gradient(180deg,#17454b,#123a3f);
+    border:1px solid rgba(255,255,255,.12);border-radius:18px;
+    padding:22px 24px;box-shadow:0 16px 40px var(--sombra);
+  }
+  .painel h2{font-size:1.25rem;color:var(--sol);margin-bottom:4px}
+  .painel .dica{font-size:.9rem;color:rgba(253,243,227,.65);margin-bottom:14px}
+  .taticas{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+  .tatica{
+    text-align:left;color:var(--creme);
+    background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.16);
+    border-radius:12px;padding:12px 14px;transition:border-color .2s,background .2s,transform .12s;
+  }
+  .tatica:hover:not(:disabled){border-color:var(--coral);background:rgba(255,107,87,.1);transform:translateX(3px)}
+  .tatica:disabled{opacity:.4;cursor:not-allowed}
+  .tatica .nome{font-weight:800}
+  .tatica .custo{font-size:.78rem;color:var(--agua);margin-top:2px}
+
+  .cena{
+    margin-top:16px;background:rgba(0,0,0,.25);border-radius:14px;
+    border:1px dashed rgba(95,208,199,.4);padding:16px 18px;
+    animation:pop .35s ease both;
+  }
+  @keyframes pop{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+  .cena .balao{margin:6px 0;font-size:1rem}
+  .cena .balao b{color:var(--sol)}
+  .cena .balao.amigo b{color:var(--agua)}
+  .cena .dano{margin-top:10px;font-weight:800}
+  .cena .dano.bom{color:var(--sol)} .cena .dano.ruim{color:var(--coral)}
+  .btn-grande{
+    font-family:'Fraunces',serif;font-weight:700;font-size:1.05rem;
+    color:var(--tinta);background:var(--sol);
+    border:none;border-radius:999px;padding:12px 30px;
+    transition:transform .15s,box-shadow .2s;
+  }
+  .btn-grande:hover{transform:translateY(-2px) rotate(-1deg);box-shadow:0 10px 24px rgba(255,201,60,.35)}
+  .btn-coral{background:var(--coral);color:#fff}
+
+  .tela{
+    background:linear-gradient(180deg,#17454b,#123a3f);
+    border:1px solid rgba(255,255,255,.12);border-radius:22px;
+    padding:44px 34px;text-align:center;box-shadow:0 20px 50px var(--sombra);
+    animation:pop .4s ease both;
+  }
+  .tela h1{font-size:clamp(1.9rem,6vw,3rem);font-weight:900;color:#fff;line-height:1.12}
+  .tela h1 em{font-style:italic;color:var(--sol)}
+  .tela .grande-emoji{font-size:3.4rem;margin-bottom:10px}
+  .tela p{color:rgba(253,243,227,.85);max-width:56ch;margin:14px auto 0}
+  .tela .selo{
+    display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+    border:2px solid var(--coral);color:var(--coral);border-radius:999px;padding:5px 16px;margin-bottom:14px;
+  }
+  .modos{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+  .placar{margin-top:18px;font-size:.85rem;color:rgba(253,243,227,.55)}
+  .elenco{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+  .elenco span{
+    background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);
+    border-radius:999px;padding:6px 14px;font-size:.85rem;
+  }
+</style>
+
+<main class="palco" id="palco" aria-live="polite"></main>
+
+<script>
+const $ = s => document.getElementById(s);
+const rnd = a => a[Math.floor(Math.random() * a.length)];
+const clamp = (v,min,max) => Math.max(min, Math.min(max, v));
+
+function novosAmigos(dificil){
+  const base = dificil ? 130 : 100;
+  return [
+    {
+      id:'rc', quem:'Rogério & Cristiane', cenario:'🏠🌳',
+      onde:'Casa com quintal — perfeita pra criança (eles sabem, por isso se escondem)',
+      resist: base, max: base,
+      fraco:'suborno', forte:'quinze',
+      desculpas:[
+        '"A gente ia dar grau no jardim HOJE, imagina…"',
+        '"O cachorro tá numa fase que não aceita criança, o veterinário proibiu."',
+        '"A casa tá em obra. Qual obra? É… uma obra invisível. Estrutural!"',
+        '"A Cris torceu o pulso agora há pouco. Os dois pulsos. Olha aí, ó… ai."',
+        '"Quintal tem formiga. Formiga BRAVA. Não é ambiente pro Juca."'
+      ],
+      fugas:['🏃‍♂️ Rogério pulou o muro do próprio quintal!','🚪 Cristiane apagou a luz e fingiu que a casa estava vazia!','🌳 Os dois se esconderam atrás da mangueira!'],
+      fraqueza_cena:'O cheiro imaginário de picanha invade a casa. Rogério olha pra churrasqueira parada há 3 semanas… e fraqueja.',
+      epilogo:{
+        titulo:'O quintal caiu!',
+        texto:'Rogério e Cristiane aceitaram "só dessa vez". Resultado: o Juca colheu TODOS os tomates verdes da horta, deu banho no cachorro com terra e dormiu no gramado. Cristiane postou 47 stories. Rogério já perguntou "quando ele volta?". O quintal venceu.'
+      },
+      epilogo_gemeos:'Com os gêmeos, a horta virou escavação arqueológica e o cachorro pediu asilo na casa do vizinho. Mas no fim, Rogério montou DUAS balancinhas na mangueira. Sem volta.'
+    },
+    {
+      id:'ah', quem:'Andriele & Henrique', cenario:'🏢🛋️',
+      onde:'Apartamento compacto — "nada criança-friendly", segundo eles',
+      resist: base, max: base,
+      fraco:'quinze', forte:'surpresa',
+      desculpas:[
+        '"Nosso ap é 90% vidro e quinas. É praticamente uma armadilha ninja."',
+        '"O síndico proibiu ruído. Criança É ruído, Marcel. É a lei."',
+        '"A gente ia lavar a sacada hoje. É um evento. Tem cronograma."',
+        '"O elevador tá em manutenção. Você vai subir 11 andares com o bebê?"',
+        '"A Andriele desenvolveu alergia a… responsabilidade alheia. Atestado e tudo."'
+      ],
+      fugas:['🛗 Henrique entrou no elevador e apertou TODOS os andares pra fugir!','📵 Andriele viu a mensagem, deixou no visto e mudou a foto do perfil!','🚪 A portaria informou: "os moradores solicitaram sigilo de existência."'],
+      fraqueza_cena:'"Quinze minutinhos" parece pouco. Henrique olha pra Andriele: "quinze minutos a gente aguenta, né?". Doce ilusão. A porta se entreabre…',
+      epilogo:{
+        titulo:'O apartamento caiu!',
+        texto:'"Só 15 minutinhos" viraram 6 horas. O Juca apertou todos os botões do elevador, fez amizade com o síndico (que revogou a lei do silêncio) e desenhou na sacada recém-lavada. Henrique e Andriele agora têm um cantinho de brinquedos "pra visitas". Sei.'
+      },
+      epilogo_gemeos:'Os gêmeos em 90m²: um foi pra esquerda, outro pra direita, e Henrique descobriu que não dá pra correr atrás dos dois. O síndico? Virou babá reserva. O prédio inteiro se rendeu.'
+    },
+    {
+      id:'me', quem:'Melise', cenario:'🏖️🌊',
+      onde:'Solteira, casa na praia — longe fisicamente E emocionalmente da paternidade',
+      resist: base, max: base,
+      fraco:'chantagem', forte:'suborno', longe:true,
+      desculpas:[
+        '"Areia + fralda = crime ambiental, amiga. Pensa no planeta."',
+        '"Hoje o mar tá me chamando. É espiritual. Criança corta a vibe da maré."',
+        '"Tô num detox de responsabilidades. Meu terapeuta assinou embaixo."',
+        '"Aqui não tem tomada com protetor, não tem NADA com protetor. Nem eu."',
+        '"Vou surfar. Volto quando o Juca fizer 18."'
+      ],
+      fugas:['🏄‍♀️ Melise remou pro fundo do mar quando viu o carro de vocês chegando!','🥥 Melise se escondeu atrás de um coqueiro segurando uma água de coco!','🌅 Melise alegou "compromisso com o pôr do sol" e sumiu na areia!'],
+      fraqueza_cena:'"Você é a MADRINHA, Melise. Foi você que chorou no batizado." Ela olha pro mar, olha pro Juca, olha pro mar… o golpe da madrinha é jurisprudência.',
+      epilogo:{
+        titulo:'A praia caiu!',
+        texto:'A madrinha cedeu. O Juca comeu areia (duas vezes), foi apresentado ao mar "da forma zen correta" e ganhou o primeiro chinelinho. Melise postou "dia de tia 🧿🌊" e recebeu 200 curtidas. Devolveu o Juca com 3 horas de atraso porque "a vibe tava boa". Quem diria.'
+      },
+      epilogo_gemeos:'Melise com gêmeos na praia: um comeu areia, o outro comeu a areia que o primeiro cuspiu. Ela improvisou um cercadinho com pranchas de surf e chamou de "projeto Montessori litorâneo". Influencer de tia nasce assim.'
+    }
+  ];
+}
+
+const TATICAS = [
+  { id:'surpresa', emoji:'🚪', nome:'Visita surpresa com mala pronta', custo:12, dano:18,
+    desc:'Aparecer sem avisar, bolsa do bebê no ombro, sorriso no rosto.',
+    falaPais:['"Olha quem passou pra dar um OI! E olha o que ele trouxe: a malinha!"','"A gente tava passando aqui na frente, coincidentemente com tudo do Juca no carro…"'] },
+  { id:'chantagem', emoji:'🥺', nome:'Chantagem emocional', custo:10, dano:16,
+    desc:'Ativar memórias de favores antigos e olhares de cachorro abandonado.',
+    falaPais:['"Lembra quem carregou teu sofá de 300kg na mudança? Pois é."','"A gente não dorme há 8 meses. OITO. Olha meu olho. OLHA MEU OLHO."'] },
+  { id:'suborno', emoji:'🍖', nome:'Suborno gastronômico', custo:15, dano:20,
+    desc:'Churrasco, rodízio, vinho importado — o que for preciso.',
+    falaPais:['"Fica com o Juca 3 horinhas e sábado tem picanha na sua casa. Eu levo TUDO."','"Uma caixa daquele vinho que você ama. UMA CAIXA. Pensa bem."'] },
+  { id:'quinze', emoji:'⏱️', nome:'"Só 15 minutinhos"', custo:8, dano:14,
+    desc:'A mentira mais antiga da parentalidade. Todo mundo sabe. Às vezes funciona.',
+    falaPais:['"Quinze minutinhos! Cronometrados! A gente só vai ali e volta!"','"Rapidinho, juro. O Juca nem vai perceber que a gente saiu. (Ele vai.)"'] },
+  { id:'fuga', emoji:'🏃', nome:'Deixar o Juca e SAIR CORRENDO', custo:0, dano:0, especial:true,
+    desc:'Alto risco: 25% de chance de folga instantânea. Se falhar, queima o filme feio.',
+    falaPais:['"Segura ele um segundinho— VAMBORA GABRIELA, ACELERA, ACELERAAA!"'] }
+];
+
+let J = null;
+function novoJogo(dificil){
+  J = {
+    dificil,
+    bebe: dificil ? 'os gêmeos Juca & Théo' : 'o Juca',
+    bebeEmoji: dificil ? '👶👶' : '👶',
+    paciencia: 100,
+    rodada: 1,
+    alvo: null,
+    amigos: novosAmigos(dificil),
+    tentativas: 0
+  };
+}
+
+function telaAbertura(){
+  $('palco').innerHTML = `
+    <div class="tela">
+      <div class="grande-emoji">👨‍👩‍👦💨</div>
+      <h1>Operação <em>Folga</em></h1>
+      <p><strong>O bebê nasceu!</strong> Marcel e Gabriela amam o Juca mais que tudo. Mas faz 8 meses que eles não veem um filme inteiro, não jantam sem purê no cabelo e não terminam uma frase.</p>
+      <p>A missão é simples: <strong>empurrar o Juca pra casa de um amigo</strong> e ganhar UMA noite de folga. O problema? Os amigos fogem, se escondem, inventam obra, alergia e compromisso com o pôr do sol.</p>
+      <div class="elenco">
+        <span>🏠 Rogério & Cristiane — casa com quintal</span>
+        <span>🏢 Andriele & Henrique — apartamento</span>
+        <span>🏖️ Melise — solteira na praia</span>
+      </div>
+      <p style="font-size:.9rem">Cada amigo tem uma <strong>fraqueza secreta</strong> e uma tática contra a qual é imune. Descubra na base da insistência — mas cuidado: a paciência de vocês (e a fralda do Juca) não dura pra sempre.</p>
+      <div class="modos">
+        <button class="btn-grande" onclick="comecar(false)">Jogar com 1 filho 👶</button>
+        <button class="btn-grande btn-coral" onclick="comecar(true)">Modo GÊMEOS 👶👶 (difícil)</button>
+      </div>
+    </div>`;
+}
+
+function comecar(dificil){ novoJogo(dificil); render(); }
+
+function render(msgCena){
+  const alvosHtml = J.amigos.map(a => `
+    <button class="alvo ${J.alvo===a.id?'selecionado':''}" ${a.resist<=0?'disabled':''} onclick="escolherAlvo('${a.id}')">
+      <div class="cenario">${a.cenario}</div>
+      <div class="quem">${a.quem}</div>
+      <div class="onde">${a.onde}${a.longe?' · <b>viagem longa (+8 de paciência por tentativa)</b>':''}</div>
+      <div class="resist">
+        <div class="rotulo">Resistência à babá-gem</div>
+        <div class="trilho"><div class="fill" style="width:${clamp(a.resist/a.max*100,0,100)}%"></div></div>
+      </div>
+      ${a.fugiu ? `<div class="fugindo">🏃💨</div>` : ''}
+    </button>`).join('');
+
+  const alvoSel = J.amigos.find(a => a.id === J.alvo);
+  const taticasHtml = alvoSel ? TATICAS.map(t => `
+    <button class="tatica" ${J.paciencia < t.custo + (alvoSel.longe?8:0) && !t.especial ? 'disabled':''} onclick="atacar('${t.id}')">
+      <div class="nome">${t.emoji} ${t.nome}</div>
+      <div class="custo">${t.especial ? 'Custo: sua dignidade · 25% de vitória instantânea' : `Custo: ${t.custo + (alvoSel.longe?8:0)} de paciência`}</div>
+      <div style="font-size:.82rem;color:rgba(253,243,227,.6);margin-top:2px">${t.desc}</div>
+    </button>`).join('') : '';
+
+  $('palco').innerHTML = `
+    <div class="hud">
+      <div class="casal">😵‍💫👩‍🦱 ${J.bebeEmoji}</div>
+      <div class="info">
+        <div class="nome">Paciência de Marcel & Gabriela</div>
+        <div class="trilho"><div class="fill" style="width:${J.paciencia}%"></div></div>
+      </div>
+      <div class="rodada">Tentativa ${J.tentativas} · carregando ${J.bebe}</div>
+    </div>
+
+    <div class="alvos">${alvosHtml}</div>
+
+    <div class="painel">
+      ${alvoSel ? `
+        <h2>Alvo: ${alvoSel.quem}</h2>
+        <div class="dica">Escolha a tática. Cada amigo tem uma fraqueza (dano dobrado) e uma imunidade (dano pela metade). Descubra sofrendo.</div>
+        <div class="taticas">${taticasHtml}</div>
+      ` : `
+        <h2>Escolha a vítima… digo, o amigo 🎯</h2>
+        <div class="dica">Clique em um dos amigos acima pra começar a ofensiva. Lembre: a Melise mora na praia — cada investida contra ela custa mais paciência (é longe, e ${J.bebe} chora no carro).</div>
+      `}
+      <div id="cena">${msgCena || ''}</div>
+    </div>`;
+}
+
+function escolherAlvo(id){
+  J.alvo = id;
+  J.amigos.forEach(a => a.fugiu = false);
+  render();
+}
+
+function atacar(tid){
+  const t = TATICAS.find(x => x.id === tid);
+  const a = J.amigos.find(x => x.id === J.alvo);
+  J.tentativas++;
+
+  if (t.especial){
+    if (Math.random() < 0.25){
+      a.resist = 0;
+      return telaVitoria(a, true);
+    }
+    J.paciencia = clamp(J.paciencia - 25, 0, 100);
+    a.resist = clamp(a.resist + 15, 0, a.max);
+    a.fugiu = true;
+    const cena = `
+      <div class="cena">
+        <div class="balao"><b>Marcel:</b> ${rnd(t.falaPais)}</div>
+        <div class="balao amigo"><b>${a.quem}:</b> "EU VI VOCÊS PELO OLHO MÁGICO! NEM VEM!" 🔒</div>
+        <div class="balao">${rnd(a.fugas)}</div>
+        <div class="dano ruim">💥 Falhou feio! ${a.quem} trancou tudo (+15 de resistência) e a paciência de vocês despencou (−25). ${J.bebe.charAt(0).toUpperCase()+J.bebe.slice(1)} achou a correria divertidíssima.</div>
+      </div>`;
+    if (J.paciencia <= 0) return telaDerrota();
+    return render(cena);
+  }
+
+  const custo = t.custo + (a.longe ? 8 : 0);
+  J.paciencia = clamp(J.paciencia - custo, 0, 100);
+
+  let mult = 1, nota = '';
+  if (a.fraco === t.id){ mult = 1.9; nota = 'FRAQUEZA ATINGIDA! Dano dobrado! 🎯'; }
+  if (a.forte === t.id){ mult = 0.45; nota = 'Imunidade! Eles conhecem esse golpe… dano pela metade. 🛡️'; }
+  const dano = Math.round(t.dano * mult * (0.85 + Math.random() * 0.3));
+  a.resist = clamp(a.resist - dano, 0, a.max);
+  a.fugiu = mult < 1;
+
+  if (a.resist <= 0) return telaVitoria(a, false);
+
+  const reacao = a.fraco === t.id
+    ? a.fraqueza_cena
+    : rnd(a.desculpas);
+
+  const cena = `
+    <div class="cena">
+      <div class="balao"><b>Marcel & Gabriela:</b> ${rnd(t.falaPais)}</div>
+      <div class="balao amigo"><b>${a.quem}:</b> ${reacao}</div>
+      ${mult < 1 ? `<div class="balao">${rnd(a.fugas)}</div>` : ''}
+      <div class="dano ${mult>=1?'bom':'ruim'}">${t.emoji} Resistência de ${a.quem}: −${dano} ${nota ? '· ' + nota : ''}</div>
+    </div>`;
+
+  if (J.paciencia <= 0) return telaDerrota();
+  render(cena);
+}
+
+function telaVitoria(a, foiFuga){
+  const ep = J.dificil ? a.epilogo_gemeos : a.epilogo.texto;
+  $('palco').innerHTML = `
+    <div class="tela">
+      <div class="selo">Vitória · noite de folga garantida</div>
+      <div class="grande-emoji">🍿🥂</div>
+      <h1>${a.epilogo.titulo}</h1>
+      ${foiFuga ? `<p><strong>A técnica do "segura um segundinho" FUNCIONOU!</strong> ${a.quem} ficou parado(a) na porta segurando ${J.bebe} enquanto o carro de vocês cantava pneu na esquina.</p>` : ''}
+      <p>${ep}</p>
+      <p><strong>E Marcel e Gabriela?</strong> Foram ao cinema depois de 8 meses. Escolheram o filme, compraram pipoca gigante, sentaram na melhor fileira… e <strong>dormiram nos primeiros 10 minutos</strong>, abraçados, babando na poltrona. Melhor noite das vidas deles.</p>
+      <div class="placar">Conquistado em ${J.tentativas} tentativa(s) · paciência restante: ${J.paciencia}% · modo: ${J.dificil ? 'GÊMEOS 👶👶' : '1 filho 👶'}</div>
+      <div class="modos">
+        <button class="btn-grande" onclick="telaAbertura()">Jogar de novo ↺</button>
+        ${!J.dificil ? `<button class="btn-grande btn-coral" onclick="comecar(true)">Encarar o modo GÊMEOS 👶👶</button>` : ''}
+      </div>
+    </div>`;
+}
+
+function telaDerrota(){
+  $('palco').innerHTML = `
+    <div class="tela">
+      <div class="selo" style="border-color:var(--agua);color:var(--agua)">Derrota · paciência esgotada</div>
+      <div class="grande-emoji">📺${J.bebeEmoji}</div>
+      <h1>A noite de folga <em>era um sonho</em></h1>
+      <p>Os amigos venceram. Melise segue zen na praia, Rogério e Cristiane "em obra", Andriele e Henrique protegidos pelo síndico. Marcel e Gabriela voltaram pra casa derrotados, exaustos…</p>
+      <p>…e passaram a noite assistindo <strong>Galinha Pintadinha pela 947ª vez</strong>, com ${J.bebe} dançando no meio da sala. E sabe o pior? Lá pela terceira música, os dois estavam cantando junto e rindo. <strong>Malditos sejam. Era a folga que eles queriam, e foi a melhor noite mesmo assim.</strong></p>
+      <div class="placar">Tentativas: ${J.tentativas} · modo: ${J.dificil ? 'GÊMEOS 👶👶' : '1 filho 👶'}</div>
+      <div class="modos">
+        <button class="btn-grande" onclick="telaAbertura()">Tentar de novo ↺</button>
+      </div>
+    </div>`;
+}
+
+telaAbertura();
+</script>
+</template>
+
+<!-- ============================================================
+     JOGO 2: CASA DIVIDIDA (template inerte, roda no iframe)
+     ============================================================ -->
+<template id="tpl-novela">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Nunito:ital,wght@0,400;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <style>
   :root{
-    --noite:#26101F;       /* fundo vinho profundo */
+    --noite:#26101F;
     --noite2:#3A1A30;
-    --dourado:#E9B44C;     /* Vera / títulos */
-    --rosa:#FF4D8D;        /* Cândido / drama */
-    --verde:#35C4A8;       /* Cristiane / sucesso */
-    --creme:#F6E8D6;       /* texto */
-    --vermelho:#E4484F;    /* perigo / oficial */
+    --dourado:#E9B44C;
+    --rosa:#FF4D8D;
+    --verde:#35C4A8;
+    --creme:#F6E8D6;
+    --vermelho:#E4484F;
     --display:'Abril Fatface', serif;
     --body:'Nunito', sans-serif;
   }
@@ -29,7 +567,6 @@
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     min-height:100vh; padding:16px; gap:10px;
   }
-  /* ---------- Moldura de TV ---------- */
   #tv{
     width:min(760px, 100%);
     aspect-ratio:4/3;
@@ -45,7 +582,6 @@
     overflow:hidden;
     display:flex; flex-direction:column;
   }
-  /* scanlines de TV antiga */
   #tv::after{
     content:''; position:absolute; inset:0; pointer-events:none; z-index:50;
     background:repeating-linear-gradient(0deg, rgba(255,255,255,.028) 0 1px, transparent 1px 3px);
@@ -64,7 +600,6 @@
   .screen.on{display:flex; animation:fadein .5s ease;}
   @keyframes fadein{from{opacity:0} to{opacity:1}}
 
-  /* ---------- Título ---------- */
   #tela-titulo{align-items:center; justify-content:center; text-align:center; gap:14px; padding:24px;}
   .logo-novela{
     font-family:var(--display);
@@ -79,7 +614,6 @@
   .sub{font-style:italic; opacity:.85; font-size:15px;}
   .elenco{font-size:13px; opacity:.7; line-height:1.7;}
 
-  /* ---------- Cartela de episódio (PLIM PLIM) ---------- */
   #tela-cartela{align-items:center; justify-content:center; text-align:center; gap:8px; background:radial-gradient(600px 400px at 50% 40%, #55254a 0%, transparent 70%);}
   .plim{font-size:13px; letter-spacing:.5em; color:var(--rosa); font-weight:800; animation:pisca .7s steps(2) infinite;}
   @keyframes pisca{50%{opacity:.2}}
@@ -93,7 +627,6 @@
   @keyframes zoomdrama{from{transform:scale(.6); opacity:0; filter:blur(6px)} to{transform:scale(1); opacity:1; filter:blur(0)}}
   .ep-desc{max-width:420px; opacity:.8; font-size:14px; font-style:italic;}
 
-  /* ---------- Diálogo ---------- */
   #tela-dialogo{justify-content:flex-end;}
   #cenario{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:clamp(60px,14vw,110px); opacity:.9; filter:drop-shadow(0 10px 20px rgba(0,0,0,.5));}
   #caixa{
@@ -125,7 +658,6 @@
   }
   .opcao:hover, .opcao:focus-visible{background:var(--rosa); color:#fff; transform:translateX(4px); outline:none;}
 
-  /* ---------- Botões ---------- */
   .btn{
     font-family:var(--body); font-weight:800; letter-spacing:.08em;
     background:var(--dourado); color:#3a1a30; border:none; border-radius:999px;
@@ -137,7 +669,6 @@
   .btn.rosa{background:var(--rosa); color:#fff; box-shadow:0 6px 0 #a12457;}
   .btn.rosa:hover{box-shadow:0 4px 0 #a12457;}
 
-  /* ---------- Mini-game 1: placas ---------- */
   #jogo1{background:linear-gradient(#3f2440 0 55%, #2f5c3a 55% 100%);}
   #jardim{flex:1; position:relative;}
   .casa-fundo{position:absolute; left:50%; top:46%; transform:translate(-50%,-50%); font-size:clamp(70px,16vw,130px); filter:drop-shadow(0 8px 14px rgba(0,0,0,.5));}
@@ -160,7 +691,6 @@
   @keyframes sobe{to{transform:translateY(-34px); opacity:0}}
   .barra-jogo{display:flex; justify-content:space-between; gap:10px; padding:10px 14px; font-weight:800; font-size:13px; background:rgba(0,0,0,.35); z-index:5;}
 
-  /* ---------- Mini-game 2: oficial ---------- */
   #jogo2{background:linear-gradient(#241226 0 60%, #4a3450 60% 100%);}
   #sala{flex:1; position:relative; overflow:hidden;}
   #oficial{position:absolute; top:12px; left:50%; transform:translateX(-50%); text-align:center; transition:transform .25s;}
@@ -180,7 +710,6 @@
   }
   .aviso-pego{position:absolute; inset:0; display:none; align-items:center; justify-content:center; flex-direction:column; gap:8px; background:rgba(120,10,20,.55); z-index:8; font-family:var(--display); font-size:clamp(26px,6vw,44px); text-align:center;}
 
-  /* ---------- Final ---------- */
   #tela-final{align-items:center; justify-content:center; text-align:center; gap:14px; padding:24px;}
   .selo-final{font-family:var(--display); font-size:clamp(30px,7vw,56px); color:var(--dourado); animation:zoomdrama 1.8s ease both;}
   .resumo-final{max-width:460px; font-size:15px; line-height:1.6; opacity:.9;}
@@ -195,8 +724,7 @@
     *{animation-duration:.01s !important; transition-duration:.01s !important;}
   }
 </style>
-</head>
-<body>
+
 <div id="tv">
   <div id="hud">
     <span id="hud-ep">CASA DIVIDIDA</span>
@@ -257,7 +785,7 @@
         <div id="trilha"><i id="trilha-fill"></i></div>
         <button class="btn rosa" id="btn-andar">SEGURE PARA ANDAR 🤫</button>
         <div class="aviso-pego" id="pego">
-          <div>“A SENHORITA ESTÁ INTIMADA!”</div>
+          <div>"A SENHORITA ESTÁ INTIMADA!"</div>
           <button class="btn" onclick="Jogo2.reiniciar()">Tentar de novo</button>
         </div>
       </div>
@@ -277,13 +805,12 @@
 <p id="rodape">Feito com Claude · aperte F pra pagar o aluguel da Vera</p>
 
 <script>
-/* ================== ESTADO GERAL ================== */
 const $ = s => document.querySelector(s);
 const Jogo = {
   drama: 0,
-  candidoFoiHumilhado: 0, // encontros que deram errado no Ep.3
+  candidoFoiHumilhado: 0,
   telaAtual: 'tela-titulo',
-  proximo: null, // callback após cartela
+  proximo: null,
 
   mostrar(id){
     document.querySelectorAll('.screen').forEach(t=>t.classList.remove('on'));
@@ -303,13 +830,12 @@ const Jogo = {
   },
   depoisCartela(){ if(this.proximo) this.proximo(); },
   comecar(){
-    this.cartela('EPISÓDIO 1', '“A Casa é Minha!”',
+    this.cartela('EPISÓDIO 1', '"A Casa é Minha!"',
       'Vera acorda com barulho no jardim. Adivinha quem trouxe placas de VENDE-SE outra vez…',
       ()=> Dialogo.rodar(ROTEIRO.ep1_intro, ()=> Jogo1.iniciar()));
   }
 };
 
-/* ================== MOTOR DE DIÁLOGO ================== */
 const PERSONAGENS = {
   narrador:{nome:'NARRADOR', emoji:'📺', cor:'#F6E8D6'},
   vera:{nome:'VERA', emoji:'👩‍🦱', cor:'#E9B44C'},
@@ -341,7 +867,6 @@ const Dialogo = {
     $('#dlg-quem').style.setProperty('--cor', p.cor);
     $('#caixa').style.setProperty('--cor', p.cor);
 
-    // efeito máquina de escrever
     clearInterval(this.digitando);
     const alvo = $('#dlg-texto'); alvo.textContent = '';
     let j = 0;
@@ -350,7 +875,6 @@ const Dialogo = {
       if(j >= c.t.length) clearInterval(this.digitando);
     }, 16);
 
-    // escolhas?
     const esc = $('#escolhas');
     if(c.escolhas){
       this.escolhaAtiva = true;
@@ -370,7 +894,6 @@ const Dialogo = {
   avancar(){
     if(this.escolhaAtiva) return;
     const c = this.fila[this.i];
-    // se ainda está digitando, completa primeiro
     if(c && $('#dlg-texto').textContent.length < c.t.length){
       clearInterval(this.digitando);
       $('#dlg-texto').textContent = c.t;
@@ -380,7 +903,6 @@ const Dialogo = {
   }
 };
 
-/* ================== ROTEIRO ================== */
 const ROTEIRO = {
   ep1_intro:[
     {p:'narrador', cenario:'🌅🏠', t:'Sete da manhã. O bairro ainda dorme. A casa da família — a famosa casa — resiste em pé, igual ao orgulho da Vera.'},
@@ -405,7 +927,7 @@ const ROTEIRO = {
   ep2_fim:[
     {p:'cris', cenario:'🚪🏃‍♀️', t:'CONSEGUI! Adeus, audiência! Vou pra casa da vó comer bolo em paz.'},
     {p:'oficial', t:'(sozinho na sala) …Vinte anos de carreira. Perdi pra uma menina de pantufa.', drama:1},
-    {p:'narrador', t:'Enquanto isso, do outro lado da cidade, Cândido se preparava para mais uma noite de… “superação”.'}
+    {p:'narrador', t:'Enquanto isso, do outro lado da cidade, Cândido se preparava para mais uma noite de… "superação".'}
   ],
   ep3_intro:[
     {p:'narrador', cenario:'🍷🕯️', t:'Restaurante à meia-luz. Cândido ajeita a camisa aberta até o terceiro botão. Hoje ele decidiu: vai virar a página.'},
@@ -419,14 +941,13 @@ const ROTEIRO = {
     {p:'candido', t:'Se ela revirar o olho, eu levanto.'},
     {p:'cris', t:'NINGUÉM LEVANTA. Eu passei três episódios sendo colocada no meio da briga de vocês. Agora EU decido como isso termina.',
       escolhas:[
-        {rotulo:'💥 “CHEGA! Vou gritar tudo que eu engoli em 20 anos!”', acao:()=>Final.encerrar('barraco')},
-        {rotulo:'🧘 “Eu amo os dois. Mas eu não sou o campo de batalha de vocês.”', acao:()=>Final.encerrar('limite')},
-        {rotulo:'🧳 “Sabe de uma coisa? Resolvam sozinhos. Vou morar com a vó.”', acao:()=>Final.encerrar('vo')}
+        {rotulo:'💥 "CHEGA! Vou gritar tudo que eu engoli em 20 anos!"', acao:()=>Final.encerrar('barraco')},
+        {rotulo:'🧘 "Eu amo os dois. Mas eu não sou o campo de batalha de vocês."', acao:()=>Final.encerrar('limite')},
+        {rotulo:'🧳 "Sabe de uma coisa? Resolvam sozinhos. Vou morar com a vó."', acao:()=>Final.encerrar('vo')}
       ]}
   ]
 };
 
-/* ================== MINI-GAME 1: PLACAS ================== */
 const Jogo1 = {
   pontos:0, vidas:3, spawner:null, ativo:false,
   iniciar(){
@@ -439,7 +960,7 @@ const Jogo1 = {
   spawn(){
     if(!this.ativo) return;
     this.criarPlaca();
-    const ritmo = Math.max(450, 1150 - this.pontos*60); // acelera
+    const ritmo = Math.max(450, 1150 - this.pontos*60);
     this.spawner = setTimeout(()=>this.spawn(), ritmo);
   },
   criarPlaca(){
@@ -483,7 +1004,7 @@ const Jogo1 = {
   venceu(){
     this.parar();
     Dialogo.rodar(ROTEIRO.ep1_fim, ()=>
-      Jogo.cartela('EPISÓDIO 2', '“Ninguém Me Intima”',
+      Jogo.cartela('EPISÓDIO 2', '"Ninguém Me Intima"',
         'O oficial de justiça está na sala. Cristiane só queria chegar na geladeira em paz.',
         ()=> Dialogo.rodar(ROTEIRO.ep2_intro, ()=> Jogo2.iniciar())));
   },
@@ -496,7 +1017,6 @@ const Jogo1 = {
   }
 };
 
-/* ================== MINI-GAME 2: OFICIAL ================== */
 const Jogo2 = {
   progresso:0, estado:'costas', andando:false, loop:null, ciclo:null, ativo:false,
   iniciar(){
@@ -559,25 +1079,24 @@ const Jogo2 = {
     this.ativo=false; clearInterval(this.loop); clearTimeout(this.ciclo);
     window.onkeydown = window.onkeyup = null;
     Dialogo.rodar(ROTEIRO.ep2_fim, ()=>
-      Jogo.cartela('EPISÓDIO 3', '“O Conquistador”',
+      Jogo.cartela('EPISÓDIO 3', '"O Conquistador"',
         'Cândido jurou que hoje não fala da ex. O restaurante inteiro duvida.',
         ()=> Dialogo.rodar(ROTEIRO.ep3_intro, ()=> Jogo3.iniciar())));
   }
 };
 
-/* ================== MINI-GAME 3: ENCONTROS ================== */
 const Jogo3 = {
   encontro:0,
   dates:[
     {emoji:'💃', nome:'MÁRCIA', abertura:'Então, Cândido… me fala de você. O que te faz feliz?',
-      certa:{rotulo:'😊 “Boa música, um bom papo… e recomeços.”', reacao:'Márcia sorri. Milagre: Cândido pareceu um adulto funcional por 12 segundos.'},
-      errada:{rotulo:'🏠 “Feliz mesmo eu vou ficar quando vender aquela casa. METADE é minha.”', reacao:'Márcia pediu a conta antes da entrada chegar. Recorde da casa.'}},
+      certa:{rotulo:'😊 "Boa música, um bom papo… e recomeços."', reacao:'Márcia sorri. Milagre: Cândido pareceu um adulto funcional por 12 segundos.'},
+      errada:{rotulo:'🏠 "Feliz mesmo eu vou ficar quando vender aquela casa. METADE é minha."', reacao:'Márcia pediu a conta antes da entrada chegar. Recorde da casa.'}},
     {emoji:'💁‍♀️', nome:'SOLANGE', abertura:'Adorei o restaurante! Você vem sempre aqui?',
-      certa:{rotulo:'🍷 “Primeira vez. Guardei pra uma ocasião especial.”', reacao:'Solange achou charmoso. Cândido quase estraga citando o valor da conta, mas segurou.'},
-      errada:{rotulo:'💔 “Vinha com a Vera. Ela sentava AÍ. Nessa cadeira. Exatamente essa.”', reacao:'Solange olhou pra cadeira, olhou pra ele, e simplesmente evaporou.'}},
-    {emoji:'👩‍🎤', nome:'PATRÍCIA', abertura:'Seu perfil dizia “sem bagagem emocional”. É verdade?',
-      certa:{rotulo:'😅 “Todo mundo tem bagagem. A minha eu carrego sozinho.”', reacao:'Patrícia aplaudiu a sinceridade. Primeira sobremesa dividida em 8 meses!'},
-      errada:{rotulo:'📄 “Só uma açãozinha judicial. Aliás, você depõe? Preciso de testemunha.”', reacao:'Patrícia fingiu uma ligação da tia. Não existia tia. Não existia ligação.'}}
+      certa:{rotulo:'🍷 "Primeira vez. Guardei pra uma ocasião especial."', reacao:'Solange achou charmoso. Cândido quase estraga citando o valor da conta, mas segurou.'},
+      errada:{rotulo:'💔 "Vinha com a Vera. Ela sentava AÍ. Nessa cadeira. Exatamente essa."', reacao:'Solange olhou pra cadeira, olhou pra ele, e simplesmente evaporou.'}},
+    {emoji:'👩‍🎤', nome:'PATRÍCIA', abertura:'Seu perfil dizia "sem bagagem emocional". É verdade?',
+      certa:{rotulo:'😅 "Todo mundo tem bagagem. A minha eu carrego sozinho."', reacao:'Patrícia aplaudiu a sinceridade. Primeira sobremesa dividida em 8 meses!'},
+      errada:{rotulo:'📄 "Só uma açãozinha judicial. Aliás, você depõe? Preciso de testemunha."', reacao:'Patrícia fingiu uma ligação da tia. Não existia tia. Não existia ligação.'}}
   ],
   iniciar(){ this.encontro=0; Jogo.candidoFoiHumilhado=0; this.proximoDate(); },
   proximoDate(){
@@ -587,7 +1106,7 @@ const Jogo3 = {
     const opcoes = [
       {rotulo:d.certa.rotulo, acao:()=> this.resultado(d.certa.reacao, false)},
       {rotulo:d.errada.rotulo, acao:()=> this.resultado(d.errada.reacao, true)}
-    ].sort(()=> Math.random()-.5); // embaralha posição
+    ].sort(()=> Math.random()-.5);
     Dialogo.rodar([
       {p:'narrador', cenario:'🍷'+d.emoji, t:`Encontro ${this.encontro+1} de 3: ${d.nome}.`},
       {p:'date', t:d.abertura, escolhas:opcoes}
@@ -601,18 +1120,17 @@ const Jogo3 = {
   terminar(){
     const h = Jogo.candidoFoiHumilhado;
     const balanco = h===0 ? 'Três encontros SEM citar a Vera. Cientistas estudam o caso.'
-      : h===3 ? 'Três fracassos em três tentativas. O garçom já anota “mesa pra um” quando ele chega.'
+      : h===3 ? 'Três fracassos em três tentativas. O garçom já anota "mesa pra um" quando ele chega.'
       : 'Saldo misto: parte da cidade acha ele charmoso, parte tem pena.';
     Dialogo.rodar([
       {p:'narrador', cenario:'🌙🍷', t:balanco},
       {p:'candido', t:'(no espelho do banheiro) Você é uma águia, Cândido. Uma águia… que sente falta do ninho.', drama:1}
-    ], ()=> Jogo.cartela('CAPÍTULO FINAL', '“A Filha no Meio”',
+    ], ()=> Jogo.cartela('CAPÍTULO FINAL', '"A Filha no Meio"',
         'Cristiane convoca a reunião que nenhum oficial de justiça conseguiu marcar.',
         ()=> Dialogo.rodar(ROTEIRO.final_intro)));
   }
 };
 
-/* ================== FINAIS ================== */
 const Final = {
   encerrar(tipo){
     const finais = {
@@ -641,5 +1159,7 @@ const Final = {
   }
 };
 </script>
+</template>
+
 </body>
 </html>
