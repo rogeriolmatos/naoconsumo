@@ -13,6 +13,7 @@
     --neon1:#ffc93c;
     --neon2:#ff4d8d;
     --neon3:#4dc9ff;
+    --neon4:#46e0b0;
     --creme:#fdf3e3;
   }
   *{margin:0;padding:0;box-sizing:border-box}
@@ -36,7 +37,7 @@
     font-size:clamp(2rem,7vw,3.6rem);line-height:1.05;color:#fff;
   }
   #menu h1 span{color:var(--neon1)}
-  #menu .sub{color:rgba(253,243,227,.7);max-width:52ch}
+  #menu .sub{color:rgba(253,243,227,.7);max-width:56ch}
   .canais{
     display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
     gap:20px;width:min(1080px,94vw);
@@ -71,6 +72,10 @@
   #canal-mala:hover{border-color:#4dc9ff;box-shadow:0 16px 40px rgba(77,201,255,.25)}
   #canal-mala .tag{background:#4dc9ff;color:#0d2038}
   #canal-mala .play{color:#4dc9ff}
+  #canal-diva{background:linear-gradient(160deg,#241b16,#37291f)}
+  #canal-diva:hover{border-color:#46e0b0;box-shadow:0 16px 40px rgba(70,224,176,.22)}
+  #canal-diva .tag{background:#46e0b0;color:#132a22}
+  #canal-diva .play{color:#46e0b0}
   #menu .rodape{font-size:.78rem;color:rgba(253,243,227,.4)}
 
   /* ---------- ÁREA DO JOGO ---------- */
@@ -96,7 +101,7 @@
      ============================================================ -->
 <main id="menu">
   <h1>🕹️ Fliperama da <span>Família</span></h1>
-  <p class="sub">Três jogos, um botão de escolha. Pais desesperados por folga, uma novela de conflito familiar e uma doutoranda que perde a mala no mundo inteiro. Escolha seu canal:</p>
+  <p class="sub">Quatro jogos, um botão de escolha. Pais desesperados por folga, uma novela de conflito familiar, uma doutoranda que perde a mala no mundo inteiro e um psicólogo que atende a família toda. Escolha seu canal:</p>
 
   <div class="canais">
     <button class="canal" id="canal-folga" onclick="abrirJogo('tpl-folga')">
@@ -122,9 +127,17 @@
       <p>Melise, doutoranda de TI da UFSC, viaja a Europa com bolsa de pesquisa e faz trilha nos Alpes. Só tem um problema: a mala dela FOGE. Ache a mala rosa em 5 fases antes que ela siga viagem sozinha!</p>
       <div class="play">▶ Embarcar</div>
     </button>
+
+    <button class="canal" id="canal-diva" onclick="abrirJogo('tpl-diva')">
+      <div class="emoji">🛋️🧠</div>
+      <span class="tag">Canal 4 · Terapia</span>
+      <h2>Divã Lotado</h2>
+      <p>Henrique é psicólogo — o mesmo que foge de ser babá no Canal 1. Agora a família inteira caiu no divã dele: Vera, Cândido, Cristiane, Melise e um casal com bebê. Seis sessões, três respostas cada. Acerte sem torrar sua energia (nem sua ética).</p>
+      <div class="play">▶ Atender</div>
+    </button>
   </div>
 
-  <p class="rodape">Feito com Claude · três jogos em um só arquivo</p>
+  <p class="rodape">Feito com Claude · quatro jogos em um só arquivo</p>
 </main>
 
 <!-- ============================================================
@@ -1518,6 +1531,454 @@ function telaDerrota(motivo){
       <p>Mas relaxa: mala da Melise é igual boomerang — <strong>sempre volta</strong>. Só precisa de mais uma tentativa (e de um milagre logístico).</p>
       <div class="placar">Chegou até a fase ${G.fase+1} de ${FASES.length} · erros: ${G.erros}</div>
       <button class="btn" onclick="telaAbertura()">Tentar de novo ↺</button>
+    </div>`;
+}
+
+telaAbertura();
+</script>
+</template>
+
+<!-- ============================================================
+     JOGO 4: DIVÃ LOTADO (template inerte, roda no iframe)
+     ============================================================ -->
+<template id="tpl-diva">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,900&family=Karla:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --fundo:#241b16;
+    --fundo-2:#33261e;
+    --menta:#46e0b0;
+    --ocre:#f0b429;
+    --tijolo:#e2725b;
+    --creme:#fbf1e6;
+    --tinta:#16100c;
+    --sombra:rgba(0,0,0,.42);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:
+      radial-gradient(ellipse 120% 55% at 50% -12%, var(--fundo-2), transparent 70%),
+      var(--fundo);
+    color:var(--creme);
+    font-family:'Karla',sans-serif;
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;
+    padding:56px 14px 70px;line-height:1.55;
+  }
+  h1,h2,h3{font-family:'Fraunces',serif}
+  button{font-family:'Karla',sans-serif;cursor:pointer}
+  button:focus-visible{outline:3px solid var(--menta);outline-offset:2px}
+
+  .palco{width:min(760px,96vw)}
+
+  /* ---------- HUD ---------- */
+  .hud{
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    background:rgba(0,0,0,.26);border:1px solid rgba(255,255,255,.1);
+    border-radius:16px;padding:12px 18px;margin-bottom:16px;
+  }
+  .hud .cara{font-size:1.7rem}
+  .hud .info{flex:1;min-width:180px}
+  .hud .nome{font-weight:800;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--menta)}
+  .trilho{height:12px;border-radius:999px;background:rgba(0,0,0,.4);overflow:hidden;margin-top:5px}
+  .fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#2f8f6d,var(--menta),var(--ocre));transition:width .5s ease}
+  .hud .agenda{font-weight:800;color:var(--ocre);white-space:nowrap;font-size:.9rem}
+
+  /* ---------- divã / sessão ---------- */
+  .painel{
+    background:linear-gradient(180deg,#33261e,#291f18);
+    border:1px solid rgba(255,255,255,.12);border-radius:20px;
+    padding:24px;box-shadow:0 16px 40px var(--sombra);
+  }
+  .paciente{display:flex;align-items:center;gap:14px;margin-bottom:6px;flex-wrap:wrap}
+  .paciente .retrato{
+    flex:none;width:54px;height:54px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:28px;
+    background:rgba(0,0,0,.35);border:2px solid var(--menta);
+    box-shadow:0 0 18px rgba(70,224,176,.28);
+  }
+  .paciente .quem{font-family:'Fraunces',serif;font-weight:600;font-size:1.3rem;color:#fff}
+  .paciente .motivo{font-size:.85rem;color:rgba(251,241,230,.6)}
+
+  .falas{margin-top:14px;display:flex;flex-direction:column;gap:10px}
+  .balao{
+    background:rgba(0,0,0,.28);border-left:3px solid var(--menta);
+    border-radius:0 12px 12px 0;padding:12px 16px;font-size:1rem;
+    animation:pop .35s ease both;
+  }
+  @keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .pergunta{
+    margin:20px 0 12px;font-weight:800;font-size:.78rem;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--ocre);
+  }
+  .opcoes{display:flex;flex-direction:column;gap:10px}
+  .opcao{
+    text-align:left;color:var(--creme);
+    background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.16);
+    border-radius:14px;padding:14px 16px;font-size:.98rem;line-height:1.5;
+    transition:border-color .2s,background .2s,transform .12s;
+  }
+  .opcao:hover{border-color:var(--menta);background:rgba(70,224,176,.1);transform:translateX(4px)}
+
+  /* ---------- telas ---------- */
+  .tela{
+    background:linear-gradient(180deg,#33261e,#291f18);
+    border:1px solid rgba(255,255,255,.12);border-radius:22px;
+    padding:42px 32px;text-align:center;box-shadow:0 20px 50px var(--sombra);
+    animation:surge .4s ease both;
+  }
+  @keyframes surge{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){*{animation:none !important}}
+  .tela h1{font-size:clamp(1.8rem,6vw,2.9rem);font-weight:900;color:#fff;line-height:1.12}
+  .tela h1 em{font-style:italic;color:var(--menta)}
+  .tela .grande{font-size:3.3rem;margin-bottom:10px}
+  .tela p{color:rgba(251,241,230,.85);max-width:56ch;margin:13px auto 0}
+  .tela .selo{
+    display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+    border:2px solid var(--menta);color:var(--menta);border-radius:999px;padding:5px 16px;margin-bottom:14px;
+  }
+  .cracha{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+  .cracha span{
+    background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);
+    border-radius:999px;padding:6px 14px;font-size:.84rem;
+  }
+  .btn{
+    font-family:'Fraunces',serif;font-weight:600;font-size:1.05rem;
+    color:var(--tinta);background:var(--menta);
+    border:none;border-radius:999px;padding:12px 30px;margin-top:22px;
+    transition:transform .15s,box-shadow .2s;
+  }
+  .btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(70,224,176,.3)}
+  .btn.ocre{background:var(--ocre)}
+  .btn.fantasma{background:transparent;color:var(--creme);border:1.5px solid rgba(255,255,255,.28)}
+  .btn.fantasma:hover{box-shadow:none;border-color:var(--menta)}
+  .botoes{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+  .ficha{
+    background:rgba(0,0,0,.26);border:1px dashed rgba(70,224,176,.4);
+    border-radius:14px;padding:14px 18px;margin-top:18px;
+    font-size:.94rem;color:rgba(251,241,230,.85);text-align:left;
+  }
+  .ficha b{color:var(--menta)}
+  .veredito{margin-top:16px;font-weight:800;font-size:1rem}
+  .veredito.bom{color:var(--menta)}
+  .veredito.ruim{color:var(--tijolo)}
+  .placar{margin-top:18px;font-size:.85rem;color:rgba(251,241,230,.55)}
+  .prontuario{margin-top:14px;font-size:1.05rem;letter-spacing:.14em}
+</style>
+
+<main class="palco" id="palco" aria-live="polite"></main>
+
+<script>
+/* =====================================================================
+   DIVÃ LOTADO
+   Henrique é psicólogo. O mesmo Henrique que, no Canal 1, foge de ficar
+   com o Juca. Agora a família inteira caiu no consultório dele.
+   6 sessões · 3 respostas cada · energia limitada.
+   ===================================================================== */
+
+const $ = s => document.getElementById(s);
+const embaralhar = a => a.map(v => [Math.random(), v]).sort((x,y) => x[0]-y[0]).map(x => x[1]);
+
+const SESSOES = [
+  {
+    quem:'Vera', emoji:'👩‍🦱',
+    motivo:'Encaminhada pela filha. Veio "só pra provar que não precisa".',
+    falas:[
+      'Doutor, vou ser bem clara: eu não tenho problema nenhum. Quem tem problema é o pai da Cristiane.',
+      'Ontem eu arranquei dez placas de VENDE-SE em quarenta minutos. DEZ. Isso não é raiva, isso é ATLETISMO.'
+    ],
+    opcoes:[
+      { boa:true,
+        t:'"Dez placas em quarenta minutos é muita energia. O que a senhora sente nos minutos ANTES de arrancar a primeira?"',
+        r:'Vera para no meio da frase. Em vinte anos, ninguém tinha perguntado do antes — só comentado o barraco. Ela responde baixinho: "medo". A sessão vira outra coisa.' },
+      { t:'"A senhora precisa parar de arrancar essas placas. Simplesmente pare."',
+        r:'Vera cruza os braços. "Se eu quisesse ouvir isso, eu ligava pro meu irmão. Ele fala de graça." Aliança terapêutica: no chão.' },
+      { t:'"Cá entre nós, o seu ex parece mesmo insuportável."',
+        r:'Vera ADORA. Fala dele por 48 minutos sem respirar. Sai leve, elogia o senhor no grupo da família — e o senhor não fez terapia nenhuma. Fez fofoca com hora marcada.' }
+    ]
+  },
+  {
+    quem:'Cândido', emoji:'🕺',
+    motivo:'Marcou sozinho. Diz que quer "virar a página, definitivamente".',
+    falas:[
+      'Hoje eu não vim falar da Vera. Deixa isso bem anotado aí no papel: NÃO vim falar da Vera.',
+      'Aliás, sabia que ela mudou a fechadura? Não que eu tenha ido lá. Fui. Mas passando. Duas vezes. Ontem.'
+    ],
+    opcoes:[
+      { boa:true,
+        t:'"Reparei que o senhor abriu a sessão dizendo que não ia falar dela. Como é o silêncio quando ela não é o assunto?"',
+        r:'Cândido abre a boca. Fecha. Abre de novo. "Vazio", ele diz. Primeira palavra honesta em três anos de briga judicial. Ele chora um pouco e finge que é alergia.' },
+      { t:'"O senhor está claramente obcecado. Precisa superar e seguir em frente."',
+        r:'Cândido concorda com tudo, entusiasmado, e passa o resto da hora explicando por que a culpa é dela. Diagnóstico entregue, insight zero.' },
+      { t:'"Já pensou em vender logo a parte dele na casa e resolver isso?"',
+        r:'O senhor virou consultor imobiliário. Cândido saiu com um plano de negócio, um corretor indicado e exatamente a mesma dor que trouxe.' }
+    ]
+  },
+  {
+    quem:'Cristiane', emoji:'🙄',
+    motivo:'Primeira sessão da vida. Chegou 20 minutos adiantada e ficou no carro.',
+    falas:[
+      'Eu tenho 26 anos e já fugi de oficial de justiça, já apartei briga de placa e já fui convocada pra depor contra meu próprio pai.',
+      'Todo mundo me pergunta como estão os meus pais. Ninguém pergunta como eu tô. Inclusive eu.'
+    ],
+    opcoes:[
+      { boa:true,
+        t:'"Então vou perguntar: como você tá? A gente tem essa hora inteira e ela é só sua."',
+        r:'Silêncio de uns oito segundos — desses que o psicólogo aprende a não interromper. Aí ela chora. E depois ri, sem graça: "que constrangedor". Não é. É a primeira vez que ela ocupa o espaço dela.' },
+      { t:'"Você precisa impor limites aos seus pais. Faz uma reunião com os dois e resolve."',
+        r:'Ela anota obedientemente. Sai com uma tarefa que não é dela e a mesma sensação de sempre: alguém empurrando a responsabilidade de volta pro colo dela.' },
+      { t:'"Coitada. Que família terrível, você não merecia nada disso."',
+        r:'A pena é confortável por dez minutos e inútil por muitos anos. Cristiane sai se sentindo vítima — e vítima não tem para onde ir.' }
+    ]
+  },
+  {
+    quem:'Melise', emoji:'🙋‍♀️',
+    motivo:'Sessão online, de Zurique. Fuso horário duvidoso, wi-fi pior ainda.',
+    falas:[
+      'Doutor, é a QUINTA mala nessa viagem. Quinta. Eu perdi no aeroporto, no trem, no ônibus e na casa dos amigos.',
+      'Todo mundo acha graça. E é engraçado mesmo. Só que ontem eu chorei num saguão de estação e não foi pela mala.'
+    ],
+    opcoes:[
+      { boa:true,
+        t:'"E foi pelo quê?"',
+        r:'Três palavras. Ela fala por doze minutos sem parar: doutorado, distância, a sensação de estar sempre em trânsito e nunca chegar. A mala nunca foi o assunto — mas era um bom jeito de começar.' },
+      { t:'"A mala representa o seu medo de perder o controle. É simbólico: você larga as coisas antes que elas te larguem."',
+        r:'Uma interpretação linda, bem construída, dita cedo demais. Melise acha genial, anota no caderno de campo — e o assunto real fica esperando na plataforma, junto com a mala.' },
+      { t:'"Compra uma daquelas etiquetas rastreadoras. Resolve na hora."',
+        r:'Conselho excelente. Ela compra. Funciona. E a coisa que fez ela chorar no saguão continua exatamente onde estava.' }
+    ]
+  },
+  {
+    quem:'Marcel & Gabriela', emoji:'😵‍💫',
+    motivo:'Terapia de casal. Trouxeram o Juca porque "não tinha com quem deixar".',
+    falas:[
+      '(Gabriela, com o Juca no colo) A gente não briga. A gente só… reveza quem tá exausto. Hoje é a minha vez.',
+      '(Marcel) Faz oito meses que a gente não termina uma frase. Inclusive essa aí, ó, ela já ia—'
+    ],
+    opcoes:[
+      { boa:true,
+        t:'"Vocês não vieram aqui porque o casamento está ruim. Vieram porque estão exaustos há oito meses. São coisas diferentes, e a segunda tem conserto."',
+        r:'Os dois se olham. Gabriela chora e Marcel segura a mão dela — pela primeira vez na sessão, no mesmo time. O Juca, que percebe tudo, dorme. Vocês passam o resto da hora falando de rede de apoio e de sono. Prático e certeiro.' },
+      { t:'"Vocês precisam de um tempo a dois. Marquem um jantar romântico."',
+        r:'Marcel dá uma risada seca: "a gente tentou. Passou quatro meses tentando empurrar o Juca em cada amigo da lista." Conselho genérico devolvido no remetente.' },
+      { t:'"Deixem o Juca comigo aqui na recepção enquanto vocês conversam, sem problema!"',
+        r:'O Juca adorou o consultório. Comeu uma caneta, derrubou a caixa de lenços e reorganizou as fichas. E o senhor virou babá em horário de atendimento — de novo. O setting agradece que não.' }
+    ]
+  },
+  {
+    quem:'Andriele', emoji:'💁‍♀️',
+    motivo:'Marcou pelo site, no seu horário das 18h. É a sua esposa.',
+    falas:[
+      'Eu sei que é estranho. Mas você é o melhor psicólogo que eu conheço e eu não quero contar essas coisas pra um estranho.',
+      'É só uma sessão, Henrique. Ninguém precisa saber. Você já sabe metade da história mesmo.'
+    ],
+    opcoes:[
+      { boa:true,
+        t:'"Justamente porque eu já sei metade da história é que eu não posso ser o seu psicólogo. Eu tenho três colegas ótimas e ligo pra elas hoje ainda — como seu marido, não como terapeuta."',
+        r:'Andriele fica brava por quinze minutos e agradece por quinze anos. Na quinta-feira ela começa com a colega. Nenhum papel se contaminou, e o casamento continuou sendo casamento.' },
+      { t:'"Tudo bem, uma sessão só não vai fazer mal. Pode deitar aí."',
+        r:'Aos 22 minutos ela cita uma briga de vocês dois. Aos 24, o senhor se defende. Aos 25, não existe mais nem sessão nem casal — existem duas pessoas discutindo numa sala com divã. O conselho de classe teria opinião sobre isso.' },
+      { t:'"Amor, isso aí não é nem terapia, é conversa de casal. Vamos jantar e resolver isso."',
+        r:'Ela pediu ajuda e ouviu que o assunto não era sério. Vocês jantaram calados. O problema dela continuou sem lugar nenhum pra existir.' }
+    ]
+  }
+];
+
+let H = null;
+
+function novoJogo(){
+  H = { i:0, energia:100, acertos:0, atraso:0, historico:[] };
+}
+
+/* ---------- ABERTURA ---------- */
+function telaAbertura(){
+  novoJogo();
+  $('palco').innerHTML = `
+    <div class="tela">
+      <div class="grande">🛋️🧠</div>
+      <h1>Divã <em>Lotado</em></h1>
+      <p>Esse é o <strong>Henrique</strong>: psicólogo clínico, apartamento compacto, síndico rigoroso e um talento notável pra fugir quando alguém pergunta "você pode ficar com o Juca hoje?".</p>
+      <p>O problema é que a fama correu. Agora a agenda dele tem <strong>seis sessões</strong> e todas são da mesma família caótica — a sogra que arranca placa, o ex que não supera, a filha no meio do fogo cruzado, a amiga que perde malas e um casal que não dorme há oito meses.</p>
+      <div class="cracha">
+        <span>🎓 CRP em dia</span>
+        <span>🛋️ Divã de segunda mão</span>
+        <span>☕ Movido a café</span>
+        <span>🏢 Ap. 11º andar</span>
+        <span>🚫 Não é babá</span>
+      </div>
+      <p style="font-size:.93rem;margin-top:16px"><strong>Como jogar:</strong> em cada sessão, escolha uma entre três respostas. A boa escuta faz a sessão render; conselho apressado, diagnóstico solto e fofoca disfarçada torram a sua <strong>energia</strong>. Se ela zerar, o Henrique entra de licença. Entre uma sessão e outra dá pra tomar um café — mas a agenda atrasa.</p>
+      <button class="btn" onclick="salaEspera()">Abrir o consultório 🔑</button>
+    </div>`;
+}
+
+/* ---------- SALA DE ESPERA ---------- */
+function salaEspera(){
+  const s = SESSOES[H.i];
+  $('palco').innerHTML = `
+    ${hud()}
+    <div class="tela">
+      <div class="selo">Sessão ${H.i+1} de ${SESSOES.length}</div>
+      <div class="grande">${s.emoji}</div>
+      <h1>${s.quem}</h1>
+      <p>${s.motivo}</p>
+      <div class="ficha"><b>Sala de espera:</b> ${esperaTexto()}</div>
+      <div class="botoes">
+        <button class="btn" onclick="iniciarSessao()">Chamar ${s.quem.split(' ')[0]} ▸</button>
+        <button class="btn fantasma" onclick="cafezinho()">☕ Café antes (+14 energia · +7 min de atraso)</button>
+      </div>
+    </div>`;
+}
+
+function esperaTexto(){
+  const cenas = [
+    'duas pessoas fingindo que não se conhecem, uma revista de 2019 e o barulho do ar-condicionado.',
+    'alguém batendo o pé no chão há sete minutos. O ritmo é impressionante e insuportável.',
+    'a recepcionista já desistiu de explicar que o consultório não valida estacionamento.',
+    'um cheiro de café requentado e o som distante do elevador que ninguém consertou.',
+    'o Juca não está aqui. Que fique registrado: o Juca NÃO está aqui.'
+  ];
+  return cenas[H.i % cenas.length];
+}
+
+function cafezinho(){
+  H.energia = Math.min(100, H.energia + 14);
+  H.atraso += 7;
+  salaEspera();
+}
+
+/* ---------- HUD ---------- */
+function hud(){
+  return `
+    <div class="hud">
+      <div class="cara">🧔‍♂️☕</div>
+      <div class="info">
+        <div class="nome">Energia do Henrique</div>
+        <div class="trilho"><div class="fill" style="width:${Math.max(H.energia,0)}%"></div></div>
+      </div>
+      <div class="agenda">📋 ${H.acertos}/${SESSOES.length} boas escutas · ⏰ ${H.atraso} min de atraso</div>
+    </div>`;
+}
+
+/* ---------- SESSÃO ---------- */
+function iniciarSessao(){
+  const s = SESSOES[H.i];
+  const ordem = embaralhar(s.opcoes.map((o, idx) => ({o, idx})));
+  const opcoesHtml = ordem.map(x =>
+    `<button class="opcao" onclick="responder(${x.idx})">${x.o.t}</button>`
+  ).join('');
+
+  $('palco').innerHTML = `
+    ${hud()}
+    <div class="painel">
+      <div class="paciente">
+        <div class="retrato">${s.emoji}</div>
+        <div>
+          <div class="quem">${s.quem}</div>
+          <div class="motivo">${s.motivo}</div>
+        </div>
+      </div>
+      <div class="falas">
+        ${s.falas.map(f => `<div class="balao">${f}</div>`).join('')}
+      </div>
+      <div class="pergunta">O que o Henrique responde?</div>
+      <div class="opcoes">${opcoesHtml}</div>
+    </div>`;
+}
+
+function responder(idx){
+  const s = SESSOES[H.i];
+  const op = s.opcoes[idx];
+  const boa = !!op.boa;
+
+  H.energia -= boa ? 7 : 20;
+  if (boa) H.acertos++;
+  H.historico.push({quem:s.quem, boa});
+
+  if (H.energia <= 0) return telaBurnout(op, s);
+  telaResultado(op, s, boa);
+}
+
+function telaResultado(op, s, boa){
+  const ultima = H.i >= SESSOES.length - 1;
+  $('palco').innerHTML = `
+    ${hud()}
+    <div class="tela">
+      <div class="selo" style="${boa?'':'border-color:var(--tijolo);color:var(--tijolo)'}">
+        ${boa ? 'Sessão rendeu' : 'Sessão escapou'}
+      </div>
+      <div class="grande">${s.emoji}${boa ? '💬' : '💭'}</div>
+      <h1>${s.quem}</h1>
+      <div class="ficha">
+        <b>Você disse:</b> ${op.t}
+        <div style="margin-top:10px">${op.r}</div>
+      </div>
+      <div class="veredito ${boa?'bom':'ruim'}">
+        ${boa ? '✅ Boa escuta · −7 de energia' : '⚠️ Não foi por aí · −20 de energia'}
+      </div>
+      <p class="prontuario">${SESSOES.map((x,i)=> i < H.i+1 ? (H.historico[i].boa ? '🟢' : '🟠') : '⬜').join(' ')}</p>
+      <button class="btn" onclick="proxima()">${ultima ? 'Fechar o consultório 🔒' : 'Próxima sessão ▸'}</button>
+    </div>`;
+}
+
+function proxima(){
+  H.i++;
+  if (H.i >= SESSOES.length) return telaFinal();
+  salaEspera();
+}
+
+/* ---------- FINAIS ---------- */
+function telaBurnout(op, s){
+  $('palco').innerHTML = `
+    <div class="tela">
+      <div class="selo" style="border-color:var(--tijolo);color:var(--tijolo)">Energia zerada · licença médica</div>
+      <div class="grande">🛋️😶‍🌫️</div>
+      <h1>O psicólogo <em>pediu licença</em></h1>
+      <div class="ficha">
+        <b>Última fala:</b> ${op.t}
+        <div style="margin-top:10px">${op.r}</div>
+      </div>
+      <p>No meio da sessão com ${s.quem}, o Henrique percebeu que estava respondendo no automático — e psicólogo no automático é só uma pessoa cansada com uma sala bonita.</p>
+      <p>Ele cancelou a agenda da semana, avisou a supervisora e foi dormir às nove da noite pela primeira vez em meses. <strong>Cuidar de quem cuida também é trabalho clínico.</strong> Volta semana que vem, inteiro.</p>
+      <div class="placar">Sessões concluídas: ${H.i} · boas escutas: ${H.acertos} · atraso acumulado: ${H.atraso} min</div>
+      <button class="btn" onclick="telaAbertura()">Recomeçar a semana ↺</button>
+    </div>`;
+}
+
+function telaFinal(){
+  const a = H.acertos;
+  let titulo, selo, texto;
+
+  if (a >= 5){
+    selo = 'Semana impecável';
+    titulo = 'O melhor divã <em>da cidade</em>';
+    texto = 'Seis sessões, seis pessoas saindo mais leves do que entraram. Vera descobriu o medo embaixo da raiva, Cândido ouviu o próprio silêncio, Cristiane ocupou uma hora só dela, Melise falou do que realmente pesava, o casal parou de brigar com o cansaço um do outro — e a Andriele foi encaminhada pra uma colega, como manda o bom senso e o conselho de classe.';
+  } else if (a >= 3){
+    selo = 'Suficientemente bom';
+    titulo = 'Um psicólogo <em>suficientemente bom</em>';
+    texto = 'Nem toda sessão foi um acerto — teve conselho apressado, teve interpretação genial na hora errada. Mas teve escuta de verdade também, e é disso que a clínica é feita. Winnicott dizia que não é preciso ser perfeito, é preciso ser suficientemente bom. O Henrique se agarra nessa frase toda sexta-feira.';
+  } else {
+    selo = 'Precisando de supervisão';
+    titulo = 'O psicólogo <em>precisa de terapia</em>';
+    texto = 'Foi uma semana de conselhos rápidos, diagnósticos soltos e uma perigosa quantidade de fofoca com hora marcada. Ninguém saiu pior, mas quase ninguém saiu diferente. Na supervisão de sexta, a colega ouviu tudo, esperou e perguntou: "e você, Henrique, tem falado com alguém?". Ele não soube responder — e essa foi a melhor resposta da semana.';
+  }
+
+  const linha = H.historico.map(h => `${h.boa ? '🟢' : '🟠'} ${h.quem}`).join(' · ');
+
+  $('palco').innerHTML = `
+    <div class="tela">
+      <div class="selo">${selo}</div>
+      <div class="grande">🛋️🌙</div>
+      <h1>${titulo}</h1>
+      <p>${texto}</p>
+      <p>Sexta, sete da noite. O Henrique apaga a luz do consultório, desce os onze andares e chega em casa. O celular vibra: <em>"oi Henrique, tudo bem? é a Gabriela… sábado vocês tão livres?"</em>. Ele olha pra tela por um bom tempo. E deixa no visto — <strong>com plena consciência clínica do que está fazendo.</strong></p>
+      <div class="ficha" style="text-align:center">${linha}</div>
+      <div class="placar">Boas escutas: ${a}/${SESSOES.length} · energia restante: ${Math.max(H.energia,0)}% · atraso da agenda: ${H.atraso} min</div>
+      <div class="botoes">
+        <button class="btn" onclick="telaAbertura()">Nova semana ↺</button>
+      </div>
     </div>`;
 }
 
