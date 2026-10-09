@@ -76,6 +76,10 @@
   #canal-diva:hover{border-color:#46e0b0;box-shadow:0 16px 40px rgba(70,224,176,.22)}
   #canal-diva .tag{background:#46e0b0;color:#132a22}
   #canal-diva .play{color:#46e0b0}
+  #canal-rota{background:linear-gradient(160deg,#16301c,#24462a)}
+  #canal-rota:hover{border-color:#ff9f43;box-shadow:0 16px 40px rgba(255,159,67,.25)}
+  #canal-rota .tag{background:#ff9f43;color:#1e2a12}
+  #canal-rota .play{color:#ff9f43}
   #menu .rodape{font-size:.78rem;color:rgba(253,243,227,.4)}
 
   /* ---------- ÁREA DO JOGO ---------- */
@@ -101,7 +105,7 @@
      ============================================================ -->
 <main id="menu">
   <h1>🕹️ Fliperama da <span>Família</span></h1>
-  <p class="sub">Quatro jogos, um botão de escolha. Pais desesperados por folga, uma novela de conflito familiar, uma doutoranda que perde a mala no mundo inteiro e um psicólogo com uma vaga só na agenda. Escolha seu canal:</p>
+  <p class="sub">Cinco jogos, um botão de escolha. Pais desesperados por folga, uma novela de conflito familiar, uma doutoranda que perde a mala no mundo inteiro, um psicólogo com uma vaga só na agenda e sete amigos tentando sobreviver a um feriadão na estrada. Escolha seu canal:</p>
 
   <div class="canais">
     <button class="canal" id="canal-folga" onclick="abrirJogo('tpl-folga')">
@@ -135,9 +139,17 @@
       <p>Não sobrou psicólogo na cidade e o Henrique tem uma vaga só. Marcel, Gabriela, Cristiane e Melise precisam de terapia. Seis conversas de corredor pra investigar, uma escolha — e seis sessões pra aguentar o que você escolheu.</p>
       <div class="play">▶ Fazer a triagem</div>
     </button>
+
+    <button class="canal" id="canal-rota" onclick="abrirJogo('tpl-rota')">
+      <div class="emoji">🚗🚙🌧️</div>
+      <span class="tag">Canal 5 · Estrada</span>
+      <h2>Rota Gaúcha</h2>
+      <p>Sete amigos, dois carros e um feriadão de Finados com El Niño. Escolha o destino na serra, no vale ou no litoral, monte os carros, sobreviva à chuva, à neblina e à Melise — e tente trazer todo mundo de volta feliz.</p>
+      <div class="play">▶ Pegar a estrada</div>
+    </button>
   </div>
 
-  <p class="rodape">Feito com Claude · quatro jogos em um só arquivo</p>
+  <p class="rodape">Feito com Claude · cinco jogos em um só arquivo</p>
 </main>
 
 <!-- ============================================================
@@ -2105,6 +2117,2890 @@ document.getElementById("btn-comecar").onclick=()=>{ novoJogo(); pintarTriagem()
 document.getElementById("btn-reiniciar").onclick=()=>{ novoJogo(); pintarTriagem(); mostrar("tela-triagem"); };
 
 novoJogo();
+</script>
+</template>
+
+<!-- ============================================================
+     JOGO 5: ROTA GAÚCHA — O FERIADÃO DOS SETE (template inerte, roda no iframe)
+     ============================================================ -->
+<template id="tpl-rota">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Karla:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* ===================== TEMA ===================== */
+:root{
+  --papel:#f5eddd; --papel2:#fffaf0; --papel3:#efe3cc;
+  --tinta:#2a2119; --tinta2:#5a4c3f; --borda:#dccbb0;
+  --campo:#2f6b3f; --campo2:#3e8a52; --terra:#a84a22; --mostarda:#c98e14;
+  --ceu1:#9fd0ec; --ceu2:#f7e3b5;
+  --ok:#2b7a46; --ruim:#b0362f; --info:#2f5f8a;
+  --sombra:0 1px 0 rgba(60,40,20,.08),0 10px 28px rgba(60,40,20,.10);
+  --raio:16px; --fonte-escala:1;
+  --display:'Fraunces',Georgia,'Times New Roman',serif;
+  --corpo:'Karla',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-tema="claro"]):not([data-theme="light"]){
+    --papel:#131a16; --papel2:#1b2420; --papel3:#24302a;
+    --tinta:#f1e9dc; --tinta2:#bcb09f; --borda:#34443b;
+    --campo:#5cb874; --campo2:#79cc8e; --terra:#ef8a5a; --mostarda:#efbd4f;
+    --ceu1:#1d3b55; --ceu2:#3d2f4f;
+    --ok:#6fd08f; --ruim:#ff8a80; --info:#8cc4f2;
+    --sombra:0 1px 0 rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);
+    color-scheme:dark;
+  }
+}
+:root[data-tema="escuro"],:root[data-theme="dark"]:not([data-tema="claro"]){
+  --papel:#131a16; --papel2:#1b2420; --papel3:#24302a;
+  --tinta:#f1e9dc; --tinta2:#bcb09f; --borda:#34443b;
+  --campo:#5cb874; --campo2:#79cc8e; --terra:#ef8a5a; --mostarda:#efbd4f;
+  --ceu1:#1d3b55; --ceu2:#3d2f4f;
+  --ok:#6fd08f; --ruim:#ff8a80; --info:#8cc4f2;
+  --sombra:0 1px 0 rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:calc(100% * var(--fonte-escala))}
+body{background:var(--papel);color:var(--tinta);font-family:var(--corpo);line-height:1.5;min-height:100vh;-webkit-font-smoothing:antialiased}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--mostarda);outline-offset:2px;border-radius:6px}
+.so-leitor{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+h1,h2,h3{font-family:var(--display);line-height:1.1;letter-spacing:-.01em}
+
+/* ===================== BOTÕES ===================== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4em;border:2px solid transparent;border-radius:999px;padding:.7em 1.3em;font-weight:800;cursor:pointer;background:var(--campo);color:#fff;transition:transform .12s,box-shadow .2s,background .2s;min-height:44px;text-align:center;text-decoration:none}
+:root[data-tema="escuro"] .btn:not(.sec):not(.terra),.btn-escuro .btn:not(.sec):not(.terra){color:#0f1612}
+@media (prefers-color-scheme:dark){:root:not([data-tema="claro"]) .btn:not(.sec):not(.terra){color:#0f1612}}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.15)}
+.btn:active{transform:translateY(0)}
+.btn.sec{background:transparent;color:var(--tinta);border-color:var(--borda)}
+.btn.sec:hover{border-color:var(--tinta2)}
+.btn.terra{background:var(--terra);color:#fff}
+.btn.mini{padding:.35em .9em;min-height:36px;font-size:.88rem}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.linha-btns{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1rem}
+
+/* ===================== HUD ===================== */
+#hud{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:color-mix(in srgb,var(--papel2) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--borda);padding:.45rem .75rem;display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+body.embutido #hud{padding-left:118px}
+#hud[hidden]{display:none}
+.hud-item{display:inline-flex;align-items:center;gap:.3em;background:var(--papel3);border:1px solid var(--borda);border-radius:999px;padding:.25em .7em;font-weight:800;font-size:.86rem;white-space:nowrap;cursor:default}
+button.hud-item{cursor:pointer}
+button.hud-item:hover{border-color:var(--tinta2)}
+.hud-item.baixo{color:var(--ruim);border-color:var(--ruim)}
+.hud-esp{flex:1}
+.hud-item .rot{font-weight:600;color:var(--tinta2)}
+@keyframes pulso{0%{transform:scale(1)}40%{transform:scale(1.15)}100%{transform:scale(1)}}
+.pulsa{animation:pulso .5s}
+
+/* ===================== PALCO ===================== */
+#palco{max-width:980px;margin:0 auto;padding:1rem 1rem 4rem;outline:none}
+.cap{font-size:.78rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--terra)}
+.titulo-cena{font-size:clamp(1.6rem,5vw,2.4rem);margin:.2rem 0 .6rem}
+.sub{color:var(--tinta2);max-width:62ch}
+.cartao{background:var(--papel2);border:1px solid var(--borda);border-radius:var(--raio);box-shadow:var(--sombra);padding:1rem 1.1rem}
+.grade{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.chip{display:inline-flex;align-items:center;gap:.25em;border-radius:999px;padding:.12em .6em;font-size:.78rem;font-weight:800;background:var(--papel3);border:1px solid var(--borda);white-space:nowrap}
+.chip.ok{color:var(--ok);border-color:currentColor;background:transparent}
+.chip.ruim{color:var(--ruim);border-color:currentColor;background:transparent}
+.chip.info{color:var(--info);border-color:currentColor;background:transparent}
+.chips{display:flex;flex-wrap:wrap;gap:.3rem;margin:.4rem 0}
+.av{--c:#888;display:inline-grid;place-items:center;width:var(--t,34px);height:var(--t,34px);border-radius:50%;background:var(--c);color:#fff;font-weight:800;font-size:calc(var(--t,34px)*.38);flex:none;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18);position:relative;font-family:var(--corpo);letter-spacing:-.02em}
+.av .humor-emo{position:absolute;right:-6px;bottom:-6px;font-size:calc(var(--t,34px)*.42);line-height:1}
+.efeitos{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.6rem}
+.efeitos .chip{font-size:.75rem}
+
+/* ===================== TÍTULO ===================== */
+.tela-titulo{position:relative;min-height:calc(100vh - 2rem);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;border-radius:24px;margin-top:.5rem;padding:2rem 1rem 9rem}
+.ceu-animado{position:absolute;inset:0;background:linear-gradient(180deg,#f9c97c 0%,#f6a374 22%,#9fd0ec 50%,#4f86b7 75%,#203a5e 100%);background-size:100% 300%;animation:ceu 24s ease-in-out infinite alternate;z-index:0}
+@keyframes ceu{0%{background-position:0 0}100%{background-position:0 100%}}
+.tela-titulo svg.coxilhas{position:absolute;left:0;right:0;bottom:0;width:100%;height:55%;z-index:1}
+.tela-titulo .conteudo{position:relative;z-index:2;background:color-mix(in srgb,var(--papel2) 96%,transparent);border-radius:22px;padding:1.6rem 1.4rem;max-width:560px;box-shadow:var(--sombra);border:1px solid var(--borda)}
+.tela-titulo h1{font-size:clamp(2.1rem,8vw,3.6rem);font-weight:800}
+.tela-titulo h1 span{display:block;font-size:.5em;color:var(--terra);margin-top:.3rem}
+.tela-titulo .linha-btns{justify-content:center}
+.carros-titulo{font-size:2.2rem;margin-bottom:.4rem}
+
+/* ===================== CHAT ===================== */
+.chat{background:var(--papel3);border-radius:var(--raio);border:1px solid var(--borda);overflow:hidden;margin:.8rem 0}
+.chat-topo{display:flex;align-items:center;gap:.6rem;padding:.7rem .9rem;background:var(--campo);color:#fff}
+.chat-topo b{font-family:var(--display);font-size:1.05rem}
+.chat-topo small{opacity:.85}
+@media (prefers-color-scheme:dark){:root:not([data-tema="claro"]) .chat-topo{color:#0f1612}}
+:root[data-tema="escuro"] .chat-topo{color:#0f1612}
+.chat-msgs{padding:.8rem;display:flex;flex-direction:column;gap:.55rem;max-height:none}
+.msg{display:flex;gap:.5rem;align-items:flex-end;max-width:92%;animation:entra .3s ease-out}
+.msg .balao{background:var(--papel2);border:1px solid var(--borda);border-radius:14px 14px 14px 4px;padding:.45rem .75rem}
+.msg .balao b{display:block;font-size:.78rem}
+.msg.sistema{align-self:center;max-width:100%}
+.msg.sistema .balao{background:transparent;border-style:dashed;border-radius:10px;font-size:.88rem;color:var(--tinta2);text-align:center}
+@keyframes entra{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ===================== DESTINOS ===================== */
+.dest{display:flex;flex-direction:column;gap:.4rem;position:relative;overflow:hidden}
+.dest h3{font-size:1.2rem}
+.dest .meta{font-size:.85rem;color:var(--tinta2)}
+.dest .notas{display:grid;grid-template-columns:1fr 1fr;gap:.2rem .8rem;font-size:.86rem}
+.dest.fora{opacity:.6;filter:grayscale(.7)}
+.dest.fora::after{content:'FORA DO ALCANCE';position:absolute;top:14px;right:-34px;transform:rotate(35deg);background:var(--ruim);color:#fff;font-weight:800;font-size:.62rem;letter-spacing:.12em;padding:.2rem 2.4rem}
+.dest .redes{background:var(--papel3);border-radius:10px;padding:.5rem .7rem;font-size:.85rem;border-left:4px solid #c94f6d}
+.dest .acoes{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:auto;padding-top:.4rem}
+.estrelas{letter-spacing:1px}
+.pessoas{display:flex;align-items:center;gap:.25rem;flex-wrap:wrap;font-size:.8rem}
+.pessoas .av{--t:24px}
+.boletim{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin:.6rem 0}
+.dia{background:var(--papel3);border-radius:12px;padding:.5rem;text-align:center;font-weight:800}
+.dia .pct{font-family:var(--display);font-size:1.5rem;display:block}
+.medidor{display:flex;gap:4px;margin:.3rem 0}
+.medidor span{flex:1;height:10px;border-radius:5px;background:var(--borda)}
+.medidor span.on{background:var(--terra)}
+
+/* ===================== CARROS ===================== */
+.garagem{display:grid;gap:.9rem;grid-template-columns:1fr}
+@media(min-width:760px){.garagem{grid-template-columns:1fr 1fr 1fr}}
+.zona{background:var(--papel2);border:2px dashed var(--borda);border-radius:var(--raio);padding:.8rem;min-height:170px;display:flex;flex-direction:column;gap:.5rem;transition:border-color .15s,background .15s}
+.zona.alvo{border-color:var(--campo);background:color-mix(in srgb,var(--campo) 10%,var(--papel2))}
+.zona h3{font-size:1.1rem;display:flex;align-items:center;gap:.4rem}
+.zona .vagas{margin-left:auto;font-family:var(--corpo);font-size:.8rem;font-weight:800;color:var(--tinta2)}
+.zona .lista{display:flex;flex-wrap:wrap;gap:.4rem;min-height:48px}
+.pessoa{display:inline-flex;align-items:center;gap:.4rem;border:2px solid var(--borda);background:var(--papel);border-radius:999px;padding:.2rem .7rem .2rem .25rem;font-weight:800;cursor:grab;touch-action:none;user-select:none;min-height:44px}
+.pessoa[aria-pressed="true"]{border-color:var(--mostarda);box-shadow:0 0 0 3px color-mix(in srgb,var(--mostarda) 40%,transparent)}
+.pessoa .dir{font-size:.8rem}
+.pessoa.arrastando{opacity:.35}
+.fantasma{position:fixed;pointer-events:none;z-index:100;transform:translate(-50%,-50%) rotate(-4deg);box-shadow:0 12px 30px rgba(0,0,0,.25)}
+.colocar{border:1px dashed var(--campo);background:transparent;color:var(--campo);border-radius:999px;padding:.3rem .8rem;font-weight:800;cursor:pointer;min-height:40px}
+.motorista{display:flex;align-items:center;gap:.4rem;font-size:.9rem;flex-wrap:wrap}
+.motorista select{border:1px solid var(--borda);background:var(--papel);border-radius:10px;padding:.35rem .5rem;min-height:40px}
+.saidas{display:grid;gap:.5rem;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-top:.4rem}
+.saida{display:flex;gap:.6rem;align-items:flex-start;border:2px solid var(--borda);border-radius:12px;padding:.6rem .7rem;cursor:pointer;background:var(--papel2)}
+.saida:has(input:checked){border-color:var(--campo)}
+.saida input{margin-top:.3rem;accent-color:var(--campo);width:18px;height:18px}
+.erros{color:var(--ruim);font-weight:800;margin-top:.6rem}
+
+/* ===================== ESTRADA ===================== */
+.mapa{width:100%;max-width:560px;display:block;margin:.4rem auto;background:var(--papel3);border-radius:var(--raio);border:1px solid var(--borda)}
+.mapa .rs{fill:var(--papel2);stroke:var(--borda);stroke-width:2}
+.mapa .rota{fill:none;stroke:var(--terra);stroke-width:3;stroke-dasharray:6 6}
+.mapa text{font-family:var(--corpo);font-weight:800;font-size:12px;fill:var(--tinta)}
+.mapa .carro-ico{transition:transform 1.2s ease-in-out}
+.feed{display:flex;flex-direction:column;gap:.7rem;margin-top:.8rem}
+.feed .linha{font-size:.95rem;color:var(--tinta2);padding-left:.8rem;border-left:3px solid var(--borda)}
+.evento{border-left:6px solid var(--mostarda)}
+.evento h3{font-size:1.2rem;margin-bottom:.3rem}
+.escolhas{display:flex;flex-direction:column;gap:.45rem;margin-top:.7rem}
+.escolhas .btn{justify-content:flex-start;text-align:left;border-radius:12px;background:var(--papel);color:var(--tinta)!important;border-color:var(--borda);font-weight:700}
+.escolhas .btn:hover{border-color:var(--campo)}
+.resultado{margin-top:.7rem;padding:.7rem .8rem;background:var(--papel3);border-radius:12px}
+.resultado p+p{margin-top:.35rem}
+.clima-faixa{display:inline-flex;align-items:center;gap:.4rem;background:var(--papel3);border:1px solid var(--borda);border-radius:999px;padding:.25rem .8rem;font-weight:800}
+
+/* ===================== DESTINO ===================== */
+.turnos{display:flex;gap:.3rem;flex-wrap:wrap;margin:.4rem 0 .8rem}
+.turnos .t{font-size:.75rem;font-weight:800;padding:.2rem .6rem;border-radius:999px;border:1px solid var(--borda);color:var(--tinta2)}
+.turnos .t.atual{background:var(--campo);color:#fff;border-color:var(--campo)}
+.turnos .t.feito{text-decoration:line-through;opacity:.7}
+.atv{display:flex;flex-direction:column;gap:.3rem;text-align:left;cursor:pointer;border:2px solid var(--borda);transition:border-color .15s,transform .15s}
+.atv:hover:not([disabled]){border-color:var(--campo);transform:translateY(-2px)}
+.atv[disabled]{cursor:not-allowed;opacity:.6}
+.atv h3{font-size:1.02rem;font-family:var(--corpo);font-weight:800}
+.atv .desc{font-size:.85rem;color:var(--tinta2)}
+.atv.especial{border-color:#c94f6d}
+.album{display:grid;gap:.7rem;grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.foto{background:#fff;padding:.45rem .45rem .7rem;border-radius:6px;box-shadow:var(--sombra);transform:rotate(var(--r,0deg));color:#2a2119}
+.foto svg{width:100%;height:auto;display:block;border-radius:3px}
+.foto figcaption{font-size:.78rem;font-weight:700;margin-top:.35rem;line-height:1.25}
+
+/* ===================== FINADOS / FINAL ===================== */
+.votos{display:grid;gap:.5rem;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));margin:.8rem 0}
+.voto{display:flex;align-items:center;gap:.6rem;padding:.55rem .7rem}
+.voto .v{margin-left:auto;font-weight:800}
+.final-topo{text-align:center;padding:1.6rem 1rem}
+.final-topo .emo{font-size:3.4rem}
+.final-topo h2{font-size:clamp(1.8rem,6vw,2.8rem);margin:.3rem 0}
+.pontos{font-family:var(--display);font-size:2.4rem;color:var(--terra)}
+.sonhos{display:grid;gap:.5rem;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.sonho{display:flex;gap:.6rem;align-items:flex-start;padding:.6rem .7rem}
+.sonho .marca{margin-left:auto;font-size:1.2rem}
+.laudo{background:repeating-linear-gradient(var(--papel2),var(--papel2) 27px,var(--borda) 28px);padding:1.2rem 1.2rem 1.2rem 2.4rem;border-left:3px double var(--terra);font-size:.98rem;line-height:28px}
+.laudo h3{line-height:1.2;margin-bottom:.4rem}
+.laudo p{margin-bottom:0}
+.secao{margin-top:1.6rem}
+.secao>h2{font-size:1.4rem;margin-bottom:.6rem}
+
+/* ===================== DIÁLOGOS ===================== */
+dialog{border:none;border-radius:20px;background:var(--papel2);color:var(--tinta);max-width:min(560px,94vw);width:100%;padding:0;box-shadow:0 30px 80px rgba(0,0,0,.4);margin:auto}
+dialog::backdrop{background:rgba(20,14,8,.55)}
+.dlg{padding:1.2rem 1.3rem}
+.dlg h2{font-size:1.4rem;margin-bottom:.6rem;padding-right:2rem}
+.dlg p+p{margin-top:.5rem}
+.fechar{position:absolute;top:.6rem;right:.6rem;background:var(--papel3);border:1px solid var(--borda);border-radius:50%;width:40px;height:40px;cursor:pointer;font-size:1.1rem}
+.matriz{display:grid;gap:2px;font-size:.72rem;margin:.6rem 0;overflow-x:auto}
+.matriz div{display:grid;place-items:center;min-height:30px;border-radius:4px;font-weight:800}
+.grupo-lista{display:flex;flex-direction:column;gap:.6rem}
+.grupo-item{display:flex;gap:.7rem;align-items:center}
+.barra{height:10px;background:var(--papel3);border-radius:5px;overflow:hidden;border:1px solid var(--borda)}
+.barra i{display:block;height:100%;background:var(--campo);border-radius:5px;transition:width .4s}
+.barra.medio i{background:var(--mostarda)}.barra.baixo i{background:var(--ruim)}
+.inv{display:flex;flex-wrap:wrap;gap:.35rem}
+.inv .chip.falta{text-decoration:line-through;opacity:.55}
+.opcao{display:flex;gap:.6rem;align-items:flex-start;padding:.55rem .7rem;border:1px solid var(--borda);border-radius:12px;margin-top:.5rem;cursor:pointer}
+.opcao input{width:20px;height:20px;accent-color:var(--campo);margin-top:.15rem}
+.ajuste{display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.55rem 0;border-bottom:1px solid var(--borda);flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--borda);border-radius:999px;overflow:hidden}
+.seg button{border:none;background:transparent;padding:.4rem .8rem;cursor:pointer;font-weight:700;min-height:38px}
+.seg button[aria-pressed="true"]{background:var(--campo);color:#fff}
+
+/* toasts */
+#toasts{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);z-index:60;display:flex;flex-direction:column;gap:.4rem;width:min(520px,92vw);pointer-events:none}
+.toast{background:var(--tinta);color:var(--papel);padding:.6rem .9rem;border-radius:12px;font-weight:700;box-shadow:var(--sombra);animation:entra .25s}
+
+/* ===================== MOVIMENTO ===================== */
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+.sem-animacao *,.sem-animacao *::before,.sem-animacao *::after{animation:none!important;transition:none!important}
+@media(max-width:520px){
+  body.embutido #hud{padding-left:.6rem;padding-top:3.4rem}
+  .hud-item{font-size:.8rem;padding:.2em .55em}
+  .boletim .dia .pct{font-size:1.2rem}
+}
+</style>
+<header id="hud" hidden aria-label="Recursos do grupo"></header>
+<main id="palco" tabindex="-1" aria-live="off"></main>
+<div id="toasts" aria-live="polite" aria-atomic="false"></div>
+<dialog id="dlg" aria-labelledby="dlg-titulo"></dialog>
+<noscript><p style="padding:2rem">Este jogo precisa de JavaScript ativado.</p></noscript>
+<script>
+"use strict";
+// =============================================================
+//  PERSONAGENS — edite à vontade!
+//  Cada personagem é um objeto de dados. O motor do jogo lê:
+//   - dirige:      pode ser motorista? (Capítulo 2)
+//   - dorminhoco:  +1 = odeia sair cedo; -1 = adora sair cedo
+//   - gostos:      quanto humor cada TAG de atividade dá (−15 a +15)
+//   - frases:      falas por contexto (uma é sorteada)
+//   - sonho:       o "sonho secreto" (a condição fica em js/rules.js)
+//  As AFINIDADES (−2 a +2) ficam em AFINIDADES, logo abaixo.
+// =============================================================
+
+const PERSONAGENS = [
+  {
+    id: 'marcel',
+    nome: 'Marcel',
+    cor: '#d9822b',
+    papel: 'O colecionador brincalhão',
+    preferencia: 'Cenários dignos para os bonecos: mirantes, pedras, cascatas',
+    mania: 'Monta cenas com os bonecos em qualquer parada e atrasa o grupo',
+    sonho: 'Uma “foto épica” dos bonecos num cenário gaúcho inesquecível',
+    habilidade: 'Modo Cena',
+    dirige: true,
+    dorminhoco: 0,
+    gostos: { mirante: 10, cascata: 8, aventura: 4, historia: 3, gastronomia: 4, compras: 5, descanso: -2, noite: 4, festa: 6, doce: 3 },
+    frases: {
+      destino: ['O Capitão Chimarrão já aprovou esse lugar, tchê!', 'Imagina a Guria Biônica naquele mirante… bah!'],
+      chuva: ['Chuva é ótimo pra cena dramática. O Robô Tchê é à prova d’água… eu acho.', 'Vou embrulhar os bonecos no saquinho do pão.'],
+      comida: ['O Capitão Chimarrão comeria três pratos desses.', 'Foto da comida COM os bonecos, por favor.'],
+      engarrafamento: ['Trânsito = tempo pra montar uma cena no painel do carro.', 'O Robô Tchê tá fazendo a sinalização. Ninguém obedece.'],
+      final: ['O álbum dos bonecos ficou tri. Próxima temporada já!', 'Os bonecos pediram pra avisar: valeu a viagem.'],
+      feliz: ['Bah, que cenário!'],
+      triste: ['Nem os bonecos tão rindo agora…']
+    }
+  },
+  {
+    id: 'rogerio',
+    nome: 'Rogério',
+    cor: '#3a6ea5',
+    papel: 'O motorista experiente',
+    preferencia: 'Dirigir na serra, estrada conhecida',
+    mania: 'Não gosta que palpitem na direção nem no caminho',
+    sonho: 'Fazer a viagem inteira sem nenhum perrengue de estrada',
+    habilidade: 'Volante Seguro',
+    dirige: true,
+    dorminhoco: -1,
+    gostos: { gastronomia: 8, historia: 4, descanso: 6, mirante: 3, noite: 2, compras: -4, aventura: -3, bebida: 4, doce: 2 },
+    frases: {
+      destino: ['Essa estrada eu faço de olho fechado. Mas não vou fechar, calma.', 'Deixa a rota comigo.'],
+      chuva: ['Chuva na serra é com calma e farol baixo. Confia.', 'Já peguei pior em 2009, tchê.'],
+      comida: ['Agora sim. Motorista bem alimentado é motorista feliz.', 'Esse galeto paga a gasolina.'],
+      engarrafamento: ['Se tivessem saído na hora que eu disse…', 'Ninguém vai buzinar. Ninguém.'],
+      final: ['Volante entregue, todo mundo inteiro. Missão cumprida.', 'Na próxima eu dirijo de novo. Óbvio.'],
+      palpite: ['Não, não precisa me dizer onde virar.', 'Eu VI a placa, obrigado.', 'Tá com a marcha errada, ó… tá, parei.'],
+      feliz: ['Tri bom.'],
+      triste: ['Ninguém escuta o motorista…']
+    }
+  },
+  {
+    id: 'andriele',
+    nome: 'Andriele',
+    cor: '#8e4ec6',
+    papel: 'A criteriosa e questionadora',
+    preferencia: 'Escolhas bem justificadas, bom custo-benefício',
+    mania: 'Questiona tudo: “mas por que esse e não aquele?”',
+    sonho: 'Uma viagem em que cada escolha valeu a pena',
+    habilidade: 'Questionamento',
+    dirige: true,
+    dorminhoco: 0,
+    gostos: { gastronomia: 5, cultura: 6, historia: 6, compras: 2, bebida: 3, aventura: -2, descanso: 3, doce: 3 },
+    frases: {
+      destino: ['Tá, mas por que esse e não aquele?', 'Quero ver a planilha antes.'],
+      chuva: ['Eu avisei que a previsão tava feia. Tá no histórico do grupo.', 'Plano B existe pra isso, gente.'],
+      comida: ['Pelo preço, tá justo. Aprovado.', 'Bom, mas a porção podia ser maior pelo valor.'],
+      engarrafamento: ['Se a gente tivesse comparado as rotas…', 'Anotando: sair mais cedo na próxima.'],
+      final: ['Fiz as contas: valeu cada real. Quase cada real.', 'Aprovado. Com ressalvas, mas aprovado.'],
+      gasto: ['Esse gasto foi justificado por quem, exatamente?', 'Bah, isso tá caro. Alguém defende?'],
+      feliz: ['Gostei. Bem pensado.'],
+      triste: ['Ninguém justificou nada até agora.']
+    }
+  },
+  {
+    id: 'henrique',
+    nome: 'Henrique',
+    cor: '#2f9e8f',
+    papel: 'O psicólogo do grupo',
+    preferencia: 'Lugares com boas histórias e conversas longas',
+    mania: 'Transforma qualquer briguinha em sessão de análise',
+    sonho: 'Entender de vez a dinâmica do grupo (e provar sua teoria)',
+    habilidade: 'Análise do Grupo',
+    dirige: true,
+    dorminhoco: 1,
+    gostos: { historia: 9, cultura: 7, gastronomia: 5, noite: 6, bebida: 4, descanso: 4, aventura: -4, compras: -2 },
+    frases: {
+      destino: ['Interessante essa escolha. Muito reveladora.', 'Escolher destino é escolher quem a gente quer ser no fim de semana.'],
+      chuva: ['A chuva é só um espelho do nosso estado interno.', 'Ótimo, um ambiente fechado pra conversar sobre sentimentos.'],
+      comida: ['Comer junto cria vínculo. Tá na literatura.', 'Percebam como o humor de vocês subiu com o carboidrato.'],
+      engarrafamento: ['O trânsito revela quem tem baixa tolerância à frustração. Não vou citar nomes. Cristiane.', 'Vamos usar esse tempo pra uma dinâmica?'],
+      final: ['Laudo pronto. A dinâmica do grupo é… complexa e adorável.', 'Teoria confirmada. Mais ou menos.'],
+      teoria: [
+        'Isso é projeção, Cristiane.',
+        'Percebam: quem mais reclama da cena do Marcel é quem mais aparece nas fotos.',
+        'A Melise não perde as coisas. Ela se desapega delas. É diferente.',
+        'O Rogério não dirige um carro. Ele dirige uma relação de confiança.',
+        'A Andriele questiona porque se importa. É uma forma de afeto.',
+        'A Gabriela é o nosso regulador emocional. Sem ela, caos.',
+        'Isso tudo é muito simbólico, gente.'
+      ],
+      feliz: ['Que grupo funcional, olha só.'],
+      triste: ['Preciso processar isso.']
+    }
+  },
+  {
+    id: 'gabriela',
+    nome: 'Gabriela',
+    cor: '#3d9a4f',
+    papel: 'A tranquila das trilhas',
+    preferencia: 'Paisagens, trilhas, natureza, mirantes',
+    mania: 'Prefere não ir a lugares centrados em bebida alcoólica',
+    sonho: 'Uma trilha linda com vista aberta, sem neblina',
+    habilidade: 'Trilha Livre',
+    dirige: true,
+    dorminhoco: -1,
+    gostos: { trilha: 12, mirante: 10, cascata: 9, praia: 6, doce: 4, gastronomia: 3, bebida: -14, noite: -2, compras: -2, historia: 2 },
+    frases: {
+      destino: ['Por mim tá tudo bem, desde que tenha uma trilha.', 'Tem mirante? Então eu vou feliz.'],
+      chuva: ['Tudo bem, a natureza também precisa de água.', 'Capa de chuva e bora, gente.'],
+      comida: ['Que delícia! E sem álcool, perfeito.', 'Pra mim um suco de uva, por favor.'],
+      engarrafamento: ['Respira. Olha aquele morro ali.', 'Tá tudo bem, a gente chega.'],
+      final: ['Que vista, que gente. Valeu muito.', 'Já quero a próxima trilha.'],
+      bebida: ['Eu fico com o suco, tá? Sem problema.', 'Hmm, lugar de bebida não é muito minha praia…'],
+      feliz: ['Que paz.'],
+      triste: ['Tá… tudo bem. Eu acho.']
+    }
+  },
+  {
+    id: 'cristiane',
+    nome: 'Cristiane',
+    cor: '#c94f6d',
+    papel: 'A do contra (que investiga tudo)',
+    preferencia: 'Lugares bem avaliados nas redes',
+    mania: 'Quer ver as redes de cada lugar antes de ir; discorda da maioria',
+    sonho: 'Descobrir um lugar “escondido” que ninguém do grupo conhecia',
+    habilidade: 'Stalker de Redes',
+    dirige: true,
+    dorminhoco: 1,
+    gostos: { gastronomia: 6, compras: 6, noite: 5, mirante: 4, doce: 5, festa: 6, trilha: -3, cultura: 2 },
+    frases: {
+      destino: ['Antes de decidir, deixa eu ver as redes.', 'Hmm. Eu teria escolhido outro. Mas vamos.'],
+      chuva: ['Nas redes ninguém posta foto de chuva, por algum motivo.', 'Eu vi um vídeo de ontem: tava LINDO. Hoje, né…'],
+      comida: ['Esse prato tem 4,8 de avaliação. Confirmo.', 'Achei melhor que nas fotos, capaz!'],
+      engarrafamento: ['Tá tudo vermelho no mapa. Eu avisei.', 'Achei um vídeo de gente presa aqui desde ontem.'],
+      final: ['Postei tudo. O grupo bombou.', 'Admito: foi tri. Mas eu teria feito diferente.'],
+      contra: ['Ninguém nem pesquisou isso. Ok, né.', 'Tá. Vamos no escuro então.'],
+      feliz: ['Tá, esse eu aprovo.'],
+      triste: ['Eu sabia que ia dar nisso.']
+    }
+  },
+  {
+    id: 'melise',
+    nome: 'Melise',
+    cor: '#d4a017',
+    papel: 'A aventureira distraída',
+    preferencia: 'Aventura, trilhas, cachoeiras, improviso',
+    mania: 'Perde coisas pelo caminho',
+    sonho: 'Uma aventura de verdade que vire história para contar',
+    habilidade: 'Perdeu de Novo',
+    dirige: false,
+    dorminhoco: 1,
+    gostos: { aventura: 14, trilha: 9, cascata: 10, praia: 6, festa: 5, compras: -3, descanso: -6, historia: -2 },
+    frases: {
+      destino: ['Qualquer lugar com cachoeira eu topo!', 'Perto demais não tem graça, né?'],
+      chuva: ['Chuva é aventura molhada!', 'Alguém viu meu casaco? …Deixa.'],
+      comida: ['Comi, amei, esqueci onde botei o guardanapo.', 'Bah, que fome de aventura. E de comida.'],
+      engarrafamento: ['Bora descer e empurrar? Tô brincando. Ou não.', 'Será que dá pra ir a pé?'],
+      final: ['Essa vai virar história pros netos!', 'Perdi umas coisas, ganhei umas histórias.'],
+      perdeu: ['Gente… alguém viu meu(minha) {item}?', 'Tava aqui agorinha. Juro.'],
+      feliz: ['ISSO SIM é viagem!'],
+      triste: ['Ai, que tédio…']
+    }
+  }
+];
+
+// Afinidades ocultas (simétricas). Valores de −2 a +2.
+// O jogador só vê esses números com a "Análise do Grupo" do Henrique.
+const AFINIDADES = [
+  ['marcel', 'melise', 1], ['marcel', 'henrique', 1], ['marcel', 'andriele', -1],
+  ['marcel', 'rogerio', 1], ['marcel', 'gabriela', 1], ['marcel', 'cristiane', 1],
+  ['rogerio', 'andriele', -1], ['rogerio', 'cristiane', -2], ['rogerio', 'gabriela', 1],
+  ['rogerio', 'melise', -1], ['rogerio', 'henrique', 0],
+  ['andriele', 'henrique', 2], ['andriele', 'cristiane', -1], ['andriele', 'gabriela', 1],
+  ['andriele', 'melise', -1],
+  ['henrique', 'cristiane', -2], ['henrique', 'gabriela', 1], ['henrique', 'melise', 0],
+  ['gabriela', 'melise', 2], ['gabriela', 'cristiane', 1],
+  ['cristiane', 'melise', 0]
+];
+
+// Bonecos do Marcel — genéricos, inventados pelo jogo.
+const BONECOS = [
+  { id: 'boneco_capitao', nome: 'Capitão Chimarrão', cor: '#3d9a4f' },
+  { id: 'boneco_guria', nome: 'Guria Biônica', cor: '#c94f6d' },
+  { id: 'boneco_robo', nome: 'Robô Tchê', cor: '#7a8794' }
+];
+
+// Inventário inicial do grupo (itens que a Melise pode perder).
+const ITENS = [
+  { id: 'carregador', nome: 'carregador', emoji: '🔌', efeito: 'Sem ele, nada de fotos (nem cenas do Marcel).' },
+  { id: 'guarda_chuva', nome: 'guarda-chuva', emoji: '☂️', efeito: 'Sem ele, a chuva pesa mais no humor.' },
+  { id: 'casaco', nome: 'casaco', emoji: '🧥', efeito: 'Sem ele, frio e neblina incomodam mais.' },
+  { id: 'oculos', nome: 'óculos', emoji: '👓', efeito: 'A Melise fica meio perdida (mais ainda).' },
+  { id: 'chave', nome: 'chave do carro', emoji: '🔑', efeito: 'Sem ela, a volta vai ser complicada…' },
+  ...BONECOS.map(b => ({ id: b.id, nome: b.nome, emoji: '🧸', efeito: 'Um boneco do Marcel. Ele vai ficar arrasado.' }))
+];
+
+// =============================================================
+//  DESTINOS — edite à vontade!
+//  ⚠️ Distâncias e tempos são APROXIMADOS. Confira no Google Maps
+//     antes de publicar e ajuste os campos km / horas.
+//  Regra dura do jogo: horas > 3 => "fora do alcance".
+//
+//  Campos de cada atividade (função A):
+//   tipo:  'arlivre' | 'coberta' | 'gastronomia' | 'noite'
+//   tags:  trilha, mirante, cascata, bebida, gastronomia, doce, historia,
+//          cultura, aventura, compras, descanso, noite, festa, praia
+//   custo: R$ para o grupo todo   tempo: horas extras que consome
+//   pais/gas: nota de paisagem e gastronomia vivida (0–5)
+//   opções: chuva (funciona com chuva?), semAlcool (tem versão sem
+//           álcool), cena (Marcel pode montar cena), melise (aventura
+//           que só a Melise destrava), escondido (só aparece depois que
+//           a Cristiane olha as redes), humor {id: +n} ajustes extras.
+//  Nada de nomes reais de restaurantes ou empresas: só descrições.
+// =============================================================
+
+function A(id, nome, tipo, tags, custo, tempo, pais, gas, op = {}) {
+  const chuvaPadrao = tipo !== 'arlivre';
+  return {
+    id, nome, tipo, tags, custo, tempo, pais, gas,
+    chuva: op.chuva ?? chuvaPadrao,
+    semAlcool: !!op.semAlcool,
+    cena: op.cena ?? (tags.includes('mirante') || tags.includes('cascata')),
+    melise: !!op.melise,
+    escondido: !!op.escondido,
+    humor: op.humor || {},
+    desc: op.desc || ''
+  };
+}
+
+const DESTINOS = [
+  {
+    id: 'gramado', nome: 'Gramado', km: 115, horas: 2.0,
+    paisagem: 4, gastro: 5, custo: 3, risco: 'médio', zona: 'serra',
+    pos: [0.66, 0.36], lotacaoBase: 0.75,
+    ama: ['cristiane', 'rogerio'], torce: ['andriele'],
+    resumo: 'Charme de serra, chocolate, fondue e muita gente.',
+    atividades: [
+      A('gr_cafe', 'Café colonial completo', 'gastronomia', ['gastronomia', 'doce'], 280, 0.5, 1, 5, { desc: 'Uma mesa que não acaba mais.' }),
+      A('gr_fondue', 'Noite de fondue', 'noite', ['gastronomia', 'noite', 'bebida'], 480, 0, 1, 5, { semAlcool: true, desc: 'Queijo, carne e chocolate. O vinho é opcional.' }),
+      A('gr_lago', 'Volta no lago com pedalinho', 'arlivre', ['mirante', 'descanso'], 80, 0, 4, 0, { cena: true }),
+      A('gr_choco', 'Fábrica de chocolate artesanal', 'coberta', ['doce', 'compras'], 120, 0, 1, 3),
+      A('gr_centro', 'Passeio pelo centro e pela rua coberta', 'coberta', ['compras', 'cultura'], 150, 0, 2, 1),
+      A('gr_miniatura', 'Parque de miniaturas ao ar livre', 'arlivre', ['cultura'], 280, 0.5, 3, 0, { cena: true, humor: { marcel: 10 } }),
+      A('gr_trilha', 'Trilha leve na mata de araucárias', 'arlivre', ['trilha'], 0, 0.5, 4, 0),
+      A('gr_tirolesa', 'Tirolesa por cima da mata', 'arlivre', ['aventura', 'mirante'], 320, 0.5, 4, 0, { melise: true }),
+      A('gr_bistro', 'Vinhos e queijos num bistrô', 'noite', ['bebida', 'gastronomia', 'noite'], 360, 0, 1, 4),
+      A('gr_escondido', 'Mirante pouco conhecido no fim de uma estrada de chão', 'arlivre', ['mirante', 'trilha'], 0, 0.5, 5, 0, { escondido: true })
+    ]
+  },
+  {
+    id: 'canela', nome: 'Canela', km: 125, horas: 2.17,
+    paisagem: 5, gastro: 4, custo: 3, risco: 'médio', zona: 'serra',
+    pos: [0.70, 0.34], lotacaoBase: 0.65,
+    ama: ['marcel', 'gabriela', 'melise'], torce: ['andriele'],
+    resumo: 'Cascata famosa, catedral de pedra e mirantes de cair o queixo.',
+    atividades: [
+      A('ca_cascata', 'Mirante da grande cascata do parque estadual', 'arlivre', ['cascata', 'mirante'], 140, 0, 5, 0),
+      A('ca_catedral', 'Catedral de pedra no centro', 'coberta', ['historia', 'cultura'], 0, 0, 3, 0, { cena: true }),
+      A('ca_casarao', 'Café num casarão histórico', 'gastronomia', ['historia', 'doce', 'gastronomia'], 180, 0, 2, 4),
+      A('ca_bondinho', 'Bondinho aéreo sobre o vale', 'arlivre', ['mirante', 'aventura'], 340, 0.5, 5, 0),
+      A('ca_trilha_baixo', 'Descer a trilha até o pé da cascata', 'arlivre', ['aventura', 'trilha', 'cascata'], 80, 1, 5, 0, { melise: true }),
+      A('ca_truta', 'Jantar serrano com truta', 'noite', ['gastronomia', 'noite'], 380, 0, 1, 4),
+      A('ca_pub', 'Pub de cerveja artesanal', 'noite', ['bebida', 'noite', 'festa'], 300, 0, 0, 3),
+      A('ca_colonial', 'Café colonial de família', 'gastronomia', ['gastronomia', 'doce'], 240, 0.5, 1, 4),
+      A('ca_escondido', 'Cascatinha escondida numa propriedade rural', 'arlivre', ['cascata', 'trilha'], 40, 0.5, 5, 0, { escondido: true })
+    ]
+  },
+  {
+    id: 'novapetropolis', nome: 'Nova Petrópolis', km: 95, horas: 1.5,
+    paisagem: 4, gastro: 4, custo: 2, risco: 'médio', zona: 'serra',
+    pos: [0.60, 0.38], lotacaoBase: 0.45,
+    ama: ['henrique', 'gabriela'], torce: ['melise'],
+    resumo: 'Jardim da serra, cultura alemã, mirante de voo livre.',
+    atividades: [
+      A('np_labirinto', 'Labirinto verde na praça', 'arlivre', ['cultura', 'descanso'], 0, 0, 3, 0, { cena: true }),
+      A('np_mirante', 'Mirante de voo livre', 'arlivre', ['mirante'], 0, 0, 5, 0),
+      A('np_parapente', 'Voo duplo de parapente', 'arlivre', ['aventura', 'mirante'], 650, 1, 5, 0, { melise: true }),
+      A('np_cafe', 'Café colonial alemão', 'gastronomia', ['gastronomia', 'doce'], 220, 0.5, 1, 4),
+      A('np_cerveja', 'Cervejaria artesanal (tem refri artesanal)', 'noite', ['bebida', 'noite'], 260, 0, 0, 3, { semAlcool: true }),
+      A('np_aldeia', 'Aldeia histórica dos imigrantes', 'arlivre', ['historia', 'cultura'], 80, 0.5, 3, 1, { cena: true }),
+      A('np_feira', 'Feira de produtos coloniais', 'coberta', ['compras', 'doce'], 100, 0, 1, 2),
+      A('np_jantar', 'Jantar de comida alemã', 'noite', ['gastronomia', 'noite'], 330, 0, 0, 4),
+      A('np_escondido', 'Trilha entre sítios com vista para o vale', 'arlivre', ['trilha', 'mirante'], 0, 0.5, 5, 0, { escondido: true })
+    ]
+  },
+  {
+    id: 'santoantonio', nome: 'Santo Antônio da Patrulha', km: 75, horas: 1.0,
+    paisagem: 3, gastro: 4, custo: 1, risco: 'baixo-médio', zona: 'planicie',
+    pos: [0.66, 0.50], lotacaoBase: 0.15,
+    ama: ['andriele', 'rogerio'], torce: ['melise', 'cristiane'],
+    resumo: 'A escolha segura: pertinho, barata, doce de sonho e engenhos de cana.',
+    destaque: 'Um dos municípios mais antigos do RS, famoso pelos doces e pela tradição dos engenhos de cana.',
+    atividades: [
+      A('sa_doces', 'Provar o tradicional sonho e a rapadura', 'gastronomia', ['doce', 'gastronomia'], 90, 0, 1, 4, { humor: { gabriela: 6 } }),
+      A('sa_engenho', 'Engenho de cana e alambique familiar', 'coberta', ['historia', 'cultura', 'bebida'], 60, 0.5, 2, 2, { semAlcool: true, cena: true, humor: { marcel: 8 }, desc: 'Sem degustação? Tem caldo de cana e rapadura.' }),
+      A('sa_centro', 'Centro histórico e igreja matriz', 'arlivre', ['historia', 'cultura'], 0, 0, 3, 0, { cena: true, humor: { henrique: 4 } }),
+      A('sa_lagoa', 'Tarde na beira de uma lagoa da região', 'arlivre', ['descanso', 'mirante'], 30, 0, 3, 0, { cena: true }),
+      A('sa_campeira', 'Almoço de comida campeira', 'gastronomia', ['gastronomia'], 220, 0, 1, 4),
+      A('sa_rural', 'Estradas rurais entre morros e campos', 'arlivre', ['trilha', 'mirante'], 20, 0.5, 3, 0, { cena: true }),
+      A('sa_caiaque', 'Caiaque improvisado na lagoa', 'arlivre', ['aventura', 'praia'], 120, 0.5, 3, 0, { melise: true }),
+      A('sa_galpao', 'Galpão crioulo com música nativista e churrasco', 'noite', ['festa', 'noite', 'gastronomia'], 260, 0, 1, 4),
+      A('sa_escondido', 'Cascatinha nos morros que só os moradores conhecem', 'arlivre', ['cascata', 'trilha'], 0, 0.5, 4, 0, { escondido: true })
+    ]
+  },
+  {
+    id: 'bento', nome: 'Bento Gonçalves / Vale dos Vinhedos', km: 125, horas: 2.0,
+    paisagem: 5, gastro: 5, custo: 2, risco: 'baixo-médio', zona: 'vale',
+    pos: [0.56, 0.32], lotacaoBase: 0.6,
+    ama: ['rogerio', 'henrique', 'andriele'], torce: ['gabriela'],
+    resumo: 'Parreirais a perder de vista, galeto e trem a vapor. Muito vinho.',
+    atividades: [
+      A('be_trem', 'Passeio de maria-fumaça com música', 'coberta', ['historia', 'cultura', 'bebida'], 560, 1, 4, 2, { semAlcool: true, desc: 'A degustação a bordo tem suco de uva.' }),
+      A('be_vinicola', 'Vinícola familiar com degustação', 'coberta', ['bebida', 'gastronomia'], 300, 0.5, 3, 4, { semAlcool: true, desc: 'Ou suco de uva integral, pra quem não bebe.' }),
+      A('be_parreirais', 'Caminhada pelos parreirais (sem degustação)', 'arlivre', ['mirante', 'trilha'], 0, 0, 5, 0, { cena: true }),
+      A('be_pedra', 'Roteiro das casas antigas de pedra', 'arlivre', ['historia', 'cultura'], 60, 0.5, 4, 1, { cena: true }),
+      A('be_galeto', 'Sequência de galeto', 'gastronomia', ['gastronomia'], 280, 0, 1, 5, { humor: { rogerio: 6 } }),
+      A('be_cantina', 'Jantar numa cantina italiana tradicional', 'noite', ['gastronomia', 'noite', 'bebida'], 360, 0, 1, 5, { semAlcool: true }),
+      A('be_bike', 'Pedalada pelo vale', 'arlivre', ['aventura', 'trilha'], 200, 1, 5, 0, { melise: true }),
+      A('be_suco', 'Loja de sucos e geleias', 'coberta', ['compras', 'doce'], 80, 0, 1, 2),
+      A('be_escondido', 'Mirante sobre o vale de um rio da serra', 'arlivre', ['mirante'], 0, 0.5, 5, 0, { escondido: true })
+    ]
+  },
+  {
+    id: 'garibaldi', nome: 'Garibaldi', km: 110, horas: 1.83,
+    paisagem: 4, gastro: 4, custo: 2, risco: 'baixo-médio', zona: 'vale',
+    pos: [0.55, 0.35], lotacaoBase: 0.4,
+    ama: ['henrique', 'cristiane'], torce: ['gabriela'],
+    resumo: 'Terra do espumante, casarões e estação de trem.',
+    atividades: [
+      A('ga_cave', 'Visita a uma cave de espumante', 'coberta', ['bebida', 'historia'], 260, 0.5, 2, 3, { semAlcool: true }),
+      A('ga_centro', 'Centro histórico e antiga estação', 'arlivre', ['historia', 'cultura'], 0, 0, 3, 0, { cena: true }),
+      A('ga_bike', 'Bicicleta entre parreirais', 'arlivre', ['trilha', 'mirante'], 120, 0.5, 4, 0, { cena: true }),
+      A('ga_cafe', 'Café colonial italiano', 'gastronomia', ['gastronomia', 'doce'], 220, 0.5, 1, 4),
+      A('ga_massa', 'Jantar de massa caseira', 'noite', ['gastronomia', 'noite'], 300, 0, 0, 4),
+      A('ga_cascata', 'Trilha até uma cascata no interior', 'arlivre', ['aventura', 'cascata', 'trilha'], 60, 1, 4, 0, { melise: true }),
+      A('ga_doceria', 'Doceria tradicional', 'coberta', ['doce'], 80, 0, 1, 3),
+      A('ga_escondido', 'Capela de pedra no alto do morro, vista dos vinhedos', 'arlivre', ['mirante', 'historia'], 0, 0.5, 5, 0, { escondido: true })
+    ]
+  },
+  {
+    id: 'saofrancisco', nome: 'São Francisco de Paula', km: 115, horas: 2.0,
+    paisagem: 4, gastro: 3, custo: 1, risco: 'alto', zona: 'serraAlta',
+    pos: [0.74, 0.37], lotacaoBase: 0.25,
+    ama: ['gabriela', 'melise'], torce: ['cristiane'],
+    resumo: 'Lago, araucárias, frio e neblina. Muita neblina.',
+    atividades: [
+      A('sf_lago', 'Volta no lago central', 'arlivre', ['descanso', 'mirante'], 30, 0, 4, 0),
+      A('sf_trilha', 'Trilha na mata de araucárias', 'arlivre', ['trilha'], 0, 0.5, 5, 0),
+      A('sf_cascata', 'Cascata dentro de um parque', 'arlivre', ['cascata', 'trilha'], 60, 0.5, 5, 0),
+      A('sf_pinhao', 'Pinhão na chapa e chocolate quente', 'gastronomia', ['gastronomia', 'doce'], 120, 0, 1, 3),
+      A('sf_tropeiro', 'Jantar de comida tropeira', 'noite', ['gastronomia', 'noite', 'historia'], 260, 0, 0, 3),
+      A('sf_rapel', 'Rapel numa cascata', 'arlivre', ['aventura', 'cascata'], 280, 1, 5, 0, { melise: true }),
+      A('sf_la', 'Feira de artesanato em lã', 'coberta', ['compras', 'cultura'], 120, 0, 1, 0),
+      A('sf_fogueira', 'Fogueira e violão na pousada', 'noite', ['noite', 'festa', 'descanso'], 40, 0, 2, 1),
+      A('sf_escondido', 'Campo de cima da serra com vista infinita', 'arlivre', ['mirante', 'trilha'], 0, 0.5, 5, 0, { escondido: true })
+    ]
+  },
+  {
+    id: 'cambara', nome: 'Cambará do Sul (cânions)', km: 185, horas: 2.9,
+    paisagem: 5, gastro: 3, custo: 2, risco: 'alto', zona: 'serraAlta',
+    pos: [0.84, 0.33], lotacaoBase: 0.4,
+    ama: ['gabriela', 'melise', 'marcel'], torce: ['rogerio', 'cristiane'],
+    resumo: 'Os cânions mais impressionantes do Sul — se a neblina deixar ver.',
+    atividades: [
+      A('cb_borda', 'Trilha de borda de cânion', 'arlivre', ['trilha', 'mirante'], 120, 0.5, 5, 0, { cena: true }),
+      A('cb_rio', 'Trilha do rio no fundo do cânion', 'arlivre', ['aventura', 'trilha', 'cascata'], 250, 1.5, 5, 0, { melise: true }),
+      A('cb_mirante', 'Mirante do cânion acessível de carro', 'arlivre', ['mirante'], 80, 0, 5, 0),
+      A('cb_cachoeira', 'Cachoeira perto da cidade', 'arlivre', ['cascata'], 40, 0.5, 4, 0),
+      A('cb_truta', 'Truta na brasa', 'gastronomia', ['gastronomia'], 300, 0, 1, 4),
+      A('cb_queijo', 'Queijo serrano e doces artesanais', 'coberta', ['gastronomia', 'doce', 'compras'], 120, 0, 1, 3),
+      A('cb_fogao', 'Causos no fogão a lenha', 'noite', ['noite', 'historia', 'descanso'], 0, 0, 1, 2, { humor: { henrique: 6 } }),
+      A('cb_centro', 'Centro de visitantes do parque', 'coberta', ['historia', 'cultura'], 40, 0, 2, 0),
+      A('cb_escondido', 'Mirante sem placa onde os locais veem o pôr do sol', 'arlivre', ['mirante'], 0, 0.5, 5, 0, { escondido: true })
+    ]
+  },
+  {
+    id: 'torres', nome: 'Torres', km: 200, horas: 2.67,
+    paisagem: 4, gastro: 4, custo: 2, risco: 'médio', zona: 'litoral',
+    pos: [0.90, 0.42], lotacaoBase: 0.35,
+    ama: ['melise', 'cristiane'], torce: ['henrique'],
+    resumo: 'Praia com falésias, frutos do mar e vento. Às vezes vento demais.',
+    atividades: [
+      A('to_praia', 'Caminhada na praia', 'arlivre', ['praia', 'descanso'], 0, 0, 4, 0),
+      A('to_falesias', 'Trilha pelas falésias', 'arlivre', ['trilha', 'mirante'], 0, 0.5, 5, 0, { cena: true }),
+      A('to_barco', 'Passeio de barco até a ilha', 'arlivre', ['aventura', 'praia'], 240, 1, 4, 0),
+      A('to_balao', 'Voo de balão ao amanhecer', 'arlivre', ['aventura', 'mirante'], 700, 1, 5, 0, { melise: true }),
+      A('to_frutos', 'Almoço de frutos do mar', 'gastronomia', ['gastronomia'], 380, 0, 2, 5),
+      A('to_calcadao', 'Calçadão à noite com feirinha', 'noite', ['compras', 'noite', 'festa'], 80, 0, 1, 1),
+      A('to_peixe', 'Jantar de peixe na beira-mar', 'noite', ['gastronomia', 'noite'], 340, 0, 2, 4),
+      A('to_cultura', 'Casa de cultura da cidade', 'coberta', ['historia', 'cultura'], 20, 0, 1, 0),
+      A('to_escondido', 'Prainha escondida entre as pedras', 'arlivre', ['praia', 'mirante'], 0, 0.5, 5, 0, { escondido: true, cena: true })
+    ]
+  },
+  {
+    id: 'antonioprado', nome: 'Antônio Prado', km: 180, horas: 2.83,
+    paisagem: 3, gastro: 4, custo: 1, risco: 'médio', zona: 'serra',
+    pos: [0.62, 0.26], lotacaoBase: 0.15,
+    ama: ['henrique', 'andriele'], torce: ['cristiane', 'melise'],
+    resumo: 'Casario italiano preservado, comida colonial e rio pra rafting.',
+    atividades: [
+      A('ap_casario', 'Casario histórico italiano', 'arlivre', ['historia', 'cultura'], 0, 0, 4, 0, { cena: true }),
+      A('ap_almoco', 'Almoço colonial italiano', 'gastronomia', ['gastronomia'], 220, 0, 1, 5),
+      A('ap_rafting', 'Rafting num rio da região', 'arlivre', ['aventura'], 320, 1.5, 4, 0, { melise: true }),
+      A('ap_cantina', 'Cantina de vinho colonial', 'coberta', ['bebida', 'gastronomia'], 160, 0, 1, 3, { semAlcool: true }),
+      A('ap_museu', 'Casa de memória da imigração', 'coberta', ['historia'], 20, 0, 1, 0, { humor: { henrique: 6 } }),
+      A('ap_mirante', 'Mirante sobre o vale', 'arlivre', ['mirante'], 0, 0.5, 4, 0),
+      A('ap_filo', 'Filó italiano com música e polenta na chapa', 'noite', ['festa', 'gastronomia', 'noite'], 150, 0, 1, 4),
+      A('ap_escondido', 'Moinho antigo ainda funcionando', 'arlivre', ['historia', 'cascata'], 0, 0.5, 4, 0, { escondido: true })
+    ]
+  },
+  // ---- fora do alcance (servem para ensinar a regra das 3h) ----
+  { id: 'urubici', nome: 'Urubici (SC)', km: 400, horas: 5.5, foraDoAlcance: true, pos: [0.80, 0.08], resumo: 'Lindo, mas fica em Santa Catarina e passa (muito) das 3h.' },
+  { id: 'missoes', nome: 'Missões', km: 480, horas: 6.5, foraDoAlcance: true, pos: [0.12, 0.22], resumo: 'História incrível, mas é longe demais para um fim de semana.' }
+];
+
+// Hospedagem por noite para o grupo todo, conforme o custo do destino.
+const HOSPEDAGEM = { 1: 700, 2: 1000, 3: 1400 };
+
+// Atividade "coringa" sempre disponível.
+const DESCANSO = A('descanso', 'Descansar na pousada (chimarrão e conversa)', 'coberta', ['descanso'], 0, -0.5, 0, 0, { chuva: true, cena: false });
+
+// =============================================================
+//  EVENTOS — estrada (ida/volta) e destino. Edite à vontade!
+//  fase:   'estrada' (ida e volta), 'ida', 'volta' ou 'destino'
+//  peso(s, ctx):   chance relativa (0 = não acontece)
+//  clima:          true => o "Volante Seguro" do Rogério reduz o prejuízo
+//  perrengue:      true => conta como perrengue de estrada
+//  preparar(s, ctx, R): sorteia detalhes (item perdido etc.)
+//  escolhas[].ef:  efeitos
+//     h: humor {todos, carro, motorista, outro, <id>}
+//     t: tempo (h)   d: dinheiro (R$)   c: combustível (%) nos dois carros
+//     f: flags {nome: +n}     a: ações especiais (lista)
+//  Textos aceitam: {motorista} {outro} {item} {boneco} {destino} {carro}
+// =============================================================
+
+const chuvoso = c => c === 'chuva' || c === 'temporal';
+
+const EVENTOS = [
+  // ------------------------------------------------ ESTRADA
+  {
+    id: 'chuva_serra', fase: 'ida', clima: true, titulo: 'Chuva forte na subida da serra',
+    texto: 'O para-brisa vira cachoeira. {motorista} aperta o volante. No banco de trás, alguém começa a rezar baixinho.',
+    peso: (s, x) => (chuvoso(x.clima) && x.serra ? 6 : chuvoso(x.clima) ? 2 : 0),
+    escolhas: [
+      { txt: 'Reduzir a velocidade e seguir com calma', ef: { t: -1, h: { rogerio: 3 } }, res: 'Devagar e sempre. Chegam inteiros, só mais tarde.' },
+      { txt: 'Parar num café colonial até a chuva passar', ef: { t: -1, d: -160, h: { todos: 7, andriele: -3 } }, res: 'Cuca, linguiça, chimia… a chuva passou e ninguém percebeu.', som: 'tacas' },
+      { txt: 'Manter o ritmo, tchê', ef: { t: 0.5, h: { carro: -10, motorista: 2 }, f: { perrengues: 1 } }, res: 'Ganharam tempo, mas o carro inteiro chegou com as unhas roídas.' }
+    ]
+  },
+  {
+    id: 'neblina', fase: 'estrada', clima: true, perrengue: true, titulo: 'Neblina densa',
+    texto: 'De repente, tudo branco. Os dois carros se perdem de vista. O {carro} não enxerga nem o capô.',
+    peso: (s, x) => (x.clima === 'neblina' ? 7 : x.serra ? 1.5 : 0.3),
+    escolhas: [
+      { txt: 'Combinar encontro no próximo posto', ef: { t: -0.5, h: { todos: 2 } }, res: 'Reencontro emocionante no posto. Teve abraço.' },
+      { txt: 'Cada carro segue no seu ritmo', ef: { f: { separacao: 2 }, a: ['separar'], h: { henrique: 4 } }, res: 'Cada carro agora vive sua própria viagem. Henrique acha isso fascinante.' },
+      { txt: 'Parar no acostamento e esperar abrir', ef: { t: -1, h: { todos: -3, rogerio: 4 } }, res: 'Seguro, mas longo. Deu tempo de jogar três rodadas de “adivinha quem”.' }
+    ]
+  },
+  {
+    id: 'barreira', fase: 'estrada', clima: true, perrengue: true, titulo: 'Barreira na pista',
+    texto: 'Um trecho de barranco desceu com a chuva. Placa de desvio, fila de carros e um agente com colete laranja.',
+    peso: (s, x) => (chuvoso(x.clima) ? 4 : 0.6) * (x.serra ? 1.4 : 0.6),
+    escolhas: [
+      { txt: 'Pegar o desvio asfaltado (mais longo)', ef: { t: -1.5, c: -8 }, res: 'Volta enorme, mas asfalto bom.' },
+      { txt: 'Esperar liberarem a pista', ef: { t: -2, h: { todos: -5 } }, res: 'Duas horas parados. Henrique conduziu uma dinâmica de grupo. Ninguém pediu.' },
+      { txt: 'Estrada de chão que a Melise achou no mapa', ef: { t: -0.5, c: -6, h: { melise: 12, rogerio: -6, carro: -2 }, f: { aventuras: 1 } }, res: 'Barro, buraco, vaca curiosa. A Melise chama de “a melhor parte até agora”.' }
+    ]
+  },
+  {
+    id: 'pedagio', fase: 'estrada', titulo: 'Pedágio',
+    texto: 'Fila no pedágio. Ninguém tem trocado. Andriele já está calculando o rateio.',
+    peso: () => 1.2,
+    escolhas: [
+      { txt: 'Deixa que a Andriele organiza o rateio', ef: { d: -40, h: { andriele: 6, rogerio: -2 } }, res: 'Planilha mental impecável. Cada um deve R$ 5,71.' },
+      { txt: 'O motorista paga e depois a gente vê', ef: { d: -40, h: { motorista: -3, andriele: -4 } }, res: '“Depois a gente vê” é a frase mais cara do turismo gaúcho.' }
+    ]
+  },
+  {
+    id: 'posto', fase: 'estrada', titulo: 'Parada no posto',
+    texto: 'Um posto com pastel, banheiro limpo e uma loja de conveniência perigosamente cheia de salgadinho.',
+    peso: (s, x) => (x.combMin < 45 ? 4 : 1.2),
+    escolhas: [
+      { txt: 'Encher os dois tanques', ef: { d: -260, t: -0.3, a: ['abastecer'] }, res: 'Tanques cheios. A Andriele guardou as duas notinhas.' },
+      { txt: 'Só pastel e café', ef: { d: -70, t: -0.3, h: { todos: 4 } }, res: 'Pastel de carne com ovo. Bah.' },
+      { txt: 'Não para, segue!', ef: { h: { cristiane: -3, melise: -2 } }, res: 'Seguiram. Três pessoas precisavam do banheiro.' }
+    ]
+  },
+  {
+    id: 'mirante_marcel', fase: 'estrada', titulo: 'Marcel e o mirante da estrada',
+    texto: 'Um mirante na beira da estrada. Marcel já está com o Capitão Chimarrão na mão: “Cinco minutinhos, juro.”',
+    peso: (s, x) => (x.temBoneco ? (x.serra ? 3 : 1.5) : 0),
+    escolhas: [
+      { txt: 'Deixa o Marcel montar a cena', ef: { t: -0.75, h: { marcel: 14, rogerio: -3, andriele: -3 }, a: ['fotoBoneco'] }, res: 'Foram 40 minutos, não 5. Mas a foto ficou… honestamente, ficou ótima.', cond: (s, x) => x.temCarregador },
+      { txt: 'Só uma foto rápida', ef: { t: -0.25, h: { marcel: 3 } }, res: 'Uma foto. Tremida. Marcel aceita, contrariado.' },
+      { txt: 'Hoje não, Marcel', ef: { h: { marcel: -12, andriele: 3 } }, res: 'Marcel guarda o boneco em silêncio. O Capitão Chimarrão parece triste também.' }
+    ]
+  },
+  {
+    id: 'melise_esqueceu', fase: 'estrada', titulo: 'Melise esqueceu algo no posto',
+    texto: '“Gente… alguém viu meu(minha) {item}?” Melise jura que deixou no balcão do último posto.',
+    peso: (s, x) => (x.itemPerdivel ? 2.5 : 0),
+    preparar: (s, x, R) => { x.item = x.sortearItem(R); },
+    escolhas: [
+      { txt: 'Voltar para buscar', ef: { t: -1, c: -6, a: ['perderItem', 'recuperarItem'], h: { melise: 6, rogerio: -4 } }, res: 'Estava lá, do lado do pão de queijo. A Melise prometeu nunca mais. (Ela vai.)' },
+      { txt: 'Seguir sem', ef: { a: ['perderItem'], h: { melise: -4 } }, res: 'Seguiram. A Melise já está pensando no que fazer sem o(a) {item}.' },
+      { txt: 'Ligar pro posto guardar até a volta', ef: { t: -0.25, a: ['perderItem', 'guardarItem'], h: { andriele: 3 } }, res: 'O frentista anotou num papel de pão: “guardar pra guria distraída”.' }
+    ]
+  },
+  {
+    id: 'cristiane_lotado', fase: 'ida', titulo: 'Cristiane e as redes',
+    texto: 'Cristiane levanta o celular: “Gente, os stories de hoje: tá LOTADO o lugar que a gente queria ir. Mas eu achei uma coisa…”',
+    peso: (s, x) => (x.lotacao > 0.5 ? 3 : 0.8),
+    escolhas: [
+      { txt: 'Confiar na Cristiane e mudar o roteiro', ef: { h: { cristiane: 12, rogerio: -2 }, a: ['revelarEscondido:cristiane'] }, res: 'Ela marcou um lugar escondido no mapa. Sorriso discreto de vitória.' },
+      { txt: 'Ignorar: rede social exagera', ef: { h: { cristiane: -12 }, f: { lotadoIgnorado: 1 } }, res: 'Cristiane cruza os braços e salva os prints “pra depois”.' },
+      { txt: 'Pedir pro Henrique analisar a situação', ef: { h: { henrique: 6, cristiane: -4 } }, res: '“Percebo uma necessidade de controle, Cristiane.” Ela não gostou.' }
+    ]
+  },
+  {
+    id: 'henrique_atraso', fase: 'estrada', titulo: 'A teoria do carro atrasado',
+    texto: 'O outro carro sumiu do retrovisor. Henrique ajusta os óculos: “Tenho uma teoria sobre por que eles estão atrasados…”',
+    peso: (s, x) => (x.henriqueVai ? 2 : 0),
+    escolhas: [
+      { txt: 'Ouvir a teoria inteira', ef: { h: { henrique: 10, carro: -2 }, a: ['teoriaHenrique'] }, res: 'Vinte minutos de teoria. Conclusão: “é sobre a mãe”. Era sobre um pastel.' },
+      { txt: 'Ligar pro outro carro', ef: { h: { todos: 2 } }, res: 'Pararam pra comprar pastel. A teoria do Henrique estava (quase) certa.' },
+      { txt: 'Mudar de assunto', ef: { h: { henrique: -6 } }, res: 'Henrique anota algo num caderninho. Isso vai voltar.' }
+    ]
+  },
+  {
+    id: 'disputa_rota', fase: 'estrada', titulo: 'Briga de motoristas',
+    texto: 'No rádio comunicador (o grupo do zap), Rogério e {outro} discordam: “É pela esquerda!” “Pela direita, o GPS falou!”',
+    peso: (s, x) => (x.rogerioDirige ? 2.2 : 0),
+    escolhas: [
+      { txt: 'Seguir o Rogério', ef: { t: 0.5, h: { rogerio: 8, outro: -6 } }, res: 'Rogério acertou. E vai lembrar disso até o Natal.' },
+      { txt: 'Seguir o GPS', ef: { t: -0.5, h: { rogerio: -6 } }, res: 'O GPS mandou entrar numa rua sem saída. Rogério não disse nada. Mas pensou.' },
+      { txt: 'Cada um vai do seu jeito', ef: { f: { separacao: 1 }, a: ['separar'], h: { rogerio: 4, outro: 4 } }, res: 'Viraram uma corrida silenciosa. Ninguém admitiu que era corrida.' }
+    ]
+  },
+  {
+    id: 'engarrafamento', fase: 'estrada', titulo: 'Engarrafamento',
+    texto: 'Fila de carros até onde a vista alcança. O feriadão inteiro resolveu viajar junto com vocês.',
+    peso: (s, x) => 1 + (x.saidaTarde ? 3 : 0) + (x.fase === 'volta' ? 2.5 : 0) + (x.feriadao ? 3 : 0),
+    escolhas: [
+      { txt: 'Playlist gaúcha e paciência', ef: { t: -1, h: { todos: 3, henrique: 2 } }, res: 'Cantaram tudo. Até quem dizia que não sabia a letra.' },
+      { txt: 'Atalho pelo interior', ef: { t: -0.4, c: -5, h: { melise: 4, rogerio: -2 } }, res: 'Estrada vicinal, um galpão bonito e uma ponte estreita. Funcionou!' },
+      { txt: 'Parar pra lanchar e esperar diminuir', ef: { t: -1.2, d: -100, h: { todos: 5 } }, res: 'Quando voltaram, o trânsito tinha diminuído. Ciência.' }
+    ]
+  },
+  {
+    id: 'carregador', fase: 'estrada', titulo: 'Quem esqueceu o carregador?',
+    texto: 'Três celulares em 4%. Um único cabo. Silêncio tenso.',
+    peso: (s, x) => (!x.temCarregador ? 3 : 0.8),
+    escolhas: [
+      { txt: 'Comprar um na conveniência', ef: { d: -70, a: ['comprarCarregador'], h: { cristiane: 4, marcel: 3 } }, res: 'Cabo de procedência duvidosa, mas carrega.' },
+      { txt: 'Dividir o único cabo por turnos', ef: { h: { todos: -2, andriele: 4 } }, res: 'Andriele fez uma escala de 12 minutos por pessoa.' },
+      { txt: 'Viver offline, como nossos avós', ef: { h: { cristiane: -10, henrique: 6, gabriela: 4 } }, res: 'Henrique: “Notem como a ansiedade diminui.” Cristiane: discorda.' }
+    ]
+  },
+  {
+    id: 'pneu', fase: 'estrada', perrengue: true, titulo: 'Pneu furado',
+    texto: 'Ploc-ploc-ploc. O {carro} encosta no acostamento com um pneu murcho.',
+    peso: () => 1,
+    escolhas: [
+      { txt: 'Trocar ali mesmo', ef: { t: -0.5, h: { motorista: -3 } }, res: 'Estepe no lugar. Mãos sujas, orgulho intacto.', bonusRogerio: 'Rogério trocou em 9 minutos. Cronometrado.' },
+      { txt: 'Chamar a borracharia da cidade mais próxima', ef: { t: -1, d: -90 }, res: 'O borracheiro contou a história da família dele inteira.' }
+    ]
+  },
+  {
+    id: 'chimarrao', fase: 'estrada', titulo: 'Quem ceva o chimarrão?',
+    texto: 'Garrafa térmica, cuia e bomba no colo. A grande questão: quem ceva na estrada sem derramar?',
+    peso: () => 1.3,
+    escolhas: [
+      { txt: 'O Rogério (mesmo dirigindo, não!)', ef: { h: { rogerio: 4, andriele: -4 } }, res: 'Andriele vetou: motorista não ceva. Foi debatido por 15 km.' },
+      { txt: 'A Gabriela, que tem a mão firme', ef: { h: { gabriela: 6, todos: 2 } }, res: 'Chimarrão perfeito. A cuia passou de mão em mão.' },
+      { txt: 'A Melise', ef: { h: { melise: 6, carro: -3 } }, res: 'Derramou. Duas vezes. Mas riu tanto que todo mundo riu junto.' }
+    ]
+  },
+  {
+    id: 'banco_tras', fase: 'estrada', titulo: 'A briga do banco de trás',
+    texto: 'No {carro}, a discussão sobre “quem tá ocupando mais espaço” escalou para “você sempre faz isso”.',
+    peso: (s, x) => (x.tensao ? 3.5 : 0.3),
+    escolhas: [
+      { txt: 'Henrique, mediação já!', ef: { h: { henrique: 8, carro: 3 } }, res: '“Vamos usar a comunicação não violenta.” Funcionou, surpreendentemente.', cond: (s, x) => x.henriqueNoCarro },
+      { txt: 'Trocar de lugar na próxima parada', ef: { t: -0.3, h: { carro: 4 } }, res: 'Dança das cadeiras no acostamento. Paz restaurada.' },
+      { txt: 'Aumentar o som', ef: { h: { carro: -3, motorista: 2 } }, res: 'O som abafou a briga. A briga voltou no silêncio entre as músicas.' }
+    ]
+  },
+  {
+    id: 'rota_fuga', fase: 'ida', clima: true, titulo: 'Rota de fuga: Santo Antônio da Patrulha',
+    texto: 'O rádio avisa: temporal na serra, estradas complicadas. Andriele abre o mapa: “Santo Antônio da Patrulha fica logo ali. Pertinho, barato, sem serra.”',
+    peso: (s, x) => (x.elNino === 2 && x.destinoId !== 'santoantonio' && x.risco !== 'baixo-médio' && chuvoso(x.clima) && x.etapa <= 1 ? 30 : 0),
+    escolhas: [
+      { txt: 'Mudar para Santo Antônio da Patrulha', ef: { t: 1, h: { andriele: 8, rogerio: 6, melise: -8 }, a: ['rotaFuga'] }, res: 'Mudança de planos! Doce de sonho, engenho de cana e nada de serra no temporal.' },
+      { txt: 'Seguir firme para {destino}', ef: { t: -1.5, h: { todos: -4, melise: 6 }, f: { perrengues: 1 } }, res: 'Seguiram. Foi tenso, mas foram.' }
+    ]
+  },
+  {
+    id: 'radio', fase: 'estrada', titulo: 'Boletim do rádio',
+    texto: 'O locutor da rádio regional: “E o El Niño segue mandando nuvem pro Rio Grande, minha gente…”',
+    peso: (s, x) => (x.elNino >= 1 ? 1.2 : 0.4),
+    escolhas: [
+      { txt: 'Prestar atenção na previsão', ef: { h: { andriele: 4, cristiane: 2 } }, res: 'Anotado. A Andriele já atualizou o plano B.' },
+      { txt: 'Trocar pra música', ef: { h: { melise: 3, marcel: 3, andriele: -3 } }, res: 'Ninguém sabe a previsão, mas todo mundo sabe a letra.' }
+    ]
+  },
+  {
+    id: 'gado', fase: 'estrada', titulo: 'Gado na pista',
+    texto: 'Um peão tocando uma tropa de bois atravessa a estrada, sem pressa nenhuma. Os bois também não têm pressa.',
+    peso: () => 0.9,
+    escolhas: [
+      { txt: 'Esperar com calma (e foto!)', ef: { t: -0.4, h: { gabriela: 5, marcel: 5, todos: 1 } }, res: 'O peão acenou. Marcel garante que o Robô Tchê também acenou.' },
+      { txt: 'Buzinar', ef: { h: { todos: -3, rogerio: -4 } }, res: 'Um boi olhou com desprezo. Os bois continuaram sem pressa.', som: 'buzina' }
+    ]
+  },
+  {
+    id: 'banca', fase: 'estrada', titulo: 'Banquinha de beira de estrada',
+    texto: 'Uma banca vende morango, queijo colonial, salame e cuca. O cheiro invade o carro.',
+    peso: () => 1,
+    escolhas: [
+      { txt: 'Comprar um pouco de tudo', ef: { d: -90, h: { todos: 5, andriele: -2 }, f: { gastroExtra: 1 } }, res: 'O carro agora cheira a salame. Ninguém reclama.' },
+      { txt: 'Só um pote de morango', ef: { d: -20, h: { gabriela: 4 } }, res: 'Acabou antes do próximo pedágio.' },
+      { txt: 'Passar direto', ef: { h: { rogerio: -2, cristiane: -2 } }, res: 'Ficou o arrependimento. E o cheiro.' }
+    ]
+  },
+  {
+    id: 'palpite', fase: 'estrada', titulo: 'Rogério no banco do carona',
+    texto: 'Rogério não está dirigindo. “Ó, ali dá pra ultrapassar. Não, agora não. Agora sim. Tá na quarta, coloca a quinta.” {motorista} respira fundo.',
+    peso: (s, x) => (x.rogerioPassageiro ? 2.5 : 0),
+    escolhas: [
+      { txt: 'Trocar: Rogério assume o volante', ef: { t: -0.2, h: { rogerio: 8, motorista: 2 }, a: ['rogerioAssume'] }, res: 'Rogério ao volante. Paz no carro, paz no mundo.' },
+      { txt: 'Dar a ele a função de copiloto oficial', ef: { h: { rogerio: 4, motorista: -2 } }, res: 'Rogério agora lê placas em voz alta. Todas.' },
+      { txt: 'Fingir que não ouviu', ef: { h: { rogerio: -6, motorista: -2 } }, res: 'Rogério cruza os braços. Continua palpitando, só que mentalmente.' }
+    ]
+  },
+  {
+    id: 'chave_volta', fase: 'volta', titulo: 'Cadê a chave do carro?',
+    texto: 'Hora de voltar. Mãos nos bolsos. Mochilas viradas. A chave do carro sumiu. Todos olham para a Melise.',
+    peso: (s, x) => (!x.temChave ? 100 : 0),
+    escolhas: [
+      { txt: 'Revirar a pousada inteira', ef: { t: -1.5, h: { todos: -4 }, a: ['achouChave'] }, res: 'Estava dentro da bota da Melise. Que estava no pé dela.' },
+      { txt: 'Chamar um chaveiro', ef: { d: -320, t: -1, h: { andriele: -8 }, a: ['achouChave'] }, res: 'O chaveiro abriu em 4 minutos e cobrou como se fossem 4 horas.' }
+    ]
+  },
+  {
+    id: 'saudade', fase: 'volta', titulo: '“Bah, já acabou?”',
+    texto: 'O sol baixa nas coxilhas. Alguém no {carro} diz que podia ser fim de semana pra sempre.',
+    peso: () => 1.2,
+    escolhas: [
+      { txt: 'Rodada de “melhor momento da viagem”', ef: { h: { todos: 6 } }, res: 'Cada um escolheu um momento. Teve até lágrima disfarçada de cisco.' },
+      { txt: 'Deixar o Henrique adiantar o laudo', ef: { h: { henrique: 8, cristiane: -4 }, a: ['teoriaHenrique'] }, res: '“Spoiler do laudo: vocês são mais unidos do que admitem.”' }
+    ]
+  },
+  {
+    id: 'recuperar_posto', fase: 'volta', titulo: 'O posto que guardou o item',
+    texto: 'Na volta, passam pelo posto. O frentista acena com o(a) {item} da Melise na mão!',
+    peso: (s, x) => (x.itemGuardado ? 50 : 0),
+    preparar: (s, x) => { x.item = x.nomeItem(x.itemGuardado); },
+    escolhas: [
+      { txt: 'Parar e buscar!', ef: { t: -0.2, h: { melise: 10, todos: 3 }, a: ['recuperarGuardado'] }, res: 'Recuperado! O frentista ganhou um pote de doce de presente.' }
+    ]
+  },
+
+  // ------------------------------------------------ DESTINO
+  {
+    id: 'melise_perdeu', fase: 'destino', titulo: 'Perdeu de novo',
+    texto: 'Melise apalpa os bolsos: “Gente, meu(minha) {item} tava aqui agorinha…”',
+    peso: (s, x) => (x.itemPerdivel ? 2.2 : 0),
+    preparar: (s, x, R) => { x.item = x.sortearItem(R); },
+    escolhas: [
+      { txt: 'Todo mundo procura', ef: { t: -1, a: ['perderItem', 'recuperarItem'], h: { melise: 6, todos: -1 } }, res: 'Achado! Estava no lugar mais óbvio: na mão dela.' },
+      { txt: 'Perguntar no achados e perdidos', ef: { t: -0.5, a: ['perderItem', 'recuperarSorte'] }, res: '{sorte}' },
+      { txt: 'Deixa pra lá, segue o passeio', ef: { a: ['perderItem'], h: { melise: -3, marcel: -1 } }, res: 'Seguiram. A Melise promete “ser mais atenta”. Ninguém acredita.' }
+    ]
+  },
+  {
+    id: 'boneco_sumiu', fase: 'destino', titulo: 'Sumiu um boneco!',
+    texto: 'Desespero: {boneco} não está na mochila do Marcel. A última pessoa a segurar foi… a Melise.',
+    peso: (s, x) => (x.temBoneco ? 1.6 : 0),
+    preparar: (s, x, R) => { x.item = x.sortearBoneco(R); },
+    escolhas: [
+      { txt: 'Operação resgate: refazer o caminho', ef: { t: -1, a: ['perderItem', 'recuperarItem'], h: { marcel: 10, melise: 4 } }, res: '{boneco} estava pendurado num galho, “fazendo rapel”, segundo a Melise.' },
+      { txt: 'Marcel, é só um boneco…', ef: { a: ['perderItem'], h: { marcel: -18, henrique: 3 } }, res: 'Marcel olha para vocês como se tivessem dito algo imperdoável. Porque disseram.' }
+    ]
+  },
+  {
+    id: 'chuva_surpresa', fase: 'destino', clima: true, titulo: 'Pancada de chuva no meio do passeio',
+    texto: 'O céu fecha em dois minutos. Ninguém trouxe {protecao}.',
+    peso: (s, x) => (x.ultimaAtvArLivre && (chuvoso(x.clima) || x.clima === 'nublado') ? 2.5 : 0),
+    preparar: (s, x) => { x.protecao = x.temGuardaChuva ? 'mais de um guarda-chuva (o único está com a Andriele)' : 'guarda-chuva — a Melise perdeu'; },
+    escolhas: [
+      { txt: 'Correr pra baixo de uma marquise', ef: { t: -0.3, h: { todos: -2 } }, res: 'Ficaram espremidos e rindo. Um senhor ofereceu um banquinho.' },
+      { txt: 'Dançar na chuva', ef: { h: { melise: 10, gabriela: 5, cristiane: -6, andriele: -4 }, f: { aventuras: 1 } }, res: 'Ensopados e felizes. Quase todos.' }
+    ]
+  },
+  {
+    id: 'fila', fase: 'destino', titulo: 'Fila na porta',
+    texto: 'Fila na porta do restaurante. Uma moça com prancheta diz: “uns 40 minutinhos”.',
+    peso: (s, x) => (x.ultimaAtvGastro && x.lotacao > 0.5 ? 3 : 0),
+    escolhas: [
+      { txt: 'Esperar', ef: { t: -0.7, h: { todos: -3, rogerio: -3 } }, res: 'Foram 70 minutinhos. Mas a comida compensou.' },
+      { txt: 'Procurar outro lugar na rua de trás', ef: { t: -0.3, h: { cristiane: 6 } }, res: 'Cristiane achou um lugarzinho com nota alta e mesa livre. Golaço.' }
+    ]
+  },
+  {
+    id: 'morador', fase: 'destino', titulo: 'A dica do morador',
+    texto: 'Um senhor de boina, tomando chimarrão na calçada, puxa conversa: “Vocês não vão no lugar que só a gente daqui conhece?”',
+    peso: (s, x) => (!x.escondidoRevelado ? 1.3 : 0),
+    escolhas: [
+      { txt: 'Anotar a dica', ef: { h: { henrique: 4, gabriela: 3, cristiane: -6 }, a: ['revelarEscondido:morador'] }, res: 'Ele desenhou um mapa num guardanapo. Cristiane resmunga: “eu ia achar isso”.' },
+      { txt: 'Agradecer e seguir', ef: { h: { andriele: 2 } }, res: 'O senhor volta pro chimarrão, com cara de quem sabe das coisas.' }
+    ]
+  },
+  {
+    id: 'falta_luz', fase: 'destino', clima: true, titulo: 'Caiu a luz da pousada',
+    texto: 'Um temporal derruba a energia. Velas, lanternas de celular e um jogo de cartas achado na gaveta.',
+    peso: (s, x) => (x.clima === 'temporal' ? 4 : chuvoso(x.clima) ? 0.8 : 0),
+    escolhas: [
+      { txt: 'Sessão de terapia em grupo à luz de velas', ef: { h: { henrique: 12, todos: 2, cristiane: -4 }, a: ['teoriaHenrique'] }, res: 'Descobriram coisas uns dos outros. Algumas, inclusive, úteis.' },
+      { txt: 'Torneio de truco', ef: { h: { todos: 6, andriele: 2 } }, res: 'Rogério e Gabriela foram campeões. Marcel acusou roubo.' }
+    ]
+  },
+  {
+    id: 'reserva', fase: 'destino', titulo: 'Problema na reserva',
+    texto: 'Na pousada: “Reserva pra sete? Aqui diz quatro.” Andriele tira um print do bolso como quem tira uma espada.',
+    peso: (s, x) => (x.lotacao > 0.4 ? 1 : 0.4),
+    escolhas: [
+      { txt: 'Deixa com a Andriele', ef: { h: { andriele: 10, todos: 2 } }, res: 'Em 6 minutos: quartos certos e um café da manhã de cortesia.' },
+      { txt: 'Pagar a diferença pra não incomodar', ef: { d: -250, h: { andriele: -8 } }, res: 'Resolvido. A Andriele vai falar disso por meses.' }
+    ]
+  },
+  {
+    id: 'cachorro', fase: 'destino', titulo: 'O cachorro da pousada',
+    texto: 'Um vira-lata caramelo adota o grupo e segue vocês para todo lado.',
+    peso: () => 0.8,
+    escolhas: [
+      { txt: 'Batizar de “Tchê”', ef: { h: { todos: 5, gabriela: 3 } }, res: 'Tchê agora é membro honorário. Ganhou foto no álbum.' },
+      { txt: 'Deixar o Marcel incluir ele numa cena', ef: { t: -0.3, h: { marcel: 8, todos: 2 }, a: ['fotoBoneco'] }, res: 'O Robô Tchê montado no cachorro Tchê. Arte.', cond: (s, x) => x.temCarregador && x.temBoneco }
+    ]
+  },
+  {
+    id: 'arco_iris', fase: 'destino', titulo: 'Arco-íris!',
+    texto: 'Depois da chuva, um arco-íris enorme cruza o céu.',
+    peso: (s, x) => (x.choveuAntes && !chuvoso(x.clima) ? 3 : 0),
+    escolhas: [
+      { txt: 'Parar tudo pra ver', ef: { h: { todos: 6, gabriela: 4 } }, res: 'Ninguém falou nada por um minuto inteiro. Raro.' },
+      { txt: 'Cena do Marcel com arco-íris de fundo', ef: { t: -0.3, h: { marcel: 12, todos: 2 }, a: ['fotoBoneco', 'fotoEpica'] }, res: 'A foto mais bonita da viagem. Marcel chora um pouquinho.', cond: (s, x) => x.temCarregador && x.temBoneco }
+    ]
+  },
+  {
+    id: 'grupo_divide', fase: 'destino', titulo: 'O grupo quer coisas diferentes',
+    texto: 'Metade quer descansar, a outra metade quer explorar. A votação deu empate (a Cristiane mudou o voto duas vezes).',
+    peso: () => 1,
+    escolhas: [
+      { txt: 'Dividir: cada carro faz o seu programa', ef: { f: { separacao: 2 }, h: { melise: 4, rogerio: 4, henrique: 3 } }, res: 'Dois programas, dois grupos de fotos, duas versões da mesma história.' },
+      { txt: 'Todo mundo junto, mesmo que meio contrariado', ef: { h: { todos: -2, gabriela: 3 } }, res: 'Juntos. Meio emburrados no começo, rindo no final.' }
+    ]
+  }
+];
+
+// Evento especial fixo do sábado à noite (31 de outubro).
+const EVENTO_HALLOWEEN = {
+  id: 'halloween_saci', titulo: '31 de outubro: Halloween… ou Dia do Saci?',
+  texto: 'Cristiane: “É Halloween! Festa à fantasia!” Henrique, solene: “Na verdade, 31 de outubro também é o Dia do Saci.” Melise já está com uma meia na cabeça e um cachimbo de brinquedo. Marcel fantasia os bonecos.',
+  escolhas: [
+    { txt: 'Festa à fantasia improvisada', ef: { d: -80, h: { cristiane: 10, melise: 8, marcel: 6, andriele: -2 } }, res: 'Fantasias de toalha, lençol e meia. A foto do grupo é histórica.' },
+    { txt: 'Noite do Saci: causos e lendas', ef: { h: { henrique: 10, gabriela: 6, rogerio: 4, cristiane: -4 } }, res: 'Rogério contou um causo do avô dele que arrepiou todo mundo. A meia da Melise sumiu. Saci?' },
+    { txt: 'Os bonecos fantasiados de Saci', ef: { t: -0.3, h: { marcel: 12, todos: 3 }, a: ['fotoBoneco'] }, res: 'O Capitão Chimarrão de gorrinho vermelho e numa perna só. Vira lenda do grupo.', cond: (s, x) => x.temCarregador && x.temBoneco }
+  ]
+};
+
+// =============================================================
+//  FINAIS — 8 finais (2 secretos). A ordem é a prioridade:
+//  o primeiro cuja condição for verdadeira é o escolhido.
+//  r = resumo da partida (veja calcularResumo em js lógica).
+// =============================================================
+
+const FINAIS = [
+  {
+    id: 'bonecos', secreto: true, emoji: '🧸', titulo: 'Os Bonecos Viajantes',
+    cond: r => r.fotosBoneco >= 4 && r.fotoEpica && r.bonecosIntactos,
+    texto: 'O álbum do Marcel virou outra coisa: uma saga. Capitão Chimarrão, Guria Biônica e Robô Tchê atravessaram o Rio Grande do Sul, enfrentaram neblina, posaram em mirantes e sobreviveram à Melise. O grupo? Coadjuvante na aventura dos bonecos. E ninguém se importou.'
+  },
+  {
+    id: 'achados', secreto: true, emoji: '🧳', titulo: 'Achados e Perdidos',
+    cond: r => r.perdidos >= 3 && (r.faltando === 0 || r.faltando >= 4),
+    texto: r => r.faltando === 0
+      ? 'A Melise perdeu ' + r.perdidos + ' coisas no fim de semana. O grupo recuperou TODAS. Virou uma competição, depois uma tradição: a “operação achados e perdidos” é agora o esporte oficial do grupo.'
+      : 'A Melise perdeu ' + r.perdidos + ' coisas e voltou sem ' + r.faltando + ' delas. Ela chama de “desapego radical”. O Henrique chama de “padrão”. O grupo chama de “a melhor piada interna do ano”.'
+  },
+  {
+    id: 'lendaria', emoji: '🏆', titulo: 'A Viagem Lendária',
+    cond: r => r.humor >= 70 && r.sonhos >= 4,
+    texto: 'Teve paisagem, teve comida, teve risada até doer a barriga. Os sonhos secretos foram se realizando um a um, quase sem ninguém perceber. Daqui a vinte anos, alguém vai dizer “lembra do feriadão dos sete?” — e todo mundo vai sorrir.'
+  },
+  {
+    id: 'doiscarros', emoji: '🚗🚙', titulo: 'Dois Carros, Duas Viagens',
+    cond: r => r.separacao >= 3,
+    texto: 'Os carros se separaram tantas vezes que, no fim, cada um teve a sua viagem. No grupo do zap, as duas versões dos fatos não batem. Henrique já escreveu um artigo sobre isso.'
+  },
+  {
+    id: 'finados', emoji: '🕯️', titulo: 'Segunda de Finados',
+    cond: r => r.ficou,
+    texto: r => r.humor >= 60
+      ? 'Esticaram o feriado, e a segunda-feira foi o melhor dia: sem pressa, sem previsão, só o grupo. Voltaram com trânsito, sim. Mas voltaram outros.'
+      : 'Esticaram o feriado… e a segunda-feira cobrou o preço. Cansaço, conta alta e estrada cheia. Ainda assim, ninguém trocaria a história de “o dia a mais que não precisava”.'
+  },
+  {
+    id: 'aprovado', emoji: '✅', titulo: 'Aprovado pela Andriele',
+    cond: r => r.aprovacoes >= 3 && r.reprovacoes === 0 && r.humor < 72,
+    texto: 'Cada escolha foi justificada, cada real foi bem gasto, cada horário foi cumprido. A Andriele aprovou tudo. A viagem foi… correta. Organizada. Talvez um pouquinho sem emoção. Mas impecável na planilha.'
+  },
+  {
+    id: 'chuva', emoji: '☕', titulo: 'Chuva, Café e Risada',
+    cond: r => r.turnosChuva >= 2 && r.humor >= 45,
+    texto: 'Choveu. Muito. O El Niño fez questão de aparecer. Mas o plano B salvou: café colonial, conversa na pousada, truco à luz de velas. No fim, a chuva virou parte da graça.'
+  },
+  {
+    id: 'volta', emoji: '🌂', titulo: 'Volta Pra Casa, Tchê',
+    cond: () => true,
+    texto: 'Não foi bem como planejado. Faltou tempo, sobrou estresse, e alguém ainda vai pagar o pedágio que ficou devendo. Mas já virou piada interna: “a viagem do guarda-chuva quebrado”. E todo mundo já está combinando a próxima.'
+  }
+];
+
+// Ordem usada quando nenhum final "temático" casa (fallback inteligente).
+function finalFallback(r) {
+  if (r.humor < 50) return 'volta';
+  if (r.humor >= 62) return 'lendaria';
+  if (r.turnosChuva >= 1) return 'chuva';
+  return 'volta';
+}
+
+const VOCE_SABIA = 'O El Niño é o aquecimento anormal das águas do Oceano Pacífico perto da linha do Equador. Ele muda a circulação dos ventos e da umidade no planeta e, no Sul do Brasil, costuma deixar a primavera mais chuvosa que o normal, com mais temporais e episódios de chuva forte. Por isso, num ano de El Niño, vale ter sempre um plano B para dias de chuva — e conferir a previsão antes de pegar a estrada da serra.';
+
+// Conversa inicial do grupo do WhatsApp (Capítulo 1).
+const CHAT_INICIAL = [
+  ['marcel', 'Bah, gente! Feriadão chegando: sábado 31 e domingo 1º. Bora viajar? 🧸'],
+  ['andriele', 'Bora. Mas com critério: no máximo 3h de carro, paisagem bonita e comida boa. Alguém discorda?'],
+  ['rogerio', 'Eu dirijo. Serra, de preferência. Conheço as curvas de cor.'],
+  ['gabriela', 'Qualquer lugar com trilha e mirante, tô dentro 🌿 (só não quero roteiro de vinícola, tá?)'],
+  ['cristiane', 'Antes de decidir eu vou olhar as redes de TODOS os lugares. Não confio em vocês.'],
+  ['melise', 'Cânion! Cachoeira! Aventura!!! …alguém viu meu carregador?'],
+  ['henrique', 'Interessante como cada um projeta no destino o que falta na própria vida.'],
+  ['cristiane', 'Isso é você projetando, Henrique.'],
+  ['marcel', 'Os bonecos votam em Canela. O Robô Tchê quer a cascata.'],
+  ['andriele', 'Lembrando: é primavera de El Niño. Olhem a previsão antes de sonhar com mirante.'],
+  ['rogerio', 'E vamos em dois carros. Depois a gente vê quem vai com quem. (Eu dirijo.)'],
+  ['melise', 'E se a gente esticar até segunda? É Finados! 👀'],
+  ['andriele', 'Uma decisão de cada vez, Melise.']
+];
+
+const COMO_JOGAR = [
+  'Vocês são sete amigos de Porto Alegre planejando o feriadão de 31/10 a 1º/11. Seu objetivo: terminar a viagem com o grupo feliz, realizando os sonhos secretos de cada um.',
+  '1) No grupo do zap, escolha UM destino a no máximo 3 horas de carro. Antes, você pode pedir para a Cristiane olhar as redes (gasta tempo, mas revela informações).',
+  '2) Divida os sete em dois carros (máximo 5 por carro) e escolha os motoristas e o horário de saída. Quem vai com quem importa!',
+  '3) Na estrada e no destino, cada evento tem escolhas com consequências em humor 😊, tempo ⏱️ e dinheiro 💰.',
+  '4) No destino, escolha uma atividade por turno. O El Niño pode trazer chuva, temporal ou neblina: tenha sempre um plano B.',
+  '5) No domingo, decida se ficam até a segunda de Finados.',
+  'Habilidades: Marcel monta cenas com os bonecos 🎬 · Rogério dirige melhor na chuva 🛞 · Andriele questiona as decisões 🤔 · Henrique analisa o grupo 🧠 · Gabriela ama trilhas e prefere opções sem álcool 🌿 · Cristiane investiga as redes 📱 · Melise perde coisas, mas destrava aventuras 🧗.',
+  'Dica: use ?seed=1234 no endereço da página para repetir uma partida.'
+];
+
+// =============================================================
+//  LÓGICA DO JOGO — funções de regra, sem nenhum acesso ao DOM.
+//  Todo o estado fica em um objeto `s` (serializável em JSON).
+//  O sorteio usa um gerador com semente (s.rng), então a mesma
+//  semente + as mesmas escolhas = a mesma partida.
+// =============================================================
+
+// ---------- utilidades ----------
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const IDS = PERSONAGENS.map(p => p.id);
+const PERS = Object.fromEntries(PERSONAGENS.map(p => [p.id, p]));
+const ITEM = Object.fromEntries(ITENS.map(i => [i.id, i]));
+const DEST = Object.fromEntries(DESTINOS.map(d => [d.id, d]));
+const nome = id => (PERS[id] ? PERS[id].nome : id);
+
+// ---------- RNG com semente (mulberry32) ----------
+function R(s) {
+  let t = (s.rng = (s.rng + 0x6D2B79F5) >>> 0);
+  t = Math.imul(t ^ (t >>> 15), t | 1);
+  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+function hashTexto(str) {
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+  return h >>> 0;
+}
+// valor fixo em [0,1) para uma chave + semente (não consome o RNG)
+const hash01 = (s, chave) => hashTexto(String(s.seed) + '|' + chave) / 4294967296;
+const sortear = (s, arr) => arr[Math.floor(R(s) * arr.length)];
+function sortearPeso(s, itens, pesos) {
+  const total = pesos.reduce((a, b) => a + b, 0);
+  if (total <= 0) return null;
+  let r = R(s) * total;
+  for (let i = 0; i < itens.length; i++) { r -= pesos[i]; if (r < 0) return itens[i]; }
+  return itens[itens.length - 1];
+}
+function embaralhar(s, arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(R(s) * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+// ---------- afinidades ----------
+const AFIN = {};
+AFINIDADES.forEach(([a, b, v]) => { AFIN[a + '|' + b] = v; AFIN[b + '|' + a] = v; });
+const afinidade = (a, b) => AFIN[a + '|' + b] || 0;
+
+// ---------- clima ----------
+const CLIMAS = {
+  sol: { emoji: '☀️', nome: 'Sol' },
+  nublado: { emoji: '⛅', nome: 'Nublado' },
+  chuva: { emoji: '🌧️', nome: 'Chuva' },
+  temporal: { emoji: '⛈️', nome: 'Temporal' },
+  neblina: { emoji: '🌫️', nome: 'Neblina' },
+  vento: { emoji: '💨', nome: 'Vento forte' }
+};
+const NIVEL_EL_NINO = ['fraco', 'moderado', 'forte'];
+const AJUSTE_ZONA = { serraAlta: 0.06, serra: 0.02, vale: -0.08, planicie: -0.06, litoral: 0 };
+const NEBLINA_ZONA = { serraAlta: 0.45, serra: 0.25, vale: 0.08, planicie: 0.06, litoral: 0.04 };
+const ehChuva = c => c === 'chuva' || c === 'temporal';
+const TURNOS = [
+  { id: 'sabT', nome: 'Sábado à tarde', dia: 'sab' },
+  { id: 'sabN', nome: 'Sábado à noite (31/10)', dia: 'sab', noite: true },
+  { id: 'domM', nome: 'Domingo de manhã', dia: 'dom' },
+  { id: 'domT', nome: 'Domingo à tarde', dia: 'dom' },
+  { id: 'segM', nome: 'Segunda de Finados', dia: 'seg' }
+];
+const DIAS = { sab: 'Sáb 31/10', dom: 'Dom 1/11', seg: 'Seg 2/11' };
+
+function probDia(s, dia, zona) {
+  return clamp(s.clima.prob[dia] + (zona ? AJUSTE_ZONA[zona] || 0 : 0), 0.03, 0.97);
+}
+function climaReal(s, chave, dia, zona) {
+  const [u1, u2, u3] = s.clima.rolls[chave];
+  const n = s.clima.elNino;
+  if (u1 < probDia(s, dia, zona)) return u2 < 0.22 + 0.1 * n ? 'temporal' : 'chuva';
+  if (u2 < (NEBLINA_ZONA[zona] ?? 0.1) + 0.05 * n) return 'neblina';
+  if (zona === 'litoral' && u3 < 0.35) return 'vento';
+  return u3 < 0.6 ? 'sol' : 'nublado';
+}
+// estágio: 'quinta' | 'sexta' | 'agora'
+function previsao(s, dia, estagio, zona) {
+  const ruido = estagio === 'quinta' ? s.clima.ruido1[dia] : estagio === 'sexta' ? s.clima.ruido2[dia] : 0;
+  return Math.round(clamp(probDia(s, dia, zona) + ruido, 0.05, 0.95) * 100);
+}
+
+// ---------- estado ----------
+function novoEstado(seed) {
+  seed = (seed >>> 0) || 1;
+  const s = { v: 1, seed, rng: seed, cena: 'titulo' };
+  const n = sortearPeso(s, [0, 1, 2], [0.25, 0.4, 0.35]);
+  const prob = {}, ruido1 = {}, ruido2 = {};
+  ['sab', 'dom', 'seg'].forEach(d => {
+    prob[d] = clamp(0.22 + R(s) * 0.38 + 0.12 * n, 0.1, 0.92);
+    ruido1[d] = (R(s) - 0.5) * 0.5;
+    ruido2[d] = (R(s) - 0.5) * 0.24;
+  });
+  const rolls = {};
+  ['ida', 'sabT', 'sabN', 'domM', 'domT', 'segM', 'volta'].forEach(k => { rolls[k] = [R(s), R(s), R(s)]; });
+  s.clima = { elNino: n, prob, ruido1, ruido2, rolls };
+  s.humor = Object.fromEntries(IDS.map(id => [id, 58 + Math.floor(R(s) * 11)]));
+  s.inventario = Object.fromEntries(ITENS.map(i => [i.id, true]));
+  s.lotacao = Object.fromEntries(DESTINOS.filter(d => !d.foraDoAlcance).map(d => [d.id, clamp(d.lotacaoBase + (R(s) - 0.5) * 0.4, 0, 1)]));
+  s.caixa = 4200;
+  s.caixaInicial = 4200;
+  s.tempo = 6;
+  s.carros = [
+    { nome: 'Carro 1', membros: [], motorista: null, comb: Math.round(45 + R(s) * 45) },
+    { nome: 'Carro 2', membros: [], motorista: null, comb: Math.round(45 + R(s) * 45) }
+  ];
+  s.teoria = sortear(s, IDS);
+  s.flags = { separacao: 0, perrengues: 0, aventuras: 0, aprovacoes: 0, reprovacoes: 0, gastroExtra: 0, lotadoIgnorado: 0, teorias: 0, rotaFuga: 0 };
+  s.sonhos = {};
+  s.perdidos = []; s.recuperados = 0; s.guardado = null; s.destravadas = 0;
+  s.fotos = []; s.album = []; s.feitas = [];
+  s.turnosChuva = 0; s.paisVivida = 0; s.gastroVivida = 0;
+  s.analises = 3; s.analisesUsadas = 0;
+  s.redesDestino = {}; s.redesTurno = {}; s.escondidoRevelado = null;
+  s.eventosUsados = []; s.destinoId = null; s.saida = null;
+  s.fase = 'planejamento'; s.etapa = 0; s.etapasTotal = 0; s.turnoIdx = 0;
+  s.separados = false; s.ficou = null; s.rogerioDirigiu = false; s.copiloto = false;
+  s.ultimaAtv = null; s.choveuAntes = false;
+  s.passo = null; s.log = [];
+  s.andriele = {};
+  return s;
+}
+
+const destino = s => DEST[s.destinoId];
+const humorMedio = s => Math.round(IDS.reduce((a, id) => a + s.humor[id], 0) / IDS.length);
+function mudaHumor(s, id, n, acc) {
+  if (!n) return;
+  const antes = s.humor[id];
+  s.humor[id] = clamp(Math.round(antes + n), 0, 100);
+  if (acc) acc[id] = (acc[id] || 0) + (s.humor[id] - antes);
+}
+const carroDe = (s, id) => s.carros.findIndex(c => c.membros.includes(id));
+const temBoneco = s => BONECOS.some(b => s.inventario[b.id]);
+const itensPerdiveis = s => ITENS.filter(i => s.inventario[i.id]).map(i => i.id);
+function frase(s, id, ctx) {
+  const lista = (PERS[id].frases[ctx] || PERS[id].frases.feliz);
+  return sortear(s, lista);
+}
+
+// ---------- capítulo 1: destino ----------
+const alcancavel = d => !d.foraDoAlcance && d.horas <= 3;
+function escolherDestino(s, id) {
+  const d = DEST[id];
+  if (!d || !alcancavel(d)) return { ok: false, erro: 'Fora do alcance: a regra é no máximo 3 horas de carro.' };
+  s.destinoId = id;
+  const linhas = [];
+  const acc = {};
+  (d.ama || []).forEach(p => mudaHumor(s, p, 6, acc));
+  (d.torce || []).forEach(p => mudaHumor(s, p, -5, acc));
+  if (!s.redesDestino[id]) { mudaHumor(s, 'cristiane', -10, acc); linhas.push(`Cristiane: “${frase(s, 'cristiane', 'contra')}”`); }
+  linhas.push(`Henrique: “${sortear(s, PERS.henrique.frases.teoria)}”`);
+  if (id === 'santoantonio') linhas.push('Henrique: “Escolher o lugar mais perto diz muito sobre o medo do grupo de se comprometer.”');
+  return { ok: true, linhas, acc };
+}
+function redesDoDestino(s, id) {
+  const d = DEST[id];
+  if (s.redesDestino[id]) return s.redesDestino[id];
+  s.tempo -= 0.5;
+  const lot = s.lotacao[id];
+  const z = previsao(s, 'sab', 'sexta', d.zona);
+  const info = {
+    lotacao: lot > 0.66 ? 'alta' : lot > 0.35 ? 'média' : 'baixa',
+    clima: d.zona === 'serraAlta' ? 'Muitos posts com neblina nos mirantes essa semana.' :
+      d.zona === 'litoral' ? 'Vídeos de mar agitado e vento forte.' :
+      z >= 55 ? 'Posts recentes com chuva, mas o povo tá curtindo os cafés.' : 'Fotos lindas de céu aberto nos últimos dias.',
+    dica: 'Tem um lugar escondido por lá que pouca gente posta. Vale ficar de olho.'
+  };
+  s.redesDestino[id] = info;
+  mudaHumor(s, 'cristiane', 4);
+  return info;
+}
+
+// ---------- Andriele: questionamento ----------
+function argumentosAndriele(s, tipo, extra = {}) {
+  let pergunta, args;
+  if (tipo === 'destino') {
+    const d = destino(s);
+    const lista = DESTINOS.filter(alcancavel);
+    const minCusto = Math.min(...lista.map(x => x.custo));
+    pergunta = `Tá, mas por que ${d.nome} e não outro lugar?`;
+    args = [
+      { txt: 'É dos mais baratos da lista.', ok: d.custo === minCusto },
+      { txt: 'Tem pouco risco de chuva — e é ano de El Niño.', ok: d.risco === 'baixo-médio' },
+      { txt: 'Fica perto: sobra tempo pra aproveitar.', ok: d.horas <= 1.5 },
+      { txt: 'Tem a paisagem mais espetacular (nota 5).', ok: d.paisagem === 5 },
+      { txt: 'A gastronomia é nota máxima.', ok: d.gastro === 5 },
+      { txt: 'É o único com praia na lista.', ok: d.zona === 'litoral' },
+      { txt: 'Todo mundo vai amar, certeza.', ok: false },
+      { txt: 'Vi um vídeo bonito ontem.', ok: false }
+    ];
+  } else if (tipo === 'carros') {
+    const [a, b] = s.carros;
+    const maior = a.membros.length >= b.membros.length ? a : b;
+    const tenso = s.carros.some(c => paresDoCarro(c).some(p => p.v <= -2));
+    pergunta = 'E essa divisão dos carros, foi pensada ou foi no chute?';
+    args = [
+      { txt: 'O Rogério dirige o carro com mais gente.', ok: maior.motorista === 'rogerio' || (a.membros.length === b.membros.length && s.carros.some(c => c.motorista === 'rogerio')) },
+      { txt: 'Ninguém que se estranha está no mesmo carro.', ok: !tenso },
+      { txt: 'Os carros estão equilibrados (4 e 3).', ok: Math.abs(a.membros.length - b.membros.length) === 1 },
+      { txt: 'Sair cedo evita o trânsito do feriadão.', ok: s.saida === 'cedo' },
+      { txt: 'Quem odeia acordar cedo não vai ter que madrugar.', ok: s.saida !== 'cedo' },
+      { txt: 'Porque sim, tchê.', ok: false }
+    ];
+  } else {
+    const hosp = HOSPEDAGEM[destino(s).custo];
+    const seg = previsao(s, 'seg', 'agora', destino(s).zona);
+    const votosFicar = extra.votosFicar ?? 0;
+    if (extra.ficar) {
+      pergunta = 'Ficar até segunda? Justifica pra mim.';
+      args = [
+        { txt: 'Temos dinheiro sobrando pra mais uma noite.', ok: s.caixa >= hosp + 400 },
+        { txt: 'A previsão de segunda está boa.', ok: seg < 50 },
+        { txt: 'A maioria votou pra ficar.', ok: votosFicar >= 4 },
+        { txt: 'Na segunda a estrada vai estar vazia.', ok: false }
+      ];
+    } else {
+      pergunta = 'Voltar hoje? Justifica pra mim.';
+      args = [
+        { txt: 'O caixa está apertado.', ok: s.caixa < hosp + 400 },
+        { txt: 'A previsão de segunda está ruim.', ok: seg >= 50 },
+        { txt: 'A maioria votou pra voltar.', ok: votosFicar <= 3 },
+        { txt: 'O grupo está cansado; melhor descansar em casa.', ok: humorMedio(s) < 55 },
+        { txt: 'Voltar cedo é sempre melhor.', ok: false }
+      ];
+    }
+  }
+  // mostra 4 argumentos com pelo menos 1 bom e 1 ruim (se existirem)
+  const bons = embaralhar(s, args.filter(a => a.ok));
+  const ruins = embaralhar(s, args.filter(a => !a.ok));
+  const escolhidos = [];
+  if (bons.length) escolhidos.push(bons.shift());
+  if (ruins.length) escolhidos.push(ruins.shift());
+  const resto = embaralhar(s, bons.concat(ruins));
+  while (escolhidos.length < Math.min(4, args.length) && resto.length) escolhidos.push(resto.shift());
+  return { pergunta, args: embaralhar(s, escolhidos) };
+}
+function responderAndriele(s, tipo, ok) {
+  const acc = {};
+  s.andriele[tipo] = ok;
+  if (ok) {
+    s.flags.aprovacoes++;
+    mudaHumor(s, 'andriele', 8, acc);
+    IDS.forEach(id => id !== 'andriele' && mudaHumor(s, id, 2, acc));
+    return { ok, texto: sortear(s, ['Argumento coerente. Aprovado.', 'Tá, faz sentido. Gostei.', 'Bem justificado. Viu como não doeu?']), acc };
+  }
+  s.flags.reprovacoes++;
+  mudaHumor(s, 'andriele', -10, acc);
+  IDS.forEach(id => id !== 'andriele' && mudaHumor(s, id, -2, acc));
+  return { ok, texto: sortear(s, ['Hmm. Esse argumento não para em pé. Vou lembrar disso.', 'Isso não é um argumento, é um desejo.', 'Os dados dizem outra coisa, mas tá. Anotado.']), acc };
+}
+
+// ---------- capítulo 2: carros ----------
+function paresDoCarro(c) {
+  const p = [];
+  for (let i = 0; i < c.membros.length; i++)
+    for (let j = i + 1; j < c.membros.length; j++)
+      p.push({ a: c.membros[i], b: c.membros[j], v: afinidade(c.membros[i], c.membros[j]) });
+  return p;
+}
+function validarCarros(s) {
+  const erros = [];
+  const todos = s.carros.flatMap(c => c.membros);
+  if (todos.length !== 7) erros.push('Todos os 7 precisam estar em um carro.');
+  s.carros.forEach(c => {
+    if (c.membros.length > 5) erros.push(`${c.nome}: no máximo 5 pessoas.`);
+    if (c.membros.length < 1) erros.push(`${c.nome}: está vazio.`);
+    if (!c.motorista || !c.membros.includes(c.motorista)) erros.push(`${c.nome}: escolha um motorista.`);
+    else if (!PERS[c.motorista].dirige) erros.push(`${c.nome}: ${nome(c.motorista)} não dirige.`);
+  });
+  if (!s.saida) erros.push('Escolha o horário de saída.');
+  return erros;
+}
+function moverPara(s, id, carroIdx) {
+  s.carros.forEach(c => {
+    c.membros = c.membros.filter(m => m !== id);
+    if (c.motorista === id) c.motorista = null;
+  });
+  if (carroIdx === 0 || carroIdx === 1) {
+    const c = s.carros[carroIdx];
+    if (c.membros.length >= 5) return false;
+    c.membros.push(id);
+  }
+  return true;
+}
+function confirmarCarros(s) {
+  const acc = {};
+  const linhas = [];
+  s.carros.forEach(c => paresDoCarro(c).forEach(p => {
+    mudaHumor(s, p.a, p.v * 2, acc); mudaHumor(s, p.b, p.v * 2, acc);
+  }));
+  const cfg = { cedo: [3, -7, 4], meio: [1.5, 0, 0], tarde: [0, 4, -3] }[s.saida];
+  s.tempo += cfg[0];
+  IDS.forEach(id => {
+    const d = PERS[id].dorminhoco;
+    if (d === 1) mudaHumor(s, id, cfg[1], acc);
+    if (d === -1) mudaHumor(s, id, cfg[2], acc);
+  });
+  if (s.saida === 'cedo') linhas.push('Saída às 6h. Henrique, Cristiane e Melise chegam ao carro como zumbis.');
+  if (s.saida === 'tarde') linhas.push('Saída depois do almoço. Dormiram bem, mas o trânsito do feriadão está esperando.');
+  if (s.carros.some(c => c.motorista === 'rogerio')) { s.rogerioDirigiu = true; linhas.push('Rogério ao volante: “Volante Seguro” ativado.'); }
+  else linhas.push('Rogério vai de carona. Os palpites já começaram.');
+  return { linhas, acc };
+}
+
+// ---------- capítulo 3 e 6: estrada ----------
+function iniciarEstrada(s, fase) {
+  s.fase = fase;
+  s.etapa = 0;
+  const d = destino(s);
+  s.etapasTotal = fase === 'ida' ? (d.horas <= 1.2 ? 2 : 3) : 2;
+}
+function climaEstrada(s) {
+  const d = destino(s);
+  return s.fase === 'ida' ? climaReal(s, 'ida', 'sab', d.zona) : climaReal(s, 'volta', s.ficou ? 'seg' : 'dom', d.zona);
+}
+function avancarEtapa(s) {
+  const d = destino(s);
+  const linhas = [];
+  const acc = {};
+  s.carros.forEach(c => {
+    c.comb = clamp(Math.round(c.comb - (d.km * 0.22 / s.etapasTotal) * (0.9 + R(s) * 0.25)), 0, 100);
+    paresDoCarro(c).forEach(p => {
+      if (p.v) { mudaHumor(s, p.a, p.v, acc); mudaHumor(s, p.b, p.v, acc); }
+    });
+    if (c.comb < 12) {
+      s.caixa -= 260; s.tempo -= 0.5; c.comb = 100;
+      linhas.push(`⛽ ${c.nome} entrou na reserva! Parada de emergência no posto (−R$ 260, −0,5h).`);
+    }
+  });
+  const ci = carroDe(s, 'rogerio');
+  if (ci >= 0 && s.carros[ci].motorista !== 'rogerio' && !s.copiloto) {
+    mudaHumor(s, 'rogerio', -2, acc); mudaHumor(s, s.carros[ci].motorista, -2, acc);
+    linhas.push(`Rogério: “${frase(s, 'rogerio', 'palpite')}”`);
+  }
+  // carro apertado cansa; carros separados se afastam ainda mais
+  IDS.forEach(id => mudaHumor(s, id, -1, acc));
+  if (s.separados) { s.flags.separacao++; linhas.push('📡 Os carros seguem separados: cada um vive a sua própria viagem.'); }
+  s.etapa++;
+  return { linhas, acc };
+}
+function contextoEvento(s, fase, carroIdx) {
+  const d = destino(s) || {};
+  const ocupados = s.carros.map((c, i) => (c.membros.length ? i : -1)).filter(i => i >= 0);
+  const ci = carroIdx ?? (ocupados.length ? ocupados[Math.floor(R(s) * ocupados.length)] : 0);
+  const car = s.carros[ci] || { membros: [], nome: 'carro' };
+  const outro = s.carros[1 - ci] || { motorista: null };
+  const clima = fase === 'destino' ? (s.climaTurno || 'sol') : climaEstrada(s);
+  const u = s.ultimaAtv ? (DEST[s.destinoId].atividades.find(a => a.id === s.ultimaAtv) || DESCANSO) : null;
+  return {
+    fase, clima, carroIdx: ci, carro: car.nome, motorista: car.motorista, outro: outro.motorista,
+    membros: car.membros.slice(),
+    serra: d.zona === 'serra' || d.zona === 'serraAlta', elNino: s.clima.elNino,
+    destinoId: s.destinoId, destino: d.nome, risco: d.risco, etapa: s.etapa,
+    combMin: Math.min(...s.carros.map(c => c.comb)),
+    temBoneco: temBoneco(s), temCarregador: !!s.inventario.carregador, temChave: !!s.inventario.chave,
+    temGuardaChuva: !!s.inventario.guarda_chuva, itemPerdivel: itensPerdiveis(s).length > 0,
+    lotacao: s.lotacao[s.destinoId] ?? 0, saidaTarde: s.saida === 'tarde', feriadao: s.ficou && fase === 'volta',
+    henriqueVai: car.membros.includes('henrique'), henriqueNoCarro: car.membros.includes('henrique'),
+    rogerioDirige: s.carros.some(c => c.motorista === 'rogerio') && outro.motorista && car.motorista,
+    rogerioPassageiro: s.carros.some(c => c.membros.includes('rogerio') && c.motorista !== 'rogerio') && !s.copiloto,
+    tensao: paresDoCarro(car).some(p => p.v <= -2),
+    escondidoRevelado: !!s.escondidoRevelado,
+    ultimaAtvArLivre: !!u && u.tipo === 'arlivre', ultimaAtvGastro: !!u && (u.tipo === 'gastronomia' || u.tipo === 'noite'),
+    choveuAntes: s.choveuAntes, itemGuardado: s.guardado,
+    carroDe: id => carroDe(s, id),
+    sortearItem: rr => { const l = itensPerdiveis(s).filter(i => i !== 'chave' || fase !== 'volta'); return l[Math.floor(rr() * l.length)]; },
+    sortearBoneco: rr => { const l = BONECOS.filter(b => s.inventario[b.id]).map(b => b.id); return l[Math.floor(rr() * l.length)]; },
+    nomeItem: id => (ITEM[id] ? ITEM[id].nome : id)
+  };
+}
+// Foco do carro para eventos que dependem de quem está onde
+const FOCO = {
+  palpite: (s) => s.carros.findIndex(c => c.membros.includes('rogerio') && c.motorista !== 'rogerio'),
+  henrique_atraso: (s) => carroDe(s, 'henrique'),
+  banco_tras: (s) => { const i = s.carros.findIndex(c => paresDoCarro(c).some(p => p.v <= -2)); return i; },
+  disputa_rota: (s) => s.carros.findIndex(c => c.motorista !== 'rogerio')
+};
+function sortearEvento(s, fase) {
+  const x = contextoEvento(s, fase);
+  const pool = EVENTOS.filter(e => !s.eventosUsados.includes(e.id) &&
+    (e.fase === fase || (e.fase === 'estrada' && (fase === 'ida' || fase === 'volta'))));
+  const pesos = pool.map(e => {
+    let p = Math.max(0, e.peso(s, x) || 0);
+    if (e.perrengue && x.motorista === 'rogerio') p *= 0.5;
+    return p;
+  });
+  const ev = sortearPeso(s, pool, pesos);
+  if (!ev) return null;
+  let ctx = x;
+  if (FOCO[ev.id]) { const i = FOCO[ev.id](s); if (i >= 0) ctx = contextoEvento(s, fase, i); }
+  if (ev.preparar) ev.preparar(s, ctx, () => R(s));
+  s.eventosUsados.push(ev.id);
+  if (ev.id === 'palpite') ctx.motorista = s.carros[ctx.carroIdx].motorista;
+  return { ev, x: ctx };
+}
+function preencher(txt, x) {
+  return String(txt).replace(/\{(\w+)\}/g, (m, k) => {
+    if (k === 'motorista' || k === 'outro') return x[k] ? nome(x[k]) : 'o motorista';
+    if (k === 'item') return x.item ? (ITEM[x.item] ? ITEM[x.item].nome : x.item) : 'coisa';
+    if (k === 'boneco') return x.item && ITEM[x.item] ? ITEM[x.item].nome : 'o boneco';
+    return x[k] != null ? x[k] : m;
+  });
+}
+function escolhasDisponiveis(s, ev, x) {
+  return ev.escolhas.map((e, i) => ({ ...e, i, ok: !e.cond || e.cond(s, x) })).filter(e => e.ok);
+}
+function aplicarEfeitos(s, ef, x) {
+  const acc = {};
+  const notas = [];
+  const h = ef.h || {};
+  Object.keys(h).forEach(k => {
+    let alvo = [];
+    if (k === 'todos') alvo = IDS;
+    else if (k === 'carro') alvo = x.membros || [];
+    else if (k === 'motorista') alvo = x.motorista ? [x.motorista] : [];
+    else if (k === 'outro') alvo = x.outro ? [x.outro] : [];
+    else alvo = [k];
+    alvo.forEach(id => PERS[id] && mudaHumor(s, id, h[k], acc));
+  });
+  if (ef.t) s.tempo = Math.round((s.tempo + ef.t) * 100) / 100;
+  if (ef.d) s.caixa += ef.d;
+  if (ef.c) s.carros.forEach(c => { c.comb = clamp(c.comb + ef.c, 0, 100); });
+  Object.entries(ef.f || {}).forEach(([k, v]) => { s.flags[k] = (s.flags[k] || 0) + v; });
+  (ef.a || []).forEach(a => {
+    const [acao, arg] = a.split(':');
+    const id = x.item;
+    switch (acao) {
+      case 'perderItem':
+        if (id && s.inventario[id]) {
+          s.inventario[id] = false; s.perdidos.push(id); s.destravadas++;
+          if (s.destravadas === 1) notas.push('🧗 Melise destravou atividades de aventura que ninguém mais toparia!');
+        }
+        break;
+      case 'recuperarItem': if (id) { s.inventario[id] = true; s.recuperados++; } break;
+      case 'recuperarSorte':
+        if (id && R(s) < 0.5) { s.inventario[id] = true; s.recuperados++; x.sorte = 'Alguém tinha entregado no balcão! Recuperado.'; }
+        else x.sorte = 'Nada no achados e perdidos. Foi-se.';
+        break;
+      case 'guardarItem': s.guardado = id; break;
+      case 'recuperarGuardado': if (s.guardado) { s.inventario[s.guardado] = true; s.recuperados++; s.guardado = null; } break;
+      case 'comprarCarregador': s.inventario.carregador = true; break;
+      case 'achouChave': s.inventario.chave = true; if (s.perdidos.includes('chave')) s.recuperados++; break;
+      case 'abastecer': s.carros.forEach(c => { c.comb = 100; }); break;
+      case 'separar': s.separados = true; break;
+      case 'revelarEscondido': if (!s.escondidoRevelado) s.escondidoRevelado = arg; break;
+      case 'teoriaHenrique': s.flags.teorias++; notas.push(`Henrique: “${sortear(s, PERS.henrique.frases.teoria)}”`); break;
+      case 'rogerioAssume': {
+        const ci = carroDe(s, 'rogerio');
+        if (ci >= 0) { s.carros[ci].motorista = 'rogerio'; s.rogerioDirigiu = true; }
+        break;
+      }
+      case 'fotoBoneco': registrarFotoBoneco(s, x.fase === 'destino' ? 'no destino' : 'num mirante da estrada', false); break;
+      case 'fotoEpica': if (s.fotos.length) s.fotos[s.fotos.length - 1].epica = true; break;
+      case 'rotaFuga':
+        s.destinoId = 'santoantonio'; s.flags.rotaFuga = 1;
+        s.etapasTotal = Math.min(s.etapasTotal, s.etapa + 1);
+        notas.push('🧭 Destino alterado para Santo Antônio da Patrulha.');
+        break;
+      default: break;
+    }
+  });
+  return { acc, notas };
+}
+function resolverEvento(s, ev, x, idx) {
+  const esc = ev.escolhas[idx];
+  const ef = JSON.parse(JSON.stringify(esc.ef || {}));
+  const notas = [];
+  const volante = ev.clima && x.motorista === 'rogerio' && x.fase !== 'destino';
+  if (volante) {
+    if (ef.t < 0) ef.t = ef.t / 2;
+    Object.keys(ef.h || {}).forEach(k => { if (ef.h[k] < 0) ef.h[k] = Math.round(ef.h[k] / 2); });
+    if (ef.f && ef.f.perrengues) delete ef.f.perrengues;
+    notas.push('🛞 Volante Seguro: com o Rogério dirigindo, o prejuízo foi menor.');
+  }
+  let res = esc.res;
+  if (ev.id === 'pneu' && x.motorista === 'rogerio' && esc.bonusRogerio) { ef.t = (ef.t || 0) / 2; res = esc.bonusRogerio; }
+  if (ev.perrengue && !volante) s.flags.perrengues++;
+  const r = aplicarEfeitos(s, ef, x);
+  return {
+    texto: preencher(res, x),
+    acc: r.acc, notas: notas.concat(r.notas),
+    t: ef.t || 0, d: ef.d || 0, c: ef.c || 0, som: esc.som
+  };
+}
+function chegarAoDestino(s) {
+  const d = destino(s);
+  const hosp = HOSPEDAGEM[d.custo];
+  s.caixa -= hosp;
+  s.separados = false;
+  s.fase = 'destino';
+  s.turnoIdx = 0;
+  return { hosp };
+}
+
+// ---------- capítulo 4: turnos no destino ----------
+const turnoAtual = s => TURNOS[s.turnoIdx];
+function iniciarTurno(s) {
+  const t = turnoAtual(s);
+  const d = destino(s);
+  s.climaTurno = climaReal(s, t.id, t.dia, d.zona);
+  if (ehChuva(s.climaTurno)) s.turnosChuva++;
+  // cansaço natural: viajar também cansa
+  IDS.forEach(id => mudaHumor(s, id, -4));
+  if (s.tempo < 0) {
+    const acc = {};
+    IDS.forEach(id => mudaHumor(s, id, -5, acc));
+    s.tempo = Math.round((s.tempo + 3) * 100) / 100;
+    return { perdido: true, acc };
+  }
+  return { perdido: false };
+}
+const meliseDestravou = s => s.destravadas > 0 || s.humor.melise >= 80;
+function lotadoHoje(s, atv, turno) {
+  if (atv.custo <= 0 || atv.id === 'descanso') return false;
+  const pop = atv.tipo === 'gastronomia' || atv.tipo === 'noite' ? 0.75 : 0.45;
+  return hash01(s, atv.id + turno.id) < (s.lotacao[s.destinoId] || 0) * pop;
+}
+function atividadesDoTurno(s) {
+  const t = turnoAtual(s);
+  const d = destino(s);
+  const feitas = new Set(s.feitas.map(f => f.id));
+  const lista = d.atividades.filter(a => {
+    if (feitas.has(a.id)) return false;
+    if (a.escondido && !s.escondidoRevelado) return false;
+    return t.noite ? a.tipo !== 'arlivre' : a.tipo !== 'noite';
+  }).map(a => ({ atv: a, bloqueada: a.melise && !meliseDestravou(s), lotado: lotadoHoje(s, a, t) }));
+  lista.push({ atv: DESCANSO, bloqueada: false, lotado: false });
+  return lista;
+}
+function redesDoTurno(s) {
+  const t = turnoAtual(s);
+  if (s.redesTurno[t.id]) return false;
+  s.redesTurno[t.id] = true;
+  s.tempo = Math.round((s.tempo - 0.5) * 100) / 100;
+  mudaHumor(s, 'cristiane', 4);
+  if (!s.escondidoRevelado && hash01(s, 'escondido' + t.id) < 0.6) s.escondidoRevelado = 'cristiane';
+  return true;
+}
+function podeCena(s, atv) {
+  return atv.cena && !!s.inventario.carregador && temBoneco(s);
+}
+function registrarFotoBoneco(s, local, epica) {
+  if (!s.inventario.carregador || !temBoneco(s)) return null;
+  const vivos = BONECOS.filter(b => s.inventario[b.id]);
+  const b = vivos[s.fotos.length % vivos.length];
+  const foto = { boneco: b.nome, cor: b.cor, local, epica, zona: (destino(s) || {}).zona || 'planicie', clima: s.climaTurno || 'sol' };
+  s.fotos.push(foto);
+  s.album.push({ tipo: 'boneco', titulo: `${b.nome} ${local}`, zona: foto.zona, clima: foto.clima, cor: b.cor, tags: ['boneco'] });
+  return foto;
+}
+function humorBase(id, atv, semAlcool) {
+  const g = PERS[id].gostos;
+  let v = 0;
+  atv.tags.forEach(t => {
+    if (t === 'bebida' && semAlcool) { if (id === 'gabriela') v += 2; else if ((g.bebida || 0) > 0) v -= 1; return; }
+    v += (g[t] || 0) * 0.6;
+  });
+  v = clamp(Math.round(v), -12, 12);
+  return v + (atv.humor[id] || 0);
+}
+function fazerAtividade(s, atvId, op = {}) {
+  const t = turnoAtual(s);
+  const d = destino(s);
+  const atv = atvId === 'descanso' ? DESCANSO : d.atividades.find(a => a.id === atvId);
+  const clima = s.climaTurno;
+  const acc = {};
+  const linhas = [];
+  const semAlcool = !!op.semAlcool && atv.semAlcool;
+  let pais = atv.pais, gas = atv.gas;
+
+  if (!s.redesTurno[t.id] && atv.id !== 'descanso') {
+    mudaHumor(s, 'cristiane', -6, acc);
+    linhas.push(`Cristiane: “${frase(s, 'cristiane', 'contra')}”`);
+  }
+
+  // clima x atividade
+  let cancelada = false, molhada = false;
+  if (!atv.chuva && clima === 'temporal') {
+    cancelada = true;
+    IDS.forEach(id => mudaHumor(s, id, -6, acc));
+    linhas.push(`⛈️ Temporal! “${atv.nome}” foi cancelado. Plano B improvisado: chimarrão, baralho e a janela embaçada.`);
+    s.feitas.push({ id: atv.id, nome: atv.nome, pais: 0, gas: 0, clima, turno: t.id, cancelada: true });
+    s.ultimaAtv = atv.id;
+    s.choveuAntes = true;
+    return { atv, acc, linhas, cancelada, clima };
+  }
+  IDS.forEach(id => mudaHumor(s, id, humorBase(id, atv, semAlcool), acc));
+  if (!atv.chuva && clima === 'chuva') {
+    molhada = true;
+    pais = Math.ceil(pais / 2);
+    s.flags.aventuras++;
+    IDS.forEach(id => mudaHumor(s, id, id === 'melise' ? 8 : (s.inventario.guarda_chuva ? -5 : -9), acc));
+    linhas.push(`🌧️ Aventura molhada! ${s.inventario.guarda_chuva ? 'Um guarda-chuva pra sete pessoas.' : 'Sem guarda-chuva (obrigado, Melise).'} A Melise amou. O resto, nem tanto.`);
+  }
+  if (clima === 'neblina' && atv.tipo === 'arlivre' && (atv.tags.includes('mirante') || atv.tags.includes('cascata'))) {
+    pais = 1;
+    mudaHumor(s, 'gabriela', -6, acc); mudaHumor(s, 'marcel', -4, acc);
+    linhas.push('🌫️ A neblina escondeu a vista. Dava pra ver… branco. Muito branco.');
+  }
+  if (clima === 'neblina' && !s.inventario.casaco && atv.tipo === 'arlivre') {
+    IDS.forEach(id => mudaHumor(s, id, -3, acc));
+    linhas.push('🥶 Frio úmido e sem casaco. A Melise jura que tinha um.');
+  }
+  if (clima === 'vento' && atv.tipo === 'arlivre') {
+    pais = Math.max(1, pais - 1);
+    IDS.forEach(id => mudaHumor(s, id, -3, acc));
+    linhas.push('💨 Vento de levar boné. E levou o boné do Rogério.');
+  }
+  if (clima === 'sol' && atv.tipo === 'arlivre') IDS.forEach(id => mudaHumor(s, id, 3, acc));
+
+  // Gabriela e a bebida
+  if (atv.tags.includes('bebida')) {
+    if (semAlcool) linhas.push(`Gabriela: “${frase(s, 'gabriela', 'comida')}”`);
+    else linhas.push(`Gabriela: “${frase(s, 'gabriela', 'bebida')}”`);
+  }
+  if (atv.melise) { s.flags.aventuras++; linhas.push(`Melise: “${frase(s, 'melise', 'feliz')}”`); }
+
+  // custo, tempo e lotação
+  s.caixa -= atv.custo;
+  s.tempo = Math.round((s.tempo - atv.tempo) * 100) / 100;
+  if (atv.custo >= 350) {
+    mudaHumor(s, 'andriele', s.caixa < 1500 ? -6 : -3, acc);
+    linhas.push(`Andriele: “${frase(s, 'andriele', 'gasto')}”`);
+  }
+  if (lotadoHoje(s, atv, t)) {
+    s.tempo = Math.round((s.tempo - 0.75) * 100) / 100;
+    IDS.forEach(id => mudaHumor(s, id, -3, acc));
+    linhas.push(s.redesTurno[t.id] ? '🔥 Estava lotado, como a Cristiane avisou. Fila de 45 minutos.' : '🔥 Lotado! Ninguém olhou as redes antes. Fila de 45 minutos.');
+  }
+
+  // sonhos
+  if ((atv.tags.includes('trilha') || atv.tags.includes('mirante')) && (clima === 'sol' || clima === 'nublado') && !molhada) s.sonhos.gabriela = true;
+  if (atv.escondido && s.escondidoRevelado === 'cristiane') { s.sonhos.cristiane = true; linhas.push('Cristiane: “Ninguém conhecia esse lugar. NINGUÉM. Eu achei.”'); }
+
+  // Modo Cena do Marcel
+  let foto = null;
+  if (op.cena && podeCena(s, atv)) {
+    s.tempo = Math.round((s.tempo - 0.75) * 100) / 100;
+    mudaHumor(s, 'marcel', 12, acc);
+    IDS.forEach(id => {
+      if (id === 'marcel') return;
+      const a = afinidade('marcel', id);
+      if (a >= 1) mudaHumor(s, id, 3, acc); else if (a <= -1) mudaHumor(s, id, -4, acc);
+    });
+    const epica = pais >= 5 && (clima === 'sol' || clima === 'nublado');
+    foto = registrarFotoBoneco(s, 'em ' + atv.nome.toLowerCase(), epica);
+    linhas.push(epica ? '🎬📸 FOTO ÉPICA! Os bonecos posaram com o cenário perfeito. Marcel está emocionado.' : '🎬 Marcel montou a cena. Os outros esperaram (uns rindo, outros nem tanto).');
+  }
+
+  s.paisVivida += pais; s.gastroVivida += gas;
+  s.feitas.push({ id: atv.id, nome: atv.nome, pais, gas, clima, turno: t.id, molhada });
+  if (atv.id !== 'descanso') s.album.push({ tipo: 'atividade', titulo: atv.nome, zona: d.zona, clima, tags: atv.tags, atvTipo: atv.tipo });
+  s.ultimaAtv = atv.id;
+  if (ehChuva(clima)) s.choveuAntes = true;
+
+  // reação de quem mais sentiu
+  const ord = Object.entries(acc).sort((a, b) => b[1] - a[1]);
+  if (ord.length) {
+    const [melhor, vm] = ord[0];
+    const [pior, vp] = ord[ord.length - 1];
+    if (vm >= 8) linhas.push(`${nome(melhor)}: “${frase(s, melhor, atv.tipo === 'gastronomia' || atv.tipo === 'noite' ? 'comida' : 'feliz')}”`);
+    if (vp <= -6 && pior !== melhor) linhas.push(`${nome(pior)}: “${frase(s, pior, ehChuva(clima) ? 'chuva' : 'triste')}”`);
+  }
+  if (R(s) < 0.3) linhas.push(`Henrique: “${sortear(s, PERS.henrique.frases.teoria)}”`);
+  return { atv, acc, linhas, cancelada, molhada, clima, foto };
+}
+function proximoTurno(s) {
+  s.turnoIdx++;
+  return s.turnoIdx;
+}
+
+// ---------- Henrique: análise do grupo ----------
+function analiseGrupo(s) {
+  if (s.analises <= 0) return null;
+  s.analises--; s.analisesUsadas++;
+  const comCarro = s.carros.some(c => c.membros.length);
+  const pares = [];
+  for (let i = 0; i < IDS.length; i++)
+    for (let j = i + 1; j < IDS.length; j++) {
+      const a = IDS[i], b = IDS[j];
+      const mesmo = comCarro && carroDe(s, a) === carroDe(s, b) && carroDe(s, a) >= 0;
+      pares.push({ a, b, v: afinidade(a, b), mesmo });
+    }
+  const risco = IDS.map(id => {
+    const ci = carroDe(s, id);
+    const tensao = ci >= 0 ? s.carros[ci].membros.reduce((acc, m) => acc + (m !== id ? afinidade(id, m) : 0), 0) : 0;
+    return { id, score: s.humor[id] + tensao * 4 };
+  }).sort((a, b) => a.score - b.score);
+  s.teoria = risco[0].id;
+  return { pares, previsao: risco[0].id, risco };
+}
+
+// ---------- capítulo 5: Finados ----------
+function votosFinados(s) {
+  const seg = previsao(s, 'seg', 'agora', destino(s).zona);
+  const hosp = HOSPEDAGEM[destino(s).custo];
+  const perfil = {
+    melise: 2, marcel: 1, gabriela: seg < 50 ? 1.5 : -0.5, rogerio: -1.5,
+    andriele: s.caixa >= hosp + 400 ? 0.5 : -2, henrique: 0.5
+  };
+  const votos = {};
+  Object.keys(perfil).forEach(id => { votos[id] = (s.humor[id] - 55) / 10 + perfil[id] > 0; });
+  const ficar = Object.values(votos).filter(Boolean).length;
+  votos.cristiane = ficar < 3; // do contra: vota contra a maioria dos outros
+  return { votos, ficar: Object.values(votos).filter(Boolean).length, seg, hosp };
+}
+function decidirFinados(s, ficar) {
+  s.ficou = !!ficar;
+  const acc = {};
+  const { votos, hosp } = votosFinados(s);
+  if (ficar) s.caixa -= hosp;
+  IDS.forEach(id => mudaHumor(s, id, votos[id] === !!ficar ? 4 : -4, acc));
+  return { acc, hosp };
+}
+
+// ---------- final ----------
+function calcularResumo(s) {
+  const humor = humorMedio(s);
+  const menor = IDS.slice().sort((a, b) => s.humor[a] - s.humor[b])[0];
+  const sonhos = {
+    marcel: s.fotos.some(f => f.epica),
+    rogerio: s.flags.perrengues === 0 && s.rogerioDirigiu,
+    andriele: s.flags.aprovacoes >= 3 && s.flags.reprovacoes === 0,
+    henrique: menor === s.teoria && s.analisesUsadas >= 1,
+    gabriela: !!s.sonhos.gabriela,
+    cristiane: !!s.sonhos.cristiane,
+    melise: s.flags.aventuras >= 2
+  };
+  const nSonhos = Object.values(sonhos).filter(Boolean).length;
+  const perdidosUnicos = [...new Set(s.perdidos)];
+  const faltando = perdidosUnicos.filter(id => !s.inventario[id]).length;
+  const r = {
+    humor, menor,
+    fotosBoneco: s.fotos.length, fotoEpica: s.fotos.some(f => f.epica),
+    bonecosIntactos: BONECOS.every(b => s.inventario[b.id]),
+    perdidos: s.perdidos.length, faltando,
+    separacao: s.flags.separacao, aprovacoes: s.flags.aprovacoes, reprovacoes: s.flags.reprovacoes,
+    turnosChuva: s.turnosChuva, ficou: !!s.ficou,
+    pais: s.paisVivida, gastro: s.gastroVivida + s.flags.gastroExtra, caixa: s.caixa
+  };
+  r.sonhos = nSonhos; r.listaSonhos = sonhos; r.menor = menor;
+  r.pontos = Math.max(0, Math.round(humor * 10 + (r.pais + r.gastro) * 15 + Math.max(0, s.caixa) / 10 + nSonhos * 150));
+  return r;
+}
+function escolherFinal(r) {
+  const f = FINAIS.find(x => x.id !== 'volta' && x.cond(r));
+  return FINAIS.find(x => x.id === (f ? f.id : finalFallback(r)));
+}
+function laudoHenrique(s, r) {
+  const ord = IDS.slice().sort((a, b) => s.humor[b] - s.humor[a]);
+  const top = ord[0], fim = ord[ord.length - 1];
+  const p = [];
+  p.push(`Paciente coletivo: sete adultos, dois carros, um feriadão. Humor médio na alta: ${r.humor}/100.`);
+  p.push(`${nome(top)} terminou a viagem no auge (${s.humor[top]}). ${nome(fim)} terminou mais baixo (${s.humor[fim]}) — ${r.listaSonhos.henrique ? 'exatamente como a minha teoria previa. Eu SABIA.' : `minha teoria apostava em ${nome(s.teoria)}. A ciência é humilde.`}`);
+  if (r.perdidos) p.push(`A Melise perdeu ${r.perdidos} ${r.perdidos === 1 ? 'objeto' : 'objetos'}. Não é distração: é uma relação fluida com o mundo material.`);
+  else p.push('A Melise não perdeu nada. Preocupante. Vamos acompanhar.');
+  p.push(r.fotosBoneco ? `O Marcel produziu ${r.fotosBoneco} ${r.fotosBoneco === 1 ? 'cena' : 'cenas'} com os bonecos. Os bonecos são claramente uma extensão do ego dele. Saudável? Divertido, pelo menos.` : 'Nenhuma cena de boneco. O Marcel reprimiu o artista interior. Isso vai sair em algum lugar.');
+  p.push(r.reprovacoes ? `A Andriele reprovou ${r.reprovacoes} ${r.reprovacoes === 1 ? 'argumento' : 'argumentos'}. Questionar é a linguagem de amor dela.` : 'A Andriele aprovou tudo. Fato inédito na história do grupo.');
+  p.push(r.separacao >= 3 ? 'Os carros se separaram várias vezes: o grupo testou a própria autonomia. Voltou junto, o que é o mais importante.' : 'Os dois carros funcionaram como um só organismo. Bonito de ver.');
+  p.push(`Conclusão clínica: ${r.humor >= 65 ? 'grupo funcional, afetuoso e levemente caótico. Recomendo nova viagem em breve.' : r.humor >= 45 ? 'grupo resiliente. Sobreviveu a si mesmo. Recomendo uma pizza para elaborar.' : 'grupo em crise… de riso. Recomendo não falar de previsão do tempo por uma semana.'}`);
+  return p;
+}
+function textoCompartilhar(s, r, fim) {
+  const d = destino(s);
+  return [
+    `🚗🚙 Rota Gaúcha: O Feriadão dos Sete`,
+    `Destino: ${d.nome} · Final: ${fim.emoji} ${fim.titulo}`,
+    `😊 Humor do grupo: ${r.humor}/100 · 🌟 Sonhos realizados: ${r.sonhos}/7`,
+    `🏞️ Paisagem vivida: ${r.pais} · 🍽️ Gastronomia: ${r.gastro} · 💰 Sobrou: R$ ${s.caixa}`,
+    `🧸 Fotos de boneco: ${r.fotosBoneco} · 🧳 Itens perdidos pela Melise: ${r.perdidos}`,
+    `Pontuação: ${r.pontos} · Semente: ${s.seed}`
+  ].join('\n');
+}
+
+// ---------- salvar ----------
+const CHAVE_SAVE = 'rotaGaucha.save.v1';
+const CHAVE_PREFS = 'rotaGaucha.prefs.v1';
+function salvarJogo(s) {
+  try { localStorage.setItem(CHAVE_SAVE, JSON.stringify(s)); return true; } catch (e) { return false; }
+}
+function carregarJogo() {
+  try { const t = localStorage.getItem(CHAVE_SAVE); if (!t) return null; const s = JSON.parse(t); return s && s.v === 1 ? s : null; } catch (e) { return null; }
+}
+function apagarJogo() { try { localStorage.removeItem(CHAVE_SAVE); } catch (e) { /* sem storage */ } }
+
+// Expõe a lógica para a página de testes (tests) e para depuração.
+window.RotaGaucha = {
+  PERSONAGENS, AFINIDADES, ITENS, BONECOS, DESTINOS, EVENTOS, EVENTO_HALLOWEEN, FINAIS, TURNOS,
+  novoEstado, escolherDestino, redesDoDestino, argumentosAndriele, responderAndriele,
+  moverPara, validarCarros, confirmarCarros, iniciarEstrada, avancarEtapa, sortearEvento,
+  contextoEvento, escolhasDisponiveis, resolverEvento, chegarAoDestino, iniciarTurno, turnoAtual,
+  atividadesDoTurno, redesDoTurno, fazerAtividade, proximoTurno, analiseGrupo, votosFinados,
+  decidirFinados, calcularResumo, escolherFinal, laudoHenrique, textoCompartilhar,
+  climaReal, previsao, salvarJogo, carregarJogo
+};
+
+// =============================================================
+//  ARTE — tudo desenhado em SVG/CSS pelo próprio código.
+//  Nenhuma imagem externa, nenhum personagem de marca.
+// =============================================================
+
+function avatar(id, t = 34, humor) {
+  const p = PERS[id];
+  const ini = p.nome.slice(0, 2);
+  const emo = humor == null ? '' : `<span class="humor-emo" aria-hidden="true">${emojiHumor(humor)}</span>`;
+  return `<span class="av" style="--c:${p.cor};--t:${t}px" aria-hidden="true">${ini}${emo}</span>`;
+}
+function emojiHumor(h) {
+  return h >= 80 ? '😄' : h >= 62 ? '🙂' : h >= 45 ? '😐' : h >= 28 ? '😟' : '😫';
+}
+
+function araucaria(x, y, k, cor) {
+  // tronco fino + "andares" achatados (silhueta típica da araucária)
+  return `<g transform="translate(${x} ${y}) scale(${k})" fill="${cor}">
+    <rect x="-2" y="-60" width="4" height="60"/>
+    <path d="M-34 -58 Q0 -72 34 -58 Q0 -64 -34 -58Z"/>
+    <path d="M-26 -68 Q0 -82 26 -68 Q0 -74 -26 -68Z"/>
+    <path d="M-16 -77 Q0 -88 16 -77 Q0 -82 -16 -77Z"/>
+  </g>`;
+}
+
+const CEUS = {
+  sol: ['#8ecdf0', '#fbe7b2'], nublado: ['#b6c7d3', '#e3e6e3'], chuva: ['#7f8d99', '#b5bdc2'],
+  temporal: ['#4b5560', '#7d858c'], neblina: ['#d6dad8', '#eef0ee'], vento: ['#9dc3db', '#dfe9ee']
+};
+
+// Paisagem por zona + clima. Usada no álbum, títulos e cenas.
+function paisagem(zona, clima = 'sol', opt = {}) {
+  const W = 320, H = 200;
+  const [c1, c2] = CEUS[clima] || CEUS.sol;
+  const id = 'g' + Math.floor(Math.random() * 1e9);
+  let terra = '';
+  if (zona === 'litoral') {
+    terra = `<rect y="120" width="${W}" height="80" fill="#3f7fa3"/>
+      <path d="M0 132 Q20 126 40 132 T80 132 T120 132 T160 132 T200 132 T240 132 T280 132 T320 132" stroke="#cfe8f2" stroke-width="3" fill="none"/>
+      <path d="M214 200 L226 96 L248 90 L262 200Z" fill="#6b5a48"/><path d="M252 200 L266 110 L284 108 L296 200Z" fill="#7d6a55"/>
+      <path d="M0 200 L0 168 Q80 156 170 176 L190 200Z" fill="#e8d3a2"/>`;
+  } else if (zona === 'serraAlta') {
+    terra = `<path d="M0 110 L120 104 L132 200 L0 200Z" fill="#5f7d4e"/>
+      <path d="M190 102 L320 98 L320 200 L176 200Z" fill="#56744a"/>
+      <path d="M120 104 L132 200 L176 200 L190 102 Q160 140 120 104Z" fill="#3b4a35"/>
+      <path d="M150 110 Q156 150 152 200" stroke="#cfe8f2" stroke-width="3" fill="none"/>
+      ${araucaria(40, 110, 0.7, '#2c4a2a')}${araucaria(270, 100, 0.8, '#2c4a2a')}`;
+  } else if (zona === 'vale') {
+    let fileiras = '';
+    for (let i = 0; i < 7; i++) fileiras += `<path d="M${-10 + i * 8} ${150 + i * 8} Q160 ${136 + i * 9} ${330 - i * 6} ${148 + i * 8}" stroke="#2f5d2c" stroke-width="3" stroke-dasharray="2 5" fill="none"/>`;
+    terra = `<path d="M0 120 Q80 80 160 112 T320 100 L320 200 L0 200Z" fill="#6f9b4f"/>
+      <path d="M0 140 Q100 116 200 136 T320 130 L320 200 L0 200Z" fill="#82ad5c"/>${fileiras}`;
+  } else if (zona === 'planicie') {
+    terra = `<path d="M0 128 Q60 112 130 126 T260 120 T320 124 L320 200 L0 200Z" fill="#7fae5b"/>
+      <ellipse cx="220" cy="160" rx="70" ry="14" fill="#5d97b8"/>
+      <path d="M0 150 Q90 136 170 156 L0 200Z" fill="#6c9b4c"/>
+      <rect x="40" y="120" width="26" height="18" fill="#c9a77c"/><path d="M36 121 L53 108 L70 121Z" fill="#9b4a2a"/>`;
+  } else {
+    terra = `<path d="M0 118 Q60 70 130 104 T260 92 T320 100 L320 200 L0 200Z" fill="#5b8a48"/>
+      <path d="M0 146 Q90 112 170 140 T320 132 L320 200 L0 200Z" fill="#6f9e55"/>
+      ${araucaria(60, 136, 0.8, '#2f4f2c')}${araucaria(96, 130, 0.6, '#2f4f2c')}${araucaria(250, 128, 0.9, '#2f4f2c')}`;
+  }
+  let clima2 = '';
+  if (clima === 'sol') clima2 = `<circle cx="262" cy="42" r="18" fill="#ffd36b"/>`;
+  if (clima === 'nublado' || clima === 'vento') clima2 = `<g fill="#fff" opacity=".9"><ellipse cx="80" cy="44" rx="34" ry="12"/><ellipse cx="102" cy="36" rx="20" ry="12"/><ellipse cx="236" cy="56" rx="30" ry="10"/></g>`;
+  if (clima === 'chuva' || clima === 'temporal') {
+    let gotas = '';
+    for (let i = 0; i < 46; i++) { const x = (i * 37) % 330, y = (i * 53) % 190; gotas += `<line x1="${x}" y1="${y}" x2="${x - 5}" y2="${y + 14}"/>`; }
+    clima2 = `<g fill="#5d6770"><ellipse cx="90" cy="30" rx="70" ry="20"/><ellipse cx="240" cy="26" rx="80" ry="22"/></g><g stroke="#dfe7ee" stroke-width="1.6" opacity=".75">${gotas}</g>` +
+      (clima === 'temporal' ? `<path d="M196 40 L182 74 L196 72 L186 104" stroke="#ffe066" stroke-width="3" fill="none"/>` : '');
+  }
+  if (clima === 'vento') clima2 += `<g stroke="#fff" stroke-width="2" fill="none" opacity=".8"><path d="M20 70 Q60 60 100 70"/><path d="M150 86 Q200 76 250 88"/></g>`;
+  const neblina = clima === 'neblina' ? `<rect width="${W}" height="${H}" fill="#f4f6f4" opacity=".72"/><rect y="90" width="${W}" height="60" fill="#fff" opacity=".5"/>` : '';
+  const extra = opt.extra || '';
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${opt.rotulo || 'Paisagem'}">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs>
+    <rect width="${W}" height="${H}" fill="url(#${id})"/>${clima2}${terra}${extra}${neblina}</svg>`;
+}
+
+// Boneco genérico do Marcel (criado pelo jogo).
+function bonecoSVG(cor, x = 160, y = 150, k = 1) {
+  return `<g transform="translate(${x} ${y}) scale(${k})">
+    <path d="M-14 -30 L-24 4 L24 4 L14 -30Z" fill="${cor}" opacity=".55"/>
+    <rect x="-10" y="-34" width="20" height="26" rx="5" fill="${cor}"/>
+    <rect x="-9" y="-8" width="7" height="14" rx="3" fill="#333"/><rect x="2" y="-8" width="7" height="14" rx="3" fill="#333"/>
+    <circle cy="-44" r="11" fill="#f2d2a9" stroke="#333" stroke-width="1.5"/>
+    <rect x="-8" y="-48" width="16" height="5" rx="2" fill="#222"/>
+    <path d="M10 -28 L22 -40" stroke="${cor}" stroke-width="5" stroke-linecap="round"/>
+  </g>`;
+}
+
+const ICONE_TAG = { gastronomia: '🍽️', bebida: '🍇', doce: '🍰', cascata: '💧', trilha: '🥾', mirante: '🔭', historia: '🏛️', cultura: '🎭', aventura: '🧗', compras: '🛍️', descanso: '🧉', noite: '🌙', festa: '🎶', praia: '🏖️' };
+const ROTULO_TAG = { gastronomia: 'gastronomia', bebida: 'bebida', doce: 'doces', cascata: 'cascata', trilha: 'trilha', mirante: 'mirante', historia: 'história', cultura: 'cultura', aventura: 'aventura', compras: 'compras', descanso: 'descanso', noite: 'noite', festa: 'festa', praia: 'praia' };
+
+function fotoAlbum(f, i) {
+  let extra = '';
+  if (f.tipo === 'boneco') extra = bonecoSVG(f.cor || '#d9822b', 160, 168, 1.1);
+  else {
+    const ic = (f.tags || []).map(t => ICONE_TAG[t]).filter(Boolean).slice(0, 2).join('');
+    extra = `<text x="160" y="176" font-size="40" text-anchor="middle">${ic}</text>`;
+  }
+  const r = ((i * 37) % 7) - 3;
+  return `<figure class="foto" style="--r:${r}deg">${paisagem(f.zona, f.clima, { extra, rotulo: f.titulo })}<figcaption>${esc(f.titulo)} · ${CLIMAS[f.clima] ? CLIMAS[f.clima].emoji : ''}</figcaption></figure>`;
+}
+
+function carroSVG(cor, rotulo) {
+  return `<svg viewBox="0 0 90 44" width="72" height="35" role="img" aria-label="${rotulo}">
+    <path d="M6 30 Q6 20 16 18 L28 8 Q32 5 40 5 L60 5 Q66 5 70 10 L78 18 Q86 20 86 30 L86 34 L6 34Z" fill="${cor}"/>
+    <path d="M30 10 L40 8 L40 18 L22 18Z M44 8 L60 8 Q64 8 66 12 L70 18 L44 18Z" fill="#cfe8f2"/>
+    <circle cx="24" cy="35" r="7" fill="#222"/><circle cx="24" cy="35" r="3" fill="#aaa"/>
+    <circle cx="68" cy="35" r="7" fill="#222"/><circle cx="68" cy="35" r="3" fill="#aaa"/></svg>`;
+}
+
+function fundoTitulo() {
+  return `<svg class="coxilhas" viewBox="0 0 800 300" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 140 Q120 80 250 120 T520 100 T800 110 L800 300 L0 300Z" fill="#4f7d43"/>
+    <path d="M0 190 Q160 140 330 180 T640 160 T800 170 L800 300 L0 300Z" fill="#5f9150"/>
+    <path d="M0 240 Q200 200 420 236 T800 220 L800 300 L0 300Z" fill="#6fa35c"/>
+    <path d="M90 300 Q300 230 420 236 Q520 240 700 300Z" fill="#c8a678" opacity=".85"/>
+    ${araucaria(120, 150, 1.2, '#24401f')}${araucaria(170, 160, 0.8, '#24401f')}${araucaria(610, 140, 1.3, '#24401f')}${araucaria(680, 156, 0.9, '#24401f')}${araucaria(720, 150, 0.7, '#24401f')}
+  </svg>`;
+}
+
+// Mapa estilizado (não é cartografia exata!) com a rota e os dois carros.
+function mapaSVG(d, fracs, separados) {
+  const W = 360, H = 240;
+  const poa = [0.6 * W, 0.56 * H];
+  const alvo = [d.pos[0] * W, d.pos[1] * H];
+  const ctrl = [(poa[0] + alvo[0]) / 2 + 30, Math.min(poa[1], alvo[1]) - 30];
+  const pt = t => [
+    (1 - t) * (1 - t) * poa[0] + 2 * (1 - t) * t * ctrl[0] + t * t * alvo[0],
+    (1 - t) * (1 - t) * poa[1] + 2 * (1 - t) * t * ctrl[1] + t * t * alvo[1]
+  ];
+  const [a, b] = fracs;
+  const p1 = pt(a), p2 = pt(b);
+  const off = separados ? 12 : 6;
+  return `<svg class="mapa" viewBox="0 0 ${W} ${H}" role="img" aria-label="Mapa da rota de Porto Alegre até ${esc(d.nome)}">
+    <path class="rs" d="M40 60 Q120 20 210 34 Q290 30 340 70 Q352 120 300 170 Q250 222 180 226 Q120 228 70 196 Q20 160 22 110 Q24 76 40 60Z"/>
+    <ellipse cx="${0.66 * W}" cy="${0.74 * H}" rx="16" ry="34" fill="#9cc6dc" opacity=".6"/>
+    <path class="rota" d="M${poa[0]} ${poa[1]} Q${ctrl[0]} ${ctrl[1]} ${alvo[0]} ${alvo[1]}"/>
+    <circle cx="${poa[0]}" cy="${poa[1]}" r="6" fill="var(--campo)"/><text x="${poa[0] - 22}" y="${poa[1] + 20}">POA</text>
+    <circle cx="${alvo[0]}" cy="${alvo[1]}" r="7" fill="var(--terra)"/>
+    <text x="${Math.min(alvo[0] - 10, W - 130)}" y="${alvo[1] - 12}">${esc(d.nome.split(' (')[0].split(' / ')[0])}</text>
+    <g class="carro-ico" transform="translate(${p1[0] - off} ${p1[1] - 8})"><circle r="9" fill="#d9822b" stroke="#fff" stroke-width="2"/><text x="-4" y="4" style="font-size:10px;fill:#fff">1</text></g>
+    <g class="carro-ico" transform="translate(${p2[0] + off} ${p2[1] + 8})"><circle r="9" fill="#3a6ea5" stroke="#fff" stroke-width="2"/><text x="-4" y="4" style="font-size:10px;fill:#fff">2</text></g>
+  </svg>`;
+}
+
+function esc(t) {
+  return String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// =============================================================
+//  SONS — gerados na hora com a Web Audio API (sem arquivos).
+// =============================================================
+const Som = (() => {
+  let ctx = null;
+  let ligado = true;
+  const pegar = () => {
+    if (!ligado) return null;
+    try {
+      if (!ctx) { const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; ctx = new C(); }
+      if (ctx.state === 'suspended') ctx.resume();
+      return ctx;
+    } catch (e) { return null; }
+  };
+  const env = (c, g, ini, pico, dur) => {
+    g.gain.setValueAtTime(0.0001, ini);
+    g.gain.exponentialRampToValueAtTime(pico, ini + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, ini + dur);
+  };
+  const tom = (freq, dur, tipo = 'sine', vol = 0.12, atraso = 0) => {
+    const c = pegar(); if (!c) return;
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = tipo; o.frequency.value = freq;
+    o.connect(g).connect(c.destination);
+    const t = c.currentTime + atraso;
+    env(c, g, t, vol, dur); o.start(t); o.stop(t + dur + 0.05);
+  };
+  const ruido = (dur, filtro = 1200, vol = 0.08) => {
+    const c = pegar(); if (!c) return;
+    const buf = c.createBuffer(1, Math.floor(c.sampleRate * dur), c.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    const src = c.createBufferSource(); src.buffer = buf;
+    const f = c.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = filtro; f.Q.value = 0.6;
+    const g = c.createGain();
+    src.connect(f).connect(g).connect(c.destination);
+    const t = c.currentTime;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.3);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.start(t); src.stop(t + dur);
+  };
+  const sons = {
+    clique: () => tom(660, 0.06, 'sine', 0.05),
+    motor: () => {
+      const c = pegar(); if (!c) return;
+      const o = c.createOscillator(), g = c.createGain(), f = c.createBiquadFilter();
+      o.type = 'sawtooth'; f.type = 'lowpass'; f.frequency.value = 380;
+      const t = c.currentTime;
+      o.frequency.setValueAtTime(48, t); o.frequency.linearRampToValueAtTime(82, t + 1.1);
+      o.connect(f).connect(g).connect(c.destination);
+      env(c, g, t, 0.09, 1.3); o.start(t); o.stop(t + 1.4);
+    },
+    buzina: () => { tom(392, 0.32, 'square', 0.05); tom(494, 0.32, 'square', 0.04); },
+    chuva: () => ruido(2.2, 1800, 0.07),
+    tacas: () => { tom(1760, 0.9, 'sine', 0.06); tom(2637, 0.7, 'sine', 0.035, 0.02); tom(1975, 0.8, 'sine', 0.05, 0.18); },
+    vitoria: () => [523, 659, 784, 1047].forEach((f, i) => tom(f, 0.35, 'triangle', 0.08, i * 0.12)),
+    ok: () => { tom(587, 0.14, 'triangle', 0.07); tom(880, 0.2, 'triangle', 0.06, 0.1); },
+    erro: () => tom(180, 0.22, 'square', 0.04),
+    foto: () => { ruido(0.12, 4000, 0.06); tom(1200, 0.05, 'square', 0.03, 0.05); }
+  };
+  return {
+    tocar: n => { try { sons[n] && sons[n](); } catch (e) { /* som é opcional */ } },
+    set ligado(v) { ligado = !!v; },
+    get ligado() { return ligado; }
+  };
+})();
+
+// =============================================================
+//  INTERFACE — cenas, HUD, diálogos. Lê e altera o estado S
+//  usando as funções de regra; nunca inventa regra própria.
+// =============================================================
+
+const palco = document.getElementById('palco');
+const hud = document.getElementById('hud');
+const dlg = document.getElementById('dlg');
+const toasts = document.getElementById('toasts');
+let S = null;               // estado da partida
+let P = carregarPrefs();    // preferências do jogador
+let pendente = null;        // evento aguardando escolha (não é salvo)
+let avisouSave = false;
+const ACOES = {};
+const reduzido = () => P.reduzir === true || (P.reduzir == null && window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+// ---------- preferências ----------
+function carregarPrefs() {
+  const pad = { tema: 'auto', escala: 1, reduzir: null, som: true, finais: [] };
+  try { return Object.assign(pad, JSON.parse(localStorage.getItem(CHAVE_PREFS) || '{}')); } catch (e) { return pad; }
+}
+function salvarPrefs() { try { localStorage.setItem(CHAVE_PREFS, JSON.stringify(P)); } catch (e) { /* ok */ } }
+function aplicarPrefs() {
+  const r = document.documentElement;
+  if (P.tema === 'auto') r.removeAttribute('data-tema'); else r.setAttribute('data-tema', P.tema);
+  r.style.setProperty('--fonte-escala', P.escala);
+  document.body.classList.toggle('sem-animacao', P.reduzir === true);
+  Som.ligado = P.som;
+}
+
+// ---------- utilidades de UI ----------
+const real = n => 'R$ ' + Math.round(n).toLocaleString('pt-BR');
+const horas = n => (Math.round(n * 10) / 10).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + 'h';
+const sinal = n => (n > 0 ? '+' : '') + n;
+function toast(msg, ms = 3200) {
+  const el = document.createElement('div');
+  el.className = 'toast'; el.textContent = msg;
+  toasts.appendChild(el);
+  setTimeout(() => el.remove(), ms);
+}
+function salvar() {
+  const ok = salvarJogo(S);
+  if (!ok && !avisouSave) { avisouSave = true; toast('Este navegador não deixa salvar. O jogo continua normalmente, só não guarda o progresso.', 5000); }
+}
+function chipsEfeitos(r) {
+  if (!r) return '';
+  const out = [];
+  Object.entries(r.acc || {}).filter(([, v]) => v).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1])).forEach(([id, v]) => {
+    out.push(`<span class="chip ${v > 0 ? 'ok' : 'ruim'}">${avatar(id, 18)}<span class="so-leitor">${nome(id)}</span> ${sinal(v)}</span>`);
+  });
+  if (r.t) out.push(`<span class="chip ${r.t > 0 ? 'ok' : 'ruim'}">⏱️ ${sinal(Math.round(r.t * 10) / 10).replace('.', ',')}h</span>`);
+  if (r.d) out.push(`<span class="chip ${r.d > 0 ? 'ok' : 'ruim'}">💰 ${r.d > 0 ? '+' : '−'}${real(Math.abs(r.d))}</span>`);
+  if (r.c) out.push(`<span class="chip ${r.c > 0 ? 'ok' : 'ruim'}">⛽ ${sinal(r.c)}%</span>`);
+  return out.length ? `<div class="efeitos" aria-label="Efeitos">${out.join('')}</div>` : '';
+}
+function render(html) {
+  palco.innerHTML = html;
+  atualizarHUD();
+}
+function focarTopo() {
+  window.scrollTo({ top: 0, behavior: reduzido() ? 'auto' : 'smooth' });
+  palco.focus({ preventScroll: true });
+}
+palco.addEventListener('click', e => {
+  const b = e.target.closest('[data-a]');
+  if (!b || b.disabled) return;
+  const fn = ACOES[b.dataset.a];
+  if (fn) { Som.tocar('clique'); fn(b.dataset, b, e); }
+});
+hud.addEventListener('click', e => {
+  const b = e.target.closest('[data-a]');
+  if (b && ACOES[b.dataset.a]) { Som.tocar('clique'); ACOES[b.dataset.a](b.dataset, b); }
+});
+
+// ---------- diálogos ----------
+let dlgFechavel = true, dlgAoFechar = null;
+function abrirDialogo(html, { fechavel = true, aoFechar = null } = {}) {
+  dlgFechavel = fechavel; dlgAoFechar = aoFechar;
+  dlg.innerHTML = `<div class="dlg">${fechavel ? '<button class="fechar" data-d="fechar" aria-label="Fechar">✕</button>' : ''}${html}</div>`;
+  if (!dlg.open) { try { dlg.showModal(); } catch (e) { dlg.setAttribute('open', ''); } }
+  const foco = dlg.querySelector('[autofocus]') || dlg.querySelector('button:not(.fechar), select, input') || dlg.querySelector('button');
+  foco && foco.focus();
+}
+function fecharDialogo() {
+  if (dlg.open) { try { dlg.close(); } catch (e) { dlg.removeAttribute('open'); } }
+  const f = dlgAoFechar; dlgAoFechar = null;
+  if (f) f();
+}
+dlg.addEventListener('cancel', e => { if (!dlgFechavel) e.preventDefault(); else { e.preventDefault(); fecharDialogo(); } });
+dlg.addEventListener('click', e => {
+  if (e.target === dlg && dlgFechavel) { fecharDialogo(); return; }
+  const b = e.target.closest('[data-d]');
+  if (!b || b.disabled) return;
+  Som.tocar('clique');
+  if (b.dataset.d === 'fechar') fecharDialogo();
+  else if (DLG[b.dataset.d]) DLG[b.dataset.d](b.dataset, b);
+});
+const DLG = {};
+
+// ---------- HUD ----------
+let hudAntes = {};
+function atualizarHUD() {
+  if (!S || S.cena === 'titulo') { hud.hidden = true; return; }
+  hud.hidden = false;
+  const h = humorMedio(S);
+  const vals = { caixa: S.caixa, tempo: S.tempo, h, c0: S.carros[0].comb, c1: S.carros[1].comb };
+  hud.innerHTML = `
+    <span class="hud-item ${S.caixa < 600 ? 'baixo' : ''}" data-k="caixa" title="Caixa do grupo"><span aria-hidden="true">💰</span><span class="so-leitor">Caixa:</span> ${real(S.caixa)}</span>
+    <span class="hud-item ${S.tempo < 0.5 ? 'baixo' : ''}" data-k="tempo" title="Horas de folga no fim de semana"><span aria-hidden="true">⏱️</span><span class="so-leitor">Folga:</span> ${horas(S.tempo)}</span>
+    <span class="hud-item ${Math.min(vals.c0, vals.c1) < 20 ? 'baixo' : ''}" data-k="comb" title="Combustível dos carros"><span aria-hidden="true">⛽</span><span class="so-leitor">Combustível:</span> ${vals.c0}% · ${vals.c1}%</span>
+    <button class="hud-item" data-a="grupo" data-k="h" aria-label="Ver o grupo, humor ${h} de 100">${emojiHumor(h)} ${h}<span class="rot">/100 · grupo</span></button>
+    <span class="hud-esp"></span>
+    <button class="hud-item" data-a="analise" title="Análise do Grupo (Henrique)" aria-label="Análise do grupo do Henrique, ${S.analises} usos">🧠 ${S.analises}</button>
+    <button class="hud-item" data-a="ajustes" aria-label="Ajustes">⚙️</button>`;
+  Object.keys(vals).forEach(k => {
+    if (hudAntes[k] != null && hudAntes[k] !== vals[k] && !reduzido()) {
+      const el = hud.querySelector(`[data-k="${k === 'c0' || k === 'c1' ? 'comb' : k}"]`);
+      el && el.classList.add('pulsa');
+    }
+  });
+  hudAntes = vals;
+}
+ACOES.grupo = () => {
+  const lista = IDS.map(id => {
+    const p = PERS[id], h = S.humor[id];
+    return `<div class="grupo-item">${avatar(id, 42, h)}<div style="flex:1"><b>${p.nome}</b> <span class="chip">${p.habilidade}</span><br><small>${p.papel}</small>
+      <div class="barra ${h < 35 ? 'baixo' : h < 55 ? 'medio' : ''}" role="meter" aria-valuenow="${h}" aria-valuemin="0" aria-valuemax="100" aria-label="Humor de ${p.nome}"><i style="width:${h}%"></i></div></div><b>${h}</b></div>`;
+  }).join('');
+  const inv = ITENS.map(i => `<span class="chip ${S.inventario[i.id] ? '' : 'falta'}" title="${esc(i.efeito)}">${i.emoji} ${i.nome}${S.inventario[i.id] ? '' : ' (perdido)'}</span>`).join('');
+  const d = destino(S);
+  abrirDialogo(`<h2 id="dlg-titulo">O grupo</h2>
+    <p class="sub">${d ? 'Destino: <b>' + esc(d.nome) + '</b> · ' : ''}El Niño: <b>${NIVEL_EL_NINO[S.clima.elNino]}</b> · Teoria do Henrique: quem termina mais estressado é <b>${nome(S.teoria)}</b>.</p>
+    <div class="grupo-lista" style="margin-top:.8rem">${lista}</div>
+    <h3 style="margin-top:1rem;font-size:1.1rem">🎒 Inventário</h3><div class="inv" style="margin-top:.4rem">${inv}</div>`);
+};
+ACOES.analise = () => {
+  const r = analiseGrupo(S);
+  if (!r) { toast('Henrique: “Estou esgotado. Sem mais análises por hoje.”'); return; }
+  salvar(); atualizarHUD();
+  const ini = id => PERS[id].nome.slice(0, 2);
+  const cor = v => v >= 2 ? '#2b7a46' : v === 1 ? '#7fb98f' : v === 0 ? 'var(--papel3)' : v === -1 ? '#e7a19a' : '#b0362f';
+  const txt = v => (v >= 1 || v <= -2 ? '#fff' : 'var(--tinta)');
+  let grade = `<div></div>` + IDS.map(id => `<div style="color:${PERS[id].cor}">${ini(id)}</div>`).join('');
+  IDS.forEach(a => {
+    grade += `<div style="color:${PERS[a].cor}">${ini(a)}</div>`;
+    IDS.forEach(b => {
+      if (a === b) { grade += '<div>—</div>'; return; }
+      const v = afinidade(a, b);
+      const mesmo = carroDe(S, a) >= 0 && carroDe(S, a) === carroDe(S, b);
+      grade += `<div style="background:${cor(v)};color:${txt(v)};${mesmo ? 'outline:2px solid var(--tinta)' : ''}" title="${nome(a)} e ${nome(b)}: ${sinal(v)}">${sinal(v)}</div>`;
+    });
+  });
+  abrirDialogo(`<h2 id="dlg-titulo">🧠 Análise do Grupo</h2>
+    <p>Henrique abre o caderninho: “Vou revelar as afinidades ocultas. Usem com responsabilidade.”</p>
+    <div class="matriz" style="grid-template-columns:repeat(8,minmax(30px,1fr))" role="img" aria-label="Tabela de afinidades entre os personagens, de menos dois a mais dois">${grade}</div>
+    <p><small>Verde = se dão bem · Vermelho = se estranham · Contorno = estão no mesmo carro. Dividir carro com quem se gosta sobe o humor; com quem se estranha, derruba.</small></p>
+    <p style="margin-top:.6rem"><b>Previsão:</b> ${avatar(r.previsao, 24)} <b>${nome(r.previsao)}</b> é quem mais tende a se estressar no próximo perrengue.</p>
+    <p>Teoria atualizada: “${nome(r.previsao)} vai terminar a viagem com o menor humor.” Se ele acertar, realiza o sonho secreto dele.</p>
+    <p><small>Usos restantes: ${S.analises}</small></p>`, { aoFechar: () => { if (S.cena === 'carros') CENAS.carros(); } });
+};
+ACOES.ajustes = () => abrirAjustes();
+function abrirAjustes() {
+  const seg = (grupo, ops, atual) => `<span class="seg" role="group" aria-label="${grupo}">${ops.map(([v, r]) => `<button data-d="pref" data-k="${grupo}" data-v="${v}" aria-pressed="${String(atual) === String(v)}">${r}</button>`).join('')}</span>`;
+  abrirDialogo(`<h2 id="dlg-titulo">⚙️ Ajustes</h2>
+    <div class="ajuste"><span>Tema</span>${seg('tema', [['auto', 'Auto'], ['claro', 'Claro'], ['escuro', 'Escuro']], P.tema)}</div>
+    <div class="ajuste"><span>Tamanho do texto</span>${seg('escala', [[0.9, 'A−'], [1, 'A'], [1.15, 'A+'], [1.3, 'A++']], P.escala)}</div>
+    <div class="ajuste"><span>Animações</span>${seg('reduzir', [['null', 'Sistema'], ['true', 'Reduzir'], ['false', 'Normais']], String(P.reduzir))}</div>
+    <div class="ajuste"><span>Som</span>${seg('som', [['true', '🔊 Ligado'], ['false', '🔇 Mudo']], String(P.som))}</div>
+    <div class="linha-btns">${S && S.cena !== 'titulo' ? '<button class="btn sec" data-d="menuInicial">Voltar à tela inicial</button>' : ''}<button class="btn sec" data-d="apagar">Apagar progresso</button></div>`);
+}
+DLG.pref = d => {
+  let v = d.v;
+  if (d.k === 'escala') v = parseFloat(v);
+  if (d.k === 'reduzir') v = v === 'null' ? null : v === 'true';
+  if (d.k === 'som') v = v === 'true';
+  P[d.k] = v; salvarPrefs(); aplicarPrefs(); abrirAjustes();
+};
+DLG.menuInicial = () => { fecharDialogo(); if (S) salvar(); ir('titulo'); };
+DLG.apagar = () => { apagarJogo(); fecharDialogo(); toast('Progresso apagado.'); S = null; ir('titulo'); };
+
+// ---------- Andriele ----------
+function perguntarAndriele(tipo, extra, depois) {
+  const q = argumentosAndriele(S, tipo, extra);
+  window.__andriele = { tipo, q, depois };
+  abrirDialogo(`<h2 id="dlg-titulo">${avatar('andriele', 40)} Andriele questiona</h2>
+    <p style="font-size:1.1rem"><b>“${esc(q.pergunta)}”</b></p>
+    <p class="sub" style="margin-top:.3rem">Escolha um argumento. Ela só aprova se bater com os dados (preço, clima, distância, votos…).</p>
+    <div class="escolhas">${q.args.map((a, i) => `<button class="btn" data-d="arg" data-i="${i}">${esc(a.txt)}</button>`).join('')}</div>`, { fechavel: false });
+}
+DLG.arg = d => {
+  const { tipo, q, depois } = window.__andriele;
+  const res = responderAndriele(S, tipo, q.args[+d.i].ok);
+  Som.tocar(res.ok ? 'ok' : 'erro');
+  abrirDialogo(`<h2 id="dlg-titulo">${avatar('andriele', 40)} ${res.ok ? 'Aprovado ✅' : 'Reprovado 🤨'}</h2>
+    <p>Você: “${esc(q.args[+d.i].txt)}”</p><p>Andriele: <b>“${esc(res.texto)}”</b></p>${chipsEfeitos(res)}
+    <div class="linha-btns"><button class="btn" data-d="fechar" autofocus>Continuar</button></div>`, { fechavel: false, aoFechar: () => depois(res) });
+};
+
+// ---------- eventos ----------
+function cartaoEvento(ev, x, rotulo = 'Evento') {
+  const ops = escolhasDisponiveis(S, ev, x);
+  return `<article class="cartao evento" aria-labelledby="ev-t"><span class="cap">${rotulo}</span><h3 id="ev-t">${esc(preencher(ev.titulo, x))}</h3>
+    <p>${esc(preencher(ev.texto, x))}</p>
+    <div class="escolhas">${ops.map(o => `<button class="btn" data-a="escolha" data-i="${o.i}">${esc(preencher(o.txt, x))}</button>`).join('')}</div></article>`;
+}
+function eventoResolvidoHTML(ev, x, i, res) {
+  return `<article class="cartao evento"><h3>${esc(preencher(ev.titulo, x))}</h3><p>${esc(preencher(ev.texto, x))}</p>
+    <div class="resultado"><p><b>➜ ${esc(preencher(ev.escolhas[i].txt, x))}</b></p><p>${esc(res.texto)}</p>${res.notas.map(n => `<p>${esc(n)}</p>`).join('')}${chipsEfeitos(res)}</div></article>`;
+}
+ACOES.escolha = d => {
+  if (!pendente) return;
+  const { ev, x, depois } = pendente;
+  const i = +d.i;
+  const res = resolverEvento(S, ev, x, i);
+  if (res.som) Som.tocar(res.som);
+  pendente = null;
+  S.feed.push(eventoResolvidoHTML(ev, x, i, res));
+  depois && depois(res);
+};
+
+// =============================================================
+//  CENAS
+// =============================================================
+const CENAS = {};
+function ir(cena) {
+  if (S) { S.cena = cena; if (cena !== 'titulo') salvar(); }
+  pendente = null;
+  CENAS[cena]();
+  focarTopo();
+}
+
+// ---------- Capítulo 0: título ----------
+CENAS.titulo = () => {
+  const save = carregarJogo();
+  const pode = save && save.cena && save.cena !== 'titulo';
+  const fin = (P.finais || []).length;
+  hud.hidden = true;
+  palco.innerHTML = `<section class="tela-titulo">
+    <div class="ceu-animado" aria-hidden="true"></div>${fundoTitulo()}
+    <div class="conteudo">
+      <div class="carros-titulo" aria-hidden="true">🚗🚙</div>
+      <h1>Rota Gaúcha<span>O Feriadão dos Sete</span></h1>
+      <p class="sub" style="margin:.8rem auto 0">Sete amigos, dois carros, um feriadão de 31/10 a 1º/11… e o El Niño mandando chuva. Escolha o destino, monte os carros e tente fazer todo mundo voltar feliz.</p>
+      <div class="linha-btns">
+        <button class="btn" data-a="novo">▶ Começar</button>
+        ${pode ? `<button class="btn terra" data-a="continuar">↻ Continuar</button>` : ''}
+        <button class="btn sec" data-a="comoJogar">Como jogar</button>
+        <button class="btn sec" data-a="vocesabia">Você sabia?</button>
+        <button class="btn sec" data-a="creditos">Créditos</button>
+        <button class="btn sec" data-a="ajustesT" aria-label="Ajustes">⚙️</button>
+      </div>
+      ${fin ? `<p class="sub" style="margin-top:.8rem">Finais descobertos: <b>${fin}/8</b></p>` : ''}
+    </div></section>`;
+};
+function sementeURL() {
+  const ler = w => { try { return new URLSearchParams(w.location.search).get('seed'); } catch (e) { return null; } };
+  let v = ler(window);
+  if (!v && window.parent !== window) v = ler(window.parent);
+  if (!v) return null;
+  return /^\d+$/.test(v) ? parseInt(v, 10) : hashTexto(v);
+}
+ACOES.novo = () => {
+  const semente = sementeURL() || (Math.floor(Math.random() * 900000) + 100000);
+  S = novoEstado(semente);
+  S.feed = []; S.chatExtra = [];
+  ir('chat');
+};
+ACOES.continuar = () => {
+  S = carregarJogo();
+  if (!S) { toast('Não achei um jogo salvo.'); return; }
+  if (!S.feed) S.feed = [];
+  toast('Viagem retomada!');
+  ir(S.cena);
+};
+ACOES.ajustesT = () => abrirAjustes();
+ACOES.comoJogar = () => abrirDialogo(`<h2 id="dlg-titulo">Como jogar</h2>${COMO_JOGAR.map(p => `<p>${esc(p)}</p>`).join('')}`);
+ACOES.vocesabia = () => abrirDialogo(`<h2 id="dlg-titulo">🌎 Você sabia?</h2><p>${esc(VOCE_SABIA)}</p>`);
+ACOES.creditos = () => abrirDialogo(`<h2 id="dlg-titulo">Créditos</h2>
+  <p>Inspirado na viagem real de Marcel, Gabriela, Cristiane, Rogério, Melise, Henrique e Andriele.</p>
+  <p>Jogo feito em HTML, CSS e JavaScript puros. Arte em SVG e sons gerados no navegador — nada de imagens ou áudios de terceiros. Os bonecos do Marcel (Capitão Chimarrão, Guria Biônica e Robô Tchê) são criações originais do jogo.</p>
+  <p>Distâncias e tempos de viagem são aproximados. Locais e atividades são descritos de forma genérica.</p>
+  <p>Licença MIT.</p>`);
+
+// ---------- Capítulo 1: grupo do WhatsApp ----------
+function msgHTML(id, txt) {
+  if (!id) return `<div class="msg sistema"><div class="balao">${txt}</div></div>`;
+  return `<div class="msg">${avatar(id, 30)}<div class="balao"><b style="color:${PERS[id].cor}">${PERS[id].nome}</b>${esc(txt)}</div></div>`;
+}
+function estrelas(n, simb = '★') { return `<span class="estrelas" aria-label="${n} de 5">${simb.repeat(n)}<span style="opacity:.25">${simb.repeat(5 - n)}</span></span>`; }
+function boletimHTML(estagio, rotulo, zona) {
+  const n = S.clima.elNino;
+  const dias = ['sab', 'dom', 'seg'].map(d => {
+    const p = previsao(S, d, estagio, zona);
+    return `<div class="dia">${DIAS[d]}<span class="pct">${p >= 60 ? '🌧️' : p >= 40 ? '🌦️' : '⛅'} ${p}%</span><small>de chuva</small></div>`;
+  }).join('');
+  return `<div class="cartao" style="margin:.8rem 0"><span class="cap">📋 Boletim do Tempo · ${rotulo}</span>
+    <div style="display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;margin-top:.3rem"><b>El Niño: ${NIVEL_EL_NINO[n]}</b>
+    <div class="medidor" style="width:140px" role="meter" aria-valuenow="${n + 1}" aria-valuemin="1" aria-valuemax="3" aria-label="Intensidade do El Niño">${[0, 1, 2].map(i => `<span class="${i <= n ? 'on' : ''}"></span>`).join('')}</div>
+    <button class="btn mini sec" data-a="vocesabia">Você sabia?</button></div>
+    <div class="boletim">${dias}</div>
+    <small class="sub">${estagio === 'quinta' ? 'Previsão de quinta: pode mudar bastante até o fim de semana.' : estagio === 'sexta' ? 'Previsão de sexta: mais confiável, mas a serra sempre surpreende.' : 'Agora.'}</small></div>`;
+}
+function cartaoDestino(d) {
+  if (d.foraDoAlcance) {
+    return `<article class="cartao dest fora"><h3>${esc(d.nome)}</h3><div class="meta">~${d.km} km · ~${horas(d.horas)} de carro</div>
+      <p class="meta">${esc(d.resumo)}</p><div class="acoes"><button class="btn mini sec" disabled aria-label="${esc(d.nome)}: fora do alcance, mais de 3 horas">🚫 Mais de 3h</button></div></article>`;
+  }
+  const red = S.redesDestino[d.id];
+  const custo = '$'.repeat(d.custo);
+  return `<article class="cartao dest" aria-labelledby="d-${d.id}">
+    <h3 id="d-${d.id}">${esc(d.nome)}</h3>
+    <div class="meta">~${d.km} km · ~${horas(d.horas)} de carro · ${{ serra: 'Serra', serraAlta: 'Serra alta', vale: 'Vale', planicie: 'Planície', litoral: 'Litoral' }[d.zona]}</div>
+    <p class="meta">${esc(d.resumo)}</p>
+    <div class="notas"><span>Paisagem</span>${estrelas(d.paisagem)}<span>Gastronomia</span>${estrelas(d.gastro)}<span>Custo</span><b>${custo}<span style="opacity:.25">${'$'.repeat(3 - d.custo)}</span></b><span>Risco c/ chuva</span><b>${d.risco}</b></div>
+    <div class="pessoas">💚 ${d.ama.map(id => avatar(id, 24) + `<span class="so-leitor">${nome(id)}</span>`).join('')} <span style="margin-left:.4rem">😒</span> ${d.torce.map(id => avatar(id, 24) + `<span class="so-leitor">${nome(id)}</span>`).join('')}</div>
+    ${d.destaque ? `<p class="meta">⭐ ${esc(d.destaque)}</p>` : ''}
+    ${red ? `<div class="redes">📱 <b>Cristiane viu nas redes:</b><br>Lotação no feriadão: <b>${red.lotacao}</b><br>${esc(red.clima)}<br>${esc(red.dica)}</div>` : ''}
+    <div class="acoes">${red ? '' : `<button class="btn mini sec" data-a="redesDest" data-id="${d.id}">📱 Cristiane olha as redes (−0,5h)</button>`}
+      <button class="btn mini" data-a="escolherDest" data-id="${d.id}">Escolher</button></div></article>`;
+}
+CENAS.chat = () => {
+  const msgs = CHAT_INICIAL.map(([id, t]) => msgHTML(id, t)).join('') + (S.chatExtra || []).join('');
+  const d = destino(S);
+  let corpo;
+  if (!d) {
+    const lista = DESTINOS.slice().sort((a, b) => (a.foraDoAlcance ? 1 : 0) - (b.foraDoAlcance ? 1 : 0));
+    corpo = `${boletimHTML('quinta', 'previsão de quinta-feira')}
+      <h2 style="margin:1rem 0 .3rem">Escolha o destino</h2>
+      <p class="sub">Regra do grupo: no máximo 3 horas de carro saindo de Porto Alegre. Bonito de paisagem e com boa comida.</p>
+      <div class="grade" style="margin-top:.8rem">${lista.map(cartaoDestino).join('')}</div>`;
+  } else {
+    corpo = `<div class="cartao" style="margin-top:1rem"><span class="cap">Destino escolhido</span><h2 style="margin:.2rem 0">${esc(d.nome)}</h2><p class="sub">${esc(d.resumo)}</p>
+      <div class="linha-btns"><button class="btn" data-a="irCarros">Montar os carros →</button></div></div>`;
+  }
+  render(`<span class="cap">Capítulo 1</span><h1 class="titulo-cena">O grupo do zap</h1>
+    <div class="chat"><div class="chat-topo"><span aria-hidden="true">💬</span><div><b>Feriadão dos 7 🚗🚙</b><br><small>${IDS.map(nome).join(', ')}</small></div></div>
+    <div class="chat-msgs" id="msgs">${msgs}</div></div>
+    <div id="pos-chat">${corpo}</div>`);
+  if (!S.chatVisto && !reduzido()) animarChat();
+  else S.chatVisto = true;
+};
+function animarChat() {
+  const caixa = document.getElementById('msgs');
+  const pos = document.getElementById('pos-chat');
+  const itens = [...caixa.children];
+  itens.forEach(el => { el.hidden = true; });
+  pos.hidden = true;
+  const pular = document.createElement('button');
+  pular.className = 'btn mini sec'; pular.textContent = 'Pular conversa ⏩'; pular.style.margin = '.6rem';
+  caixa.after(pular);
+  let i = 0, timer;
+  const fim = () => { clearTimeout(timer); itens.forEach(el => { el.hidden = false; }); pos.hidden = false; pular.remove(); S.chatVisto = true; salvar(); };
+  pular.onclick = fim;
+  const passo = () => {
+    if (!document.body.contains(caixa)) return;
+    if (i >= itens.length) { fim(); return; }
+    itens[i++].hidden = false;
+    timer = setTimeout(passo, 650);
+  };
+  passo();
+}
+ACOES.redesDest = d => {
+  const info = redesDoDestino(S, d.id);
+  Som.tocar('foto');
+  toast(`Cristiane: “Lotação ${info.lotacao}. ${info.clima}”`);
+  salvar(); CENAS.chat();
+  const el = document.getElementById('d-' + d.id); el && el.closest('article').querySelector('button[data-a="escolherDest"]').focus();
+};
+ACOES.escolherDest = d => {
+  const r = escolherDestino(S, d.id);
+  if (!r.ok) { Som.tocar('erro'); toast(r.erro); return; }
+  const dd = destino(S);
+  const ex = [msgHTML(null, `📍 Destino escolhido: <b>${esc(dd.nome)}</b>`)];
+  dd.ama.forEach(id => ex.push(msgHTML(id, frase(S, id, 'destino'))));
+  r.linhas.forEach(l => { const m = l.match(/^(\w+): “(.*)”$/); if (m) ex.push(msgHTML(IDS.find(i => nome(i) === m[1]), m[2])); });
+  ex.push(msgHTML('henrique', `Anotei no caderninho minha teoria: quem vai terminar essa viagem mais estressado é ${nome(S.teoria)}.`));
+  S.chatExtra = ex;
+  CENAS.chat();
+  perguntarAndriele('destino', {}, res => {
+    S.chatExtra.push(msgHTML('andriele', res.texto));
+    salvar(); CENAS.chat();
+    const b = palco.querySelector('[data-a="irCarros"]'); b && b.focus();
+  });
+};
+ACOES.irCarros = () => ir('carros');
+
+// ---------- Capítulo 2: carros ----------
+let selecionado = null, arrastou = false;
+function chipPessoa(id) {
+  return `<button class="pessoa" data-pessoa="${id}" aria-pressed="${selecionado === id}" aria-label="${nome(id)}${PERS[id].dirige ? ', dirige' : ''}${selecionado === id ? ', selecionado' : ''}">${avatar(id, 32)} ${nome(id)} ${PERS[id].dirige ? '<span class="dir" title="Dirige">🛞</span>' : ''}</button>`;
+}
+CENAS.carros = () => {
+  const d = destino(S);
+  const semCarro = IDS.filter(id => carroDe(S, id) < 0);
+  const zona = (titulo, membros, alvo, extra = '', rotulo = '') => `<section class="zona" data-zona="${alvo}" aria-label="${rotulo || 'Ainda sem carro'}">
+    <h3>${titulo}${alvo !== 'pool' ? `<span class="vagas">${membros.length}/5</span>` : ''}</h3>
+    <div class="lista">${membros.map(chipPessoa).join('') || '<small class="sub">Arraste ou toque em alguém e depois em “Colocar aqui”.</small>'}</div>
+    ${selecionado ? `<button class="colocar" data-a="colocar" data-z="${alvo}">↓ Colocar ${nome(selecionado)} aqui</button>` : ''}${extra}</section>`;
+  const carroExtra = i => {
+    const c = S.carros[i];
+    const pode = c.membros.filter(id => PERS[id].dirige);
+    const tensao = S.analisesUsadas > 0 ? paresDoCarro(c).reduce((a, p) => a + p.v, 0) : null;
+    return `<label class="motorista">🛞 Motorista:
+      <select data-motorista="${i}"><option value="">— escolha —</option>${pode.map(id => `<option value="${id}" ${c.motorista === id ? 'selected' : ''}>${nome(id)}</option>`).join('')}</select></label>
+      ${tensao != null && c.membros.length > 1 ? `<small>🧠 Clima no carro: <b style="color:${tensao >= 0 ? 'var(--ok)' : 'var(--ruim)'}">${sinal(tensao)}</b></small>` : ''}`;
+  };
+  render(`<span class="cap">Capítulo 2</span><h1 class="titulo-cena">Montando os carros</h1>
+    <p class="sub">Distribua os sete em dois carros (no máximo 5 em cada) e escolha quem dirige. Só quem tem 🛞 dirige. Quem vai com quem importa — o 🧠 do Henrique revela as afinidades.</p>
+    ${boletimHTML('sexta', 'previsão de sexta-feira', d.zona)}
+    <div class="garagem">
+      ${zona('🧍 Ainda sem carro', semCarro, 'pool')}
+      ${zona(`<span style="display:inline-flex">${carroSVG('#d9822b', 'Carro 1')}</span> Carro 1`, S.carros[0].membros, '0', carroExtra(0), 'Carro 1')}
+      ${zona(`<span style="display:inline-flex">${carroSVG('#3a6ea5', 'Carro 2')}</span> Carro 2`, S.carros[1].membros, '1', carroExtra(1), 'Carro 2')}
+    </div>
+    <h2 style="margin-top:1.2rem;font-size:1.3rem">Horário de saída</h2>
+    <div class="saidas" role="radiogroup" aria-label="Horário de saída">
+      ${[['cedo', '🌅 Bem cedo (6h)', 'Evita trânsito e ganha tempo. Henrique, Cristiane e Melise vão odiar.'],
+        ['meio', '☀️ Meio da manhã (9h)', 'Equilíbrio. Ninguém morre de sono, um pouco de trânsito.'],
+        ['tarde', '🌇 Depois do almoço', 'Todo mundo descansado… e todo o feriadão na estrada junto.']].map(([v, t, desc]) =>
+        `<label class="saida"><input type="radio" name="saida" value="${v}" ${S.saida === v ? 'checked' : ''}><span><b>${t}</b><br><small>${desc}</small></span></label>`).join('')}
+    </div>
+    <div id="erros" class="erros" role="alert"></div>
+    <div class="linha-btns"><button class="btn" data-a="confirmarCarros">Pé na estrada →</button><button class="btn sec" data-a="analise">🧠 Pedir análise ao Henrique (${S.analises})</button></div>`);
+  palco.querySelectorAll('select[data-motorista]').forEach(sel => sel.addEventListener('change', () => {
+    S.carros[+sel.dataset.motorista].motorista = sel.value || null; salvar(); CENAS.carros();
+  }));
+  palco.querySelectorAll('input[name="saida"]').forEach(r => r.addEventListener('change', () => { S.saida = r.value; salvar(); }));
+  ligarArrastar();
+};
+function colocar(id, alvo) {
+  const ok = moverPara(S, id, alvo === 'pool' ? -1 : +alvo);
+  if (!ok) { Som.tocar('erro'); toast('Esse carro já está cheio (máximo 5).'); }
+  selecionado = null; salvar(); CENAS.carros();
+  const b = palco.querySelector(`[data-pessoa="${id}"]`); b && b.focus();
+}
+ACOES.colocar = d => selecionado && colocar(selecionado, d.z);
+function ligarArrastar() {
+  palco.querySelectorAll('.pessoa').forEach(el => {
+    el.addEventListener('click', () => {
+      if (arrastou) { arrastou = false; return; }
+      selecionado = selecionado === el.dataset.pessoa ? null : el.dataset.pessoa;
+      CENAS.carros();
+      const b = palco.querySelector(`[data-pessoa="${el.dataset.pessoa}"]`); b && b.focus();
+    });
+    el.addEventListener('pointerdown', ini => {
+      if (ini.button !== 0) return;
+      const id = el.dataset.pessoa;
+      let fantasma = null, zonaAlvo = null;
+      const mover = e => {
+        if (!fantasma && Math.hypot(e.clientX - ini.clientX, e.clientY - ini.clientY) < 8) return;
+        if (!fantasma) {
+          fantasma = el.cloneNode(true); fantasma.classList.add('fantasma'); document.body.appendChild(fantasma);
+          el.classList.add('arrastando');
+        }
+        fantasma.style.left = e.clientX + 'px'; fantasma.style.top = e.clientY + 'px';
+        const z = document.elementFromPoint(e.clientX, e.clientY);
+        const nz = z && z.closest('.zona');
+        if (nz !== zonaAlvo) { zonaAlvo && zonaAlvo.classList.remove('alvo'); zonaAlvo = nz; zonaAlvo && zonaAlvo.classList.add('alvo'); }
+      };
+      const soltar = () => {
+        window.removeEventListener('pointermove', mover);
+        window.removeEventListener('pointerup', soltar);
+        window.removeEventListener('pointercancel', soltar);
+        if (fantasma) {
+          fantasma.remove(); el.classList.remove('arrastando');
+          arrastou = true; setTimeout(() => { arrastou = false; }, 50);
+          if (zonaAlvo) { zonaAlvo.classList.remove('alvo'); colocar(id, zonaAlvo.dataset.zona); }
+        }
+      };
+      window.addEventListener('pointermove', mover);
+      window.addEventListener('pointerup', soltar);
+      window.addEventListener('pointercancel', soltar);
+    });
+  });
+}
+ACOES.confirmarCarros = () => {
+  const erros = validarCarros(S);
+  const caixa = document.getElementById('erros');
+  if (erros.length) { Som.tocar('erro'); caixa.innerHTML = erros.map(e => '⚠️ ' + esc(e)).join('<br>'); return; }
+  caixa.innerHTML = '';
+  perguntarAndriele('carros', {}, () => {
+    const r = confirmarCarros(S);
+    iniciarEstrada(S, 'ida');
+    S.feed = [`<div class="cartao"><p><b>Saindo de Porto Alegre!</b></p>${r.linhas.map(l => `<p class="linha">${esc(l)}</p>`).join('')}${chipsEfeitos(r)}</div>`];
+    Som.tocar('motor');
+    ir('estrada');
+  });
+};
+
+// ---------- Capítulos 3 e 6: estrada ----------
+CENAS.estrada = () => {
+  const d = destino(S);
+  const ida = S.fase === 'ida';
+  const clima = climaEstrada(S);
+  const f = S.etapa / S.etapasTotal;
+  const fr = ida ? [f, Math.max(0, f - (S.separados ? 0.18 : 0.04))] : [1 - f, Math.min(1, 1 - f + (S.separados ? 0.18 : 0.04))];
+  let acao = '';
+  if (pendente) acao = cartaoEvento(pendente.ev, pendente.x, ida ? 'Na estrada' : 'Na volta');
+  else if (S.etapa < S.etapasTotal) acao = `<div class="linha-btns"><button class="btn" data-a="seguir">Seguir viagem ▶ <small>(etapa ${S.etapa + 1} de ${S.etapasTotal})</small></button></div>`;
+  else acao = `<div class="linha-btns"><button class="btn terra" data-a="chegar">${ida ? `Chegar em ${esc(d.nome.split(' / ')[0])} 🏁` : 'Chegar em casa 🏠'}</button></div>`;
+  render(`<span class="cap">${ida ? 'Capítulo 3 · A estrada' : 'Capítulo 6 · A volta'}</span>
+    <h1 class="titulo-cena">${ida ? `Rumo a ${esc(d.nome)}` : 'De volta pra Porto Alegre'}</h1>
+    <span class="clima-faixa">${CLIMAS[clima].emoji} Na estrada: ${CLIMAS[clima].nome}</span>
+    ${mapaSVG(d, fr, S.separados)}
+    <p class="sub" style="text-align:center"><small>🟠 Carro 1 (${nome(S.carros[0].motorista)} dirigindo) · 🔵 Carro 2 (${nome(S.carros[1].motorista)} dirigindo)</small></p>
+    <div class="feed">${S.feed.join('')}${acao}</div>`);
+  const alvo = palco.querySelector('.evento:last-child button, [data-a="seguir"], [data-a="chegar"]');
+  if (alvo && S.feed.length > 1) { alvo.scrollIntoView({ block: 'center', behavior: reduzido() ? 'auto' : 'smooth' }); alvo.focus({ preventScroll: true }); }
+};
+ACOES.seguir = () => {
+  salvar();
+  const r = avancarEtapa(S);
+  Som.tocar('motor');
+  if (ehChuva(climaEstrada(S))) setTimeout(() => Som.tocar('chuva'), 300);
+  S.feed.push(`<p class="linha">🛣️ Etapa ${S.etapa} de ${S.etapasTotal}. ${r.linhas.map(esc).join(' ')}</p>${chipsEfeitos(r) ? `<div style="padding-left:.8rem">${chipsEfeitos(r)}</div>` : ''}`);
+  const sorteio = sortearEvento(S, S.fase);
+  if (sorteio) pendente = { ev: sorteio.ev, x: sorteio.x, depois: () => { salvar(); CENAS.estrada(); } };
+  else salvar();
+  CENAS.estrada();
+};
+ACOES.chegar = () => {
+  if (S.fase === 'ida') {
+    const r = chegarAoDestino(S);
+    S.feed = [];
+    S.turnoIniciado = null;
+    toast(`Chegaram! Hospedagem para o grupo: ${real(r.hosp)}.`);
+    ir('destino');
+  } else {
+    Som.tocar('vitoria');
+    ir('final');
+  }
+};
+
+// ---------- Capítulo 4: destino ----------
+CENAS.destino = () => {
+  const d = destino(S);
+  const t = turnoAtual(S);
+  if (S.turnoIniciado !== S.turnoIdx) {
+    const r = iniciarTurno(S);
+    S.turnoIniciado = S.turnoIdx; S.turnoFeito = false; S.turnoPerdido = r.perdido; S.precisaEvento = false;
+    S.feed = [];
+    if (r.perdido) S.feed.push(`<div class="cartao"><p><b>⏰ Sem folga!</b> Os atrasos se acumularam e este turno virou correria: check-in, fila, banheiro… e acabou o tempo.</p>${chipsEfeitos(r)}</div>`);
+    salvar();
+  }
+  const sabe = S.redesTurno[t.id] || S.turnoFeito;
+  const climaTxt = sabe ? `${CLIMAS[S.climaTurno].emoji} Agora: ${CLIMAS[S.climaTurno].nome}` : `🔮 Previsão: ${previsao(S, t.dia, 'sexta', d.zona)}% de chuva (a real, só olhando lá fora… ou nas redes)`;
+  const turnos = TURNOS.filter(x => x.id !== 'segM' || S.ficou).map((x, i) => `<span class="t ${i === S.turnoIdx ? 'atual' : i < S.turnoIdx ? 'feito' : ''}">${x.nome}</span>`).join('');
+  let corpo = '';
+  if (t.id === 'sabN' && !S.halloweenFeito && !S.turnoPerdido) {
+    if (!pendente) {
+      const x = contextoEvento(S, 'destino');
+      pendente = { ev: EVENTO_HALLOWEEN, x, depois: () => { S.halloweenFeito = true; salvar(); CENAS.destino(); } };
+    }
+    corpo = cartaoEvento(pendente.ev, pendente.x, '🎃 Evento especial');
+  } else if (S.turnoPerdido && !S.turnoFeito) {
+    corpo = `<div class="linha-btns"><button class="btn" data-a="perdeuTurno">Seguir →</button></div>`;
+  } else if (!S.turnoFeito) {
+    const lista = atividadesDoTurno(S);
+    corpo = `<div class="linha-btns" style="margin-top:0">${S.redesTurno[t.id] ? '<span class="chip info">📱 Cristiane já pesquisou este turno</span>' : '<button class="btn sec" data-a="redesTurno">📱 Cristiane olha as redes (−0,5h)</button>'}</div>
+      <h2 style="margin:1rem 0 .5rem;font-size:1.3rem">O que o grupo faz agora?</h2>
+      <div class="grade">${lista.map(cartaoAtividade).join('')}</div>`;
+  } else {
+    if (S.precisaEvento && !pendente) {
+      const sorteio = sortearEvento(S, 'destino');
+      S.precisaEvento = false;
+      if (sorteio) pendente = { ev: sorteio.ev, x: sorteio.x, depois: () => { salvar(); CENAS.destino(); } };
+      else salvar();
+    }
+    if (pendente) corpo = cartaoEvento(pendente.ev, pendente.x, 'Imprevisto');
+    else {
+      const prox = t.id === 'domT' ? 'Domingo à tarde… e agora? →' : t.id === 'segM' ? 'Pegar a estrada de volta →' : 'Próximo turno →';
+      corpo = `<div class="linha-btns"><button class="btn" data-a="proxTurno">${prox}</button></div>`;
+    }
+  }
+  render(`<span class="cap">Capítulo 4 · No destino</span><h1 class="titulo-cena">${esc(d.nome)}</h1>
+    <div class="turnos" aria-label="Turnos">${turnos}</div>
+    <h2 style="font-size:1.25rem">${t.nome}</h2>
+    <p><span class="clima-faixa">${climaTxt}</span></p>
+    <div class="feed">${S.feed.join('')}${corpo}</div>`);
+};
+function cartaoAtividade({ atv, bloqueada, lotado }) {
+  const t = turnoAtual(S);
+  const sabe = S.redesTurno[t.id];
+  const chips = [];
+  chips.push(`<span class="chip">${{ arlivre: '🌳 Ao ar livre', coberta: '🏠 Coberta', gastronomia: '🍽️ Gastronomia', noite: '🌙 Noite' }[atv.tipo]}</span>`);
+  chips.push(atv.chuva ? '<span class="chip ok">☔ Funciona na chuva</span>' : '<span class="chip ruim">☀️ Depende do tempo</span>');
+  if (atv.tags.includes('bebida')) chips.push(atv.semAlcool ? '<span class="chip ok">🍇 Tem opção sem álcool</span>' : '<span class="chip ruim">🍷 Centrado em bebida</span>');
+  if (podeCena(S, atv)) chips.push('<span class="chip">🎬 Cena do Marcel</span>');
+  if (sabe && lotado) chips.push('<span class="chip ruim">🔥 Lotado hoje</span>');
+  if (atv.escondido) chips.push('<span class="chip info">💎 Lugar escondido</span>');
+  const tags = atv.tags.map(tg => `${ICONE_TAG[tg] || ''} ${ROTULO_TAG[tg] || tg}`).join(' · ');
+  if (bloqueada) {
+    return `<button class="cartao atv" disabled aria-label="${esc(atv.nome)}: bloqueada"><h3>🔒 ${esc(atv.nome)}</h3><span class="desc">🧗 Ideia da Melise. Destrava quando ela aprontar alguma (perder alguma coisa) — ou se ela estiver muito animada.</span></button>`;
+  }
+  return `<button class="cartao atv ${atv.escondido || atv.melise ? 'especial' : ''}" data-a="atividade" data-id="${atv.id}">
+    <h3>${atv.melise ? '🧗 ' : ''}${esc(atv.nome)}</h3>${atv.desc ? `<span class="desc">${esc(atv.desc)}</span>` : ''}
+    <span class="desc">${tags}</span>
+    <span class="chips">${chips.join('')}</span>
+    <span class="desc"><b>${atv.custo ? real(atv.custo) : 'Grátis'}</b> · ${atv.tempo > 0 ? '⏱️ +' + horas(atv.tempo) : atv.tempo < 0 ? '⏱️ recupera ' + horas(-atv.tempo) : '⏱️ cabe no turno'}${atv.pais ? ' · 🏞️ ' + atv.pais : ''}${atv.gas ? ' · 🍽️ ' + atv.gas : ''}</span></button>`;
+}
+ACOES.redesTurno = () => {
+  redesDoTurno(S);
+  Som.tocar('foto');
+  const algunsLotados = atividadesDoTurno(S).filter(a => a.lotado).length;
+  toast(`Cristiane: “Agora tá ${CLIMAS[S.climaTurno].nome.toLowerCase()}. ${algunsLotados ? algunsLotados + ' lugar(es) lotado(s).' : 'Nada lotado!'}${S.escondidoRevelado === 'cristiane' && !S.feitas.some(f => f.id.endsWith('_escondido')) ? ' E achei um lugar escondido 💎' : ''}”`, 4500);
+  salvar(); CENAS.destino();
+};
+ACOES.atividade = d => {
+  const dd = destino(S);
+  const atv = d.id === 'descanso' ? DESCANSO : dd.atividades.find(a => a.id === d.id);
+  const t = turnoAtual(S);
+  const sabe = S.redesTurno[t.id];
+  const avisos = [];
+  if (!sabe && atv.id !== 'descanso') avisos.push('📱 Ninguém pediu pra Cristiane olhar as redes: ela vai ficar do contra.');
+  if (!atv.chuva) avisos.push(sabe ? `☁️ Tempo agora: ${CLIMAS[S.climaTurno].emoji} ${CLIMAS[S.climaTurno].nome}.` : `☁️ Depende do tempo, e a previsão é de ${previsao(S, t.dia, 'sexta', dd.zona)}% de chuva.`);
+  if (atv.tags.includes('bebida') && !atv.semAlcool) avisos.push('🌿 A Gabriela não curte lugares centrados em bebida.');
+  if (S.tempo - atv.tempo < 0) avisos.push('⏰ Isso vai estourar a folga: o próximo turno pode ser perdido.');
+  window.__atv = atv.id;
+  abrirDialogo(`<h2 id="dlg-titulo">${esc(atv.nome)}</h2>${atv.desc ? `<p>${esc(atv.desc)}</p>` : ''}
+    <p><b>${atv.custo ? real(atv.custo) : 'Grátis'}</b>${atv.tempo > 0 ? ' · gasta ' + horas(atv.tempo) + ' de folga' : ''}</p>
+    ${avisos.map(a => `<p class="sub">${a}</p>`).join('')}
+    ${atv.semAlcool ? '<label class="opcao"><input type="checkbox" id="opSem" checked><span><b>Versão sem álcool</b><br><small>Suco de uva, caldo de cana, café… A Gabriela agradece.</small></span></label>' : ''}
+    ${podeCena(S, atv) ? '<label class="opcao"><input type="checkbox" id="opCena"><span><b>🎬 Deixar o Marcel montar uma cena com os bonecos</b><br><small>Gasta 0,75h. Com paisagem nota 5 e tempo bom, vira FOTO ÉPICA.</small></span></label>' : (atv.cena ? `<p class="sub">🎬 Sem cena: ${!S.inventario.carregador ? 'sem carregador, sem foto' : 'os bonecos sumiram'}.</p>` : '')}
+    <div class="linha-btns"><button class="btn" data-d="fazer" autofocus>Bora! 🚶</button><button class="btn sec" data-d="fechar">Escolher outra</button></div>`);
+};
+DLG.fazer = () => {
+  const semAlcool = !!(dlg.querySelector('#opSem') || {}).checked;
+  const cena = !!(dlg.querySelector('#opCena') || {}).checked;
+  fecharDialogo();
+  const r = fazerAtividade(S, window.__atv, { semAlcool, cena });
+  if (ehChuva(r.clima)) Som.tocar('chuva');
+  else if (r.atv.tags.includes('bebida') || r.atv.tipo === 'gastronomia') Som.tocar('tacas');
+  if (r.foto) Som.tocar('foto');
+  const ultimaFoto = S.album.slice().reverse().find(a => a.tipo === 'boneco');
+  const fotoHTML = r.foto && ultimaFoto ? `<div class="album" style="max-width:220px;margin-top:.6rem">${fotoAlbum(ultimaFoto, S.album.length)}</div>` : '';
+  S.feed.push(`<article class="cartao"><span class="cap">${CLIMAS[r.clima].emoji} ${CLIMAS[r.clima].nome}</span><h3>${esc(r.atv.nome)}</h3>
+    <div class="resultado">${r.linhas.length ? r.linhas.map(l => `<p>${esc(l)}</p>`).join('') : '<p>Tudo tranquilo. Programa cumprido.</p>'}${chipsEfeitos({ acc: r.acc, t: -r.atv.tempo, d: -r.atv.custo })}</div>${fotoHTML}</article>`);
+  S.turnoFeito = true;
+  S.precisaEvento = R(S) < 0.5;
+  salvar();
+  CENAS.destino();
+};
+ACOES.perdeuTurno = () => { S.turnoFeito = true; salvar(); CENAS.destino(); };
+ACOES.proxTurno = () => {
+  const t = turnoAtual(S);
+  if (t.id === 'domT') { ir('finados'); return; }
+  if (t.id === 'segM') { iniciarEstrada(S, 'volta'); S.feed = [`<p class="linha">Hora de voltar. Malas no porta-malas, chimarrão na térmica.</p>`]; ir('estrada'); return; }
+  proximoTurno(S);
+  ir('destino');
+};
+
+// ---------- Capítulo 5: Finados ----------
+CENAS.finados = () => {
+  const v = votosFinados(S);
+  const votos = IDS.map(id => `<div class="cartao voto">${avatar(id, 34, S.humor[id])}<b>${nome(id)}</b><span class="v" style="color:${v.votos[id] ? 'var(--ok)' : 'var(--ruim)'}">${v.votos[id] ? '👍 Ficar' : '👎 Voltar'}</span></div>`).join('');
+  render(`<span class="cap">Capítulo 5</span><h1 class="titulo-cena">A tentação do Finados</h1>
+    <p class="sub">Domingo à tarde. A Melise solta no grupo: <b>“E se a gente ficasse até segunda? É feriado!”</b></p>
+    <div class="cartao" style="margin-top:.8rem"><div class="chips">
+      <span class="chip">🌦️ Previsão de segunda: ${v.seg}% de chuva</span><span class="chip">🛏️ Mais uma noite: ${real(v.hosp)}</span><span class="chip">💰 No caixa: ${real(S.caixa)}</span><span class="chip">⏱️ Ficar = mais um turno de passeio</span></div>
+      <p class="sub" style="margin-top:.4rem">Ficar: mais custo e estrada cheia de feriado na volta. Voltar hoje: trânsito de domingo, mas cama própria.</p></div>
+    <h2 style="margin-top:1rem;font-size:1.3rem">A votação</h2>
+    <div class="votos">${votos}</div>
+    <p class="sub">Cristiane: “${v.votos.cristiane ? 'Já que quase ninguém quer ficar, eu fico. Alguém tem que ser do contra.' : 'Todo mundo quer ficar? Então eu quero voltar.'}” · Placar: <b>${v.ficar} a ${7 - v.ficar}</b> pra ficar.</p>
+    <div class="linha-btns"><button class="btn" data-a="finados" data-f="1">Ficar até segunda 🕯️</button><button class="btn sec" data-a="finados" data-f="0">Voltar hoje 🏠</button></div>`);
+};
+ACOES.finados = dd => {
+  const ficar = dd.f === '1';
+  const v = votosFinados(S);
+  perguntarAndriele('finados', { ficar, votosFicar: v.ficar }, () => {
+    const r = decidirFinados(S, ficar);
+    toast(ficar ? `Decidido: ficam até segunda! (−${real(r.hosp)})` : 'Decidido: voltam hoje.');
+    if (ficar) { S.turnoIdx = 4; S.turnoIniciado = null; S.feed = []; ir('destino'); }
+    else { iniciarEstrada(S, 'volta'); S.feed = [`<p class="linha">Domingo à tarde, malas no carro. O trânsito de volta do feriado espera.</p>`]; ir('estrada'); }
+  });
+};
+
+// ---------- Final ----------
+CENAS.final = () => {
+  const r = calcularResumo(S);
+  const fim = escolherFinal(r);
+  if (!(P.finais || []).includes(fim.id)) { P.finais = (P.finais || []).concat(fim.id); salvarPrefs(); }
+  S.final = fim.id;
+  const texto = typeof fim.texto === 'function' ? fim.texto(r) : fim.texto;
+  const sonhos = IDS.map(id => `<div class="cartao sonho">${avatar(id, 34, S.humor[id])}<div><b>${nome(id)}</b><br><small>${esc(PERS[id].sonho)}</small></div><span class="marca" aria-label="${r.listaSonhos[id] ? 'realizado' : 'não realizado'}">${r.listaSonhos[id] ? '🌟' : '·'}</span></div>`).join('');
+  const album = S.album.slice(0, 24).map(fotoAlbum).join('') || '<p class="sub">Nenhuma foto… o carregador ficou em algum posto da serra.</p>';
+  const frases = IDS.map(id => `<div class="msg">${avatar(id, 30, S.humor[id])}<div class="balao"><b style="color:${PERS[id].cor}">${nome(id)}</b>${esc(S.humor[id] >= 45 ? frase(S, id, 'final') : frase(S, id, 'triste'))}</div></div>`).join('');
+  const descobertos = FINAIS.map(f => (P.finais || []).includes(f.id) ? `<span class="chip ok">${f.emoji} ${f.titulo}</span>` : `<span class="chip">${f.secreto ? '🔒 Final secreto' : '❔ ???'}</span>`).join('');
+  render(`<section class="cartao final-topo"><span class="cap">Final ${fim.secreto ? 'secreto ' : ''}desbloqueado</span>
+      <div class="emo" aria-hidden="true">${fim.emoji}</div><h1 class="titulo-cena" style="margin:.2rem 0">${esc(fim.titulo)}</h1>
+      <p style="max-width:62ch;margin:0 auto">${esc(texto)}</p>
+      <div class="pontos" style="margin-top:.8rem">${r.pontos.toLocaleString('pt-BR')} pontos</div>
+      <div class="chips" style="justify-content:center">
+        <span class="chip">😊 Humor ${r.humor}/100</span><span class="chip">🌟 Sonhos ${r.sonhos}/7</span><span class="chip">🏞️ Paisagem vivida ${r.pais}</span>
+        <span class="chip">🍽️ Gastronomia ${r.gastro}</span><span class="chip">💰 Sobrou ${real(S.caixa)}</span><span class="chip">🧸 ${r.fotosBoneco} fotos de boneco</span><span class="chip">🧳 ${r.perdidos} itens perdidos</span>
+      </div>
+      <div class="linha-btns" style="justify-content:center"><button class="btn" data-a="compartilhar">📋 Compartilhar resultado</button><button class="btn terra" data-a="denovo">↻ Jogar de novo</button><button class="btn sec" data-a="mesmaSemente">Mesma semente (${S.seed})</button></div>
+    </section>
+    <section class="secao"><h2>🌟 Sonhos secretos</h2><div class="sonhos">${sonhos}</div></section>
+    <section class="secao"><div class="laudo"><h3>📋 Laudo psicológico do grupo</h3><p><small>Dr. Henrique (autodeclarado)</small></p>${laudoHenrique(S, r).map(p => `<p>${esc(p)}</p>`).join('')}</div></section>
+    <section class="secao"><h2>📸 Álbum da viagem</h2><div class="album">${album}</div></section>
+    <section class="secao"><h2>💬 Últimas mensagens no grupo</h2><div class="chat"><div class="chat-msgs">${frases}</div></div></section>
+    <section class="secao"><h2>🏁 Finais descobertos (${(P.finais || []).length}/8)</h2><div class="chips">${descobertos}</div></section>`);
+  salvar();
+};
+ACOES.compartilhar = () => {
+  const r = calcularResumo(S);
+  const txt = textoCompartilhar(S, r, escolherFinal(r));
+  const fallback = () => {
+    const ta = document.createElement('textarea'); ta.value = txt; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    ta.remove();
+    if (ok) toast('Resumo copiado! Cola no grupo 😉');
+    else abrirDialogo(`<h2 id="dlg-titulo">Copie o resumo</h2><textarea readonly style="width:100%;min-height:180px;padding:.6rem;border-radius:10px;border:1px solid var(--borda);background:var(--papel)">${esc(txt)}</textarea>`);
+  };
+  try {
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(txt).then(() => toast('Resumo copiado! Cola no grupo 😉'), fallback);
+    else fallback();
+  } catch (e) { fallback(); }
+};
+ACOES.denovo = () => { apagarJogo(); S = novoEstado(Math.floor(Math.random() * 900000) + 100000); S.feed = []; S.chatExtra = []; ir('chat'); };
+ACOES.mesmaSemente = () => { const sd = S.seed; apagarJogo(); S = novoEstado(sd); S.feed = []; S.chatExtra = []; ir('chat'); };
+
+// ---------- início ----------
+if (window.parent !== window) document.body.classList.add('embutido');
+aplicarPrefs();
+CENAS.titulo();
+
 </script>
 </template>
 
